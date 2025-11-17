@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord | Cabinet Médical</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Barre latérale -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-hospital-alt"></i> Cabinet</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active"><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+            <li><a href="rendez-vous.html"><i class="fas fa-calendar-check"></i> Rendez-vous</a></li>
+            <li><a href="patients.html"><i class="fas fa-users"></i> Patients</a></li>
+            <li><a href="salles.html"><i class="fas fa-door-open"></i> Salles</a></li>
+            <li><a href="facturation.html"><i class="fas fa-file-invoice-dollar"></i> Facturation</a></li>
+            <li><a href="profile.html"><i class="fas fa-user-cog"></i> Profil</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="main-content">
+        <header class="main-header">
+            <h1>Tableau de bord</h1>
+            <div class="user-info">
+                <span>Dr. Dupont Jean</span>
+                <img src="assets/icons/user-avatar.png" alt="Avatar" class="user-avatar">
+            </div>
+        </header>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-icon bg-primary"><i class="fas fa-calendar-day"></i></div>
+                <div class="card-info">
+                    <h3>Rendez-vous aujourd'hui</h3>
+                    <p id="todayAppointments">12</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon bg-success"><i class="fas fa-users"></i></div>
+                <div class="card-info">
+                    <h3>Patients actifs</h3>
+                    <p id="activePatients">89</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon bg-warning"><i class="fas fa-door-open"></i></div>
+                <div class="card-info">
+                    <h3>Salles occupées</h3>
+                    <p id="busyRooms">3/5</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon bg-danger"><i class="fas fa-file-invoice-dollar"></i></div>
+                <div class="card-info">
+                    <h3>Factures en attente</h3>
+                    <p id="pendingInvoices">5</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-sections">
+            <div class="section">
+                <h2><i class="fas fa-calendar-alt"></i> Prochains rendez-vous</h2>
+                <table id="upcomingAppointments">
+                    <thead>
+                        <tr>
+                            <th>Heure</th>
+                            <th>Patient</th>
+                            <th>Praticien</th>
+                            <th>Salle</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamically filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="section">
+                <h2><i class="fas fa-chart-line"></i> Activité mensuelle</h2>
+                <canvas id="activityChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
