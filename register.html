@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCare31 – Créer mon espace patient</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-dark:  #2c5f9e;
+    --blue-mid:   #3a74be;
+    --blue-light: #4f8fda;
+    --blue-pale:  #e8f1fb;
+    --gold:       #e8a838;
+    --gold-pale:  #fdf3e0;
+    --green:      #12b76a;
+    --green-pale: #ecfdf3;
+    --red:        #f04438;
+    --red-pale:   #fef3f2;
+    --text-dark:  #1e2d45;
+    --text-mid:   #4a5f7a;
+    --text-light: #8fa3bc;
+    --bg:         #eef2f7;
+    --white:      #ffffff;
+    --border:     #d6e2f0;
+    --radius:     14px;
+    --shadow:     0 8px 40px rgba(44,95,158,.16);
+  }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* BG */
+  .bg-deco {
+    position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
+  }
+  .bg-deco::before {
+    content: ''; position: absolute;
+    top: -160px; left: -160px; width: 560px; height: 560px;
+    background: radial-gradient(circle, rgba(79,143,218,.16) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .bg-deco::after {
+    content: ''; position: absolute;
+    bottom: -120px; right: -120px; width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(44,95,158,.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .bg-circles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .bg-circles span {
+    position: absolute; border-radius: 50%;
+    border: 1.5px solid rgba(79,143,218,.10);
+  }
+  .bg-circles span:nth-child(1) { width: 300px; height: 300px; top: 8%;  left: 4%; }
+  .bg-circles span:nth-child(2) { width: 180px; height: 180px; top: 55%; left: 1%; }
+  .bg-circles span:nth-child(3) { width: 240px; height: 240px; top: 4%;  right: 6%; }
+  .bg-circles span:nth-child(4) { width: 130px; height: 130px; bottom: 12%; right: 3%; }
+
+  /* NAV */
+  nav {
+    position: relative; z-index: 10;
+    background: var(--blue-dark);
+    display: flex; align-items: center;
+    padding: 0 36px; height: 58px; gap: 16px;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    color: #fff; font-family: 'Nunito', sans-serif;
+    font-weight: 800; font-size: 1.22rem;
+    letter-spacing: -.3px; text-decoration: none;
+  }
+  .logo-icon {
+    width: 32px; height: 32px; background: rgba(255,255,255,.18);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 20px; height: 20px; fill: #fff; }
+  .nav-tagline { margin-left: auto; color: rgba(255,255,255,.55); font-size: .84rem; }
+  .nav-login {
+    color: rgba(255,255,255,.85); font-size: .85rem; font-weight: 600;
+    text-decoration: none; padding: 6px 14px;
+    border: 1.5px solid rgba(255,255,255,.3); border-radius: 7px;
+    transition: background .15s, border-color .15s;
+  }
+  .nav-login:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.5); }
+
+  /* PAGE */
+  .page {
+    position: relative; z-index: 1;
+    flex: 1; display: flex; align-items: flex-start;
+    justify-content: center; padding: 36px 24px 48px;
+  }
+
+  /* STEPPER WRAPPER */
+  .wrapper {
+    width: 100%; max-width: 780px;
+    animation: popIn .5s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: translateY(20px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* PROGRESS STEPPER */
+  .stepper {
+    display: flex; align-items: center;
+    margin-bottom: 24px; gap: 0;
+  }
+
+  .step {
+    display: flex; align-items: center; gap: 10px; flex: 1;
+    position: relative;
+  }
+
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: calc(22px + 10px); right: 0;
+    top: 50%; transform: translateY(-50%);
+    height: 2px;
+    background: var(--border);
+    transition: background .4s;
+    z-index: 0;
+  }
+
+  .step.done:not(:last-child)::after { background: var(--blue-mid); }
+
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .88rem;
+    border: 2px solid var(--border);
+    background: var(--white); color: var(--text-light);
+    transition: all .3s; z-index: 1; position: relative;
+  }
+
+  .step.active .step-num {
+    background: var(--blue-dark); border-color: var(--blue-dark);
+    color: #fff; box-shadow: 0 0 0 4px rgba(44,95,158,.15);
+  }
+
+  .step.done .step-num {
+    background: var(--blue-mid); border-color: var(--blue-mid); color: #fff;
+  }
+
+  .step-num svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2.5; display: none; }
+  .step.done .step-num svg { display: block; }
+  .step.done .step-num span { display: none; }
+
+  .step-label { display: flex; flex-direction: column; z-index: 1; }
+  .step-label strong { font-size: .82rem; font-weight: 700; color: var(--text-dark); }
+  .step-label small  { font-size: .72rem; color: var(--text-light); }
+
+  .step.active .step-label strong { color: var(--blue-dark); }
+  .step:not(.active):not(.done) .step-label strong { color: var(--text-light); }
+
+  /* CARD */
+  .card {
+    background: var(--white); border-radius: 18px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+
+  .card-header {
+    padding: 28px 36px 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 22px;
+  }
+
+  .step-title { font-family: 'Nunito', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
+  .step-desc  { font-size: .88rem; color: var(--text-light); }
+
+  .card-body { padding: 28px 36px; }
+
+  /* FORM GRID */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 22px;
+  }
+
+  .full { grid-column: 1 / -1; }
+
+  /* FORM ELEMENTS */
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  label {
+    font-size: .82rem; font-weight: 600; color: var(--text-mid);
+  }
+
+  label .req { color: var(--red); margin-left: 2px; }
+
+  .input-wrap { position: relative; }
+
+  .input-wrap > svg:first-child {
+    position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; stroke: var(--text-light); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    pointer-events: none; transition: stroke .2s; z-index: 1;
+  }
+
+  .input-wrap:focus-within > svg:first-child { stroke: var(--blue-mid); }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%; padding: 10px 13px 10px 40px;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: .9rem; font-family: inherit; color: var(--text-dark);
+    background: var(--white); outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    appearance: none;
+  }
+
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238fa3bc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px; }
+
+  textarea { padding: 10px 13px; resize: vertical; min-height: 76px; }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(79,143,218,.14);
+  }
+
+  input.error, select.error { border-color: var(--red); }
+  input.error:focus, select.error:focus { box-shadow: 0 0 0 3px rgba(240,68,56,.12); }
+  input.valid { border-color: var(--green); }
+
+  .field-error { font-size: .75rem; color: var(--red); margin-top: 4px; display: none; }
+  .field-error.show { display: block; }
+
+  /* no-icon inputs */
+  .no-icon input, .no-icon select, .no-icon textarea {
+    padding-left: 13px;
+  }
+
+  /* PASSWORD STRENGTH */
+  .pwd-wrap { position: relative; }
+  .eye-toggle {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--text-light);
+    display: flex; align-items: center; padding: 4px;
+  }
+  .eye-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+  .strength-bar {
+    display: flex; gap: 4px; margin-top: 6px;
+  }
+  .strength-bar span {
+    flex: 1; height: 4px; border-radius: 99px;
+    background: var(--border); transition: background .3s;
+  }
+  .strength-label { font-size: .73rem; color: var(--text-light); margin-top: 4px; }
+
+  /* RADIO GROUP */
+  .radio-group {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+
+  .radio-opt {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 16px; border: 1.5px solid var(--border);
+    border-radius: 9px; cursor: pointer;
+    transition: border-color .15s, background .15s;
+    font-size: .88rem; color: var(--text-mid); font-weight: 500;
+  }
+
+  .radio-opt input { display: none; }
+
+  .radio-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .15s;
+  }
+
+  .radio-dot::after {
+    content: ''; width: 7px; height: 7px;
+    border-radius: 50%; background: var(--blue-dark);
+    opacity: 0; transform: scale(.5);
+    transition: opacity .15s, transform .15s;
+  }
+
+  .radio-opt:has(input:checked) {
+    border-color: var(--blue-dark); background: var(--blue-pale);
+    color: var(--blue-dark);
+  }
+
+  .radio-opt:has(input:checked) .radio-dot {
+    border-color: var(--blue-dark);
+  }
+
+  .radio-opt:has(input:checked) .radio-dot::after {
+    opacity: 1; transform: scale(1);
+  }
+
+  /* CHECKBOX */
+  .checkbox-wrap {
+    display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+  }
+  .checkbox-wrap input { display: none; }
+  .custom-cb {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;
+    border: 1.5px solid var(--border); border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, border-color .15s;
+  }
+  .custom-cb svg { display: none; width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2.5; }
+  .checkbox-wrap input:checked ~ .custom-cb { background: var(--blue-mid); border-color: var(--blue-mid); }
+  .checkbox-wrap input:checked ~ .custom-cb svg { display: block; }
+  .cb-label { font-size: .83rem; color: var(--text-mid); line-height: 1.5; }
+  .cb-label a { color: var(--blue-mid); text-decoration: none; font-weight: 600; }
+  .cb-label a:hover { text-decoration: underline; }
+
+  /* HINT */
+  .hint {
+    display: flex; align-items: flex-start; gap: 8px;
+    background: var(--blue-pale); border-radius: 9px;
+    padding: 11px 14px; font-size: .8rem; color: var(--text-mid);
+    line-height: 1.5;
+  }
+  .hint svg { width: 15px; height: 15px; stroke: var(--blue-mid); fill: none; stroke-width: 1.8; flex-shrink: 0; margin-top: 1px; }
+
+  /* DIVIDER */
+  .section-divider {
+    grid-column: 1 / -1; display: flex; align-items: center; gap: 10px;
+    margin: 4px 0 2px;
+  }
+  .section-divider span { font-size: .78rem; font-weight: 700; color: var(--text-light); white-space: nowrap; text-transform: uppercase; letter-spacing: .06em; }
+  .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* CARD FOOTER */
+  .card-footer {
+    padding: 20px 36px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 24px; border-radius: 10px;
+    font-size: .9rem; font-weight: 700; font-family: inherit;
+    cursor: pointer; transition: all .15s; border: none;
+  }
+  .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; flex-shrink: 0; }
+
+  .btn-next {
+    background: var(--blue-dark); color: #fff;
+    box-shadow: 0 4px 14px rgba(44,95,158,.28);
+  }
+  .btn-next:hover { background: var(--blue-mid); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(44,95,158,.34); }
+
+  .btn-back {
+    background: var(--bg); color: var(--text-mid);
+    border: 1.5px solid var(--border);
+  }
+  .btn-back:hover { background: #e0e8f4; }
+
+  .btn-submit-final {
+    background: var(--green); color: #fff;
+    box-shadow: 0 4px 14px rgba(18,183,106,.25);
+  }
+  .btn-submit-final:hover { background: #0ea55e; transform: translateY(-1px); }
+
+  /* STEPS */
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+
+  /* SUMMARY */
+  .summary-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px;
+  }
+  .summary-item { display: flex; flex-direction: column; gap: 2px; }
+  .summary-label { font-size: .73rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: .05em; }
+  .summary-value { font-size: .9rem; font-weight: 600; color: var(--text-dark); }
+  .edit-link { font-size: .77rem; color: var(--blue-mid); text-decoration: none; font-weight: 600; }
+  .edit-link:hover { text-decoration: underline; }
+
+  /* SUCCESS */
+  .success-view {
+    display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 56px 36px; gap: 14px;
+  }
+  .success-view.show { display: flex; }
+  .success-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--green-pale); border: 2px solid #a6f4c5;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 4px;
+    animation: bounce .5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  @keyframes bounce {
+    0%,100% { transform: scale(1); }
+    40% { transform: scale(1.15); }
+    70% { transform: scale(.95); }
+  }
+  .success-icon svg { width: 34px; height: 34px; stroke: var(--green); fill: none; stroke-width: 2.5; }
+  .success-title { font-family: 'Nunito', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text-dark); }
+  .success-text  { font-size: .9rem; color: var(--text-mid); max-width: 340px; line-height: 1.6; }
+  .success-email { font-weight: 700; color: var(--blue-dark); }
+  .btn-go { margin-top: 8px; }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center; padding: 16px;
+    font-size: .76rem; color: var(--text-light);
+  }
+  footer a { color: var(--blue-light); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* PASSWORD TOGGLE */
+  input[type="password"] { padding-right: 40px; }
+</style>
+</head>
+<body>
+
+<div class="bg-deco"></div>
+<div class="bg-circles"><span></span><span></span><span></span><span></span></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="7" y="10" width="10" height="4" rx="1"/></svg>
+    </div>
+    MediCare31
+  </a>
+  <span class="nav-tagline">Votre espace de santé numérique</span>
+  <a href="#" class="nav-login">Déjà un compte ? Se connecter</a>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="wrapper">
+
+    <!-- STEPPER -->
+    <div class="stepper" id="stepper">
+      <div class="step active" id="s1">
+        <div class="step-num">
+          <span>1</span>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="step-label">
+          <strong>Identité</strong>
+          <small>Informations personnelles</small>
+        </div>
+      </div>
+      <div class="step" id="s2">
+        <div class="step-num">
+          <span>2</span>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="step-label">
+          <strong>Coordonnées</strong>
+          <small>Contact & adresse</small>
+        </div>
+      </div>
+      <div class="step" id="s3">
+        <div class="step-num">
+          <span>3</span>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="step-label">
+          <strong>Sécurité</strong>
+          <small>Mot de passe & accès</small>
+        </div>
+      </div>
+      <div class="step" id="s4">
+        <div class="step-num">
+          <span>4</span>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="step-label">
+          <strong>Confirmation</strong>
+          <small>Vérification</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="card" id="mainCard">
+
+      <!-- ═══ STEP 1 – IDENTITÉ ═══ -->
+      <div class="step-panel active" id="panel1">
+        <div class="card-header">
+          <div class="step-title">Vos informations personnelles</div>
+          <div class="step-desc">Ces informations seront utilisées par vos professionnels de santé.</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+
+            <div class="form-group full">
+              <div class="hint">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Renseignez vos informations exactement telles qu'elles figurent sur votre carte d'identité ou carte Vitale.
+              </div>
+            </div>
+
+            <!-- Civilité -->
+            <div class="form-group full">
+              <label>Civilité <span class="req">*</span></label>
+              <div class="radio-group">
+                <label class="radio-opt">
+                  <input type="radio" name="civilite" value="M" checked>
+                  <div class="radio-dot"></div> M.
+                </label>
+                <label class="radio-opt">
+                  <input type="radio" name="civilite" value="Mme">
+                  <div class="radio-dot"></div> Mme
+                </label>
+                <label class="radio-opt">
+                  <input type="radio" name="civilite" value="Autre">
+                  <div class="radio-dot"></div> Autre
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="nom">Nom de famille <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="nom" placeholder="DUPONT">
+              </div>
+              <span class="field-error" id="err-nom">Ce champ est requis.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="prenom">Prénom <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="prenom" placeholder="Marc">
+              </div>
+              <span class="field-error" id="err-prenom">Ce champ est requis.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="ddn">Date de naissance <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <input type="date" id="ddn">
+              </div>
+              <span class="field-error" id="err-ddn">Ce champ est requis.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="sexe">Sexe <span class="req">*</span></label>
+              <div class="input-wrap no-icon">
+                <select id="sexe">
+                  <option value="">-- Sélectionner --</option>
+                  <option value="M">Masculin</option>
+                  <option value="F">Féminin</option>
+                  <option value="A">Non précisé</option>
+                </select>
+              </div>
+              <span class="field-error" id="err-sexe">Ce champ est requis.</span>
+            </div>
+
+            <div class="form-group full">
+              <label for="numsecu">Numéro de sécurité sociale</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                <input type="text" id="numsecu" placeholder="1 85 04 75 123 456 78" maxlength="21">
+              </div>
+              <span style="font-size:.73rem;color:var(--text-light);margin-top:3px">Optionnel — permet de pré-remplir votre dossier médical.</span>
+            </div>
+
+          </div>
+        </div>
+        <div class="card-footer">
+          <div></div>
+          <button class="btn btn-next" onclick="goTo(2)">
+            Suivant
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 2 – COORDONNÉES ═══ -->
+      <div class="step-panel" id="panel2">
+        <div class="card-header">
+          <div class="step-title">Vos coordonnées</div>
+          <div class="step-desc">Adresse e-mail, numéro de téléphone et adresse postale.</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+
+            <div class="form-group full">
+              <label for="email">Adresse e-mail <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <input type="email" id="email" placeholder="marc.dupont@email.fr">
+              </div>
+              <span class="field-error" id="err-email">Adresse e-mail invalide.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="tel">Téléphone mobile <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <input type="tel" id="tel" placeholder="06 00 00 00 00">
+              </div>
+              <span class="field-error" id="err-tel">Numéro invalide.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="tel2">Téléphone secondaire</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <input type="tel" id="tel2" placeholder="05 00 00 00 00">
+              </div>
+            </div>
+
+            <div class="section-divider full"><span>Adresse postale</span></div>
+
+            <div class="form-group full">
+              <label for="adresse">Adresse <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <input type="text" id="adresse" placeholder="50 Avenue de la Santé">
+              </div>
+              <span class="field-error" id="err-adresse">Ce champ est requis.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="cp">Code postal <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <input type="text" id="cp" placeholder="31000" maxlength="5">
+              </div>
+              <span class="field-error" id="err-cp">Code postal invalide.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="ville">Ville <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <input type="text" id="ville" placeholder="Toulouse">
+              </div>
+              <span class="field-error" id="err-ville">Ce champ est requis.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="medecin">Médecin traitant</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <input type="text" id="medecin" placeholder="Dr. Jean Martin">
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-back" onclick="goTo(1)">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Retour
+          </button>
+          <button class="btn btn-next" onclick="goTo(3)">
+            Suivant
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 3 – SÉCURITÉ ═══ -->
+      <div class="step-panel" id="panel3">
+        <div class="card-header">
+          <div class="step-title">Sécurité de votre compte</div>
+          <div class="step-desc">Créez un mot de passe fort pour protéger vos données de santé.</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+
+            <div class="form-group full">
+              <label for="pwd">Mot de passe <span class="req">*</span></label>
+              <div class="input-wrap pwd-wrap">
+                <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="pwd" placeholder="Minimum 8 caractères" oninput="checkStrength(this.value)">
+                <button type="button" class="eye-toggle" onclick="toggleEye('pwd','eye1')">
+                  <svg id="eye1" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="strength-bar">
+                <span id="sb1"></span><span id="sb2"></span><span id="sb3"></span><span id="sb4"></span>
+              </div>
+              <div class="strength-label" id="strengthLabel">Entrez un mot de passe</div>
+              <span class="field-error" id="err-pwd">Mot de passe trop court (min. 8 caractères).</span>
+            </div>
+
+            <div class="form-group full">
+              <label for="pwd2">Confirmer le mot de passe <span class="req">*</span></label>
+              <div class="input-wrap pwd-wrap">
+                <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="pwd2" placeholder="Répétez votre mot de passe">
+                <button type="button" class="eye-toggle" onclick="toggleEye('pwd2','eye2')">
+                  <svg id="eye2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+              <span class="field-error" id="err-pwd2">Les mots de passe ne correspondent pas.</span>
+            </div>
+
+            <div class="section-divider full"><span>Questions de sécurité</span></div>
+
+            <div class="form-group full">
+              <label for="q1">Question secrète <span class="req">*</span></label>
+              <div class="input-wrap no-icon">
+                <select id="q1">
+                  <option value="">-- Choisir une question --</option>
+                  <option>Quel est le nom de votre premier animal de compagnie ?</option>
+                  <option>Quelle est la ville de naissance de votre mère ?</option>
+                  <option>Quel était le nom de votre école primaire ?</option>
+                  <option>Quel est le prénom de votre meilleur(e) ami(e) d'enfance ?</option>
+                </select>
+              </div>
+              <span class="field-error" id="err-q1">Veuillez choisir une question.</span>
+            </div>
+
+            <div class="form-group full">
+              <label for="r1">Réponse <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <input type="text" id="r1" placeholder="Votre réponse">
+              </div>
+              <span class="field-error" id="err-r1">Ce champ est requis.</span>
+            </div>
+
+            <div class="section-divider full"><span>Consentements</span></div>
+
+            <div class="form-group full" style="gap:12px">
+
+              <label class="checkbox-wrap">
+                <input type="checkbox" id="cgu">
+                <div class="custom-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="cb-label">J'accepte les <a href="#">Conditions Générales d'Utilisation</a> et la <a href="#">Politique de confidentialité</a> de MediCare31. <span class="req">*</span></span>
+              </label>
+              <span class="field-error" id="err-cgu">Vous devez accepter les CGU pour continuer.</span>
+
+              <label class="checkbox-wrap">
+                <input type="checkbox" id="hds">
+                <div class="custom-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="cb-label">Je consens au stockage de mes données de santé sur un hébergement certifié <strong>HDS</strong> (Hébergeur de Données de Santé). <span class="req">*</span></span>
+              </label>
+              <span class="field-error" id="err-hds">Ce consentement est obligatoire.</span>
+
+              <label class="checkbox-wrap">
+                <input type="checkbox" id="notifs">
+                <div class="custom-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="cb-label">J'accepte de recevoir des rappels de rendez-vous et notifications par e-mail / SMS.</span>
+              </label>
+
+            </div>
+
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-back" onclick="goTo(2)">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Retour
+          </button>
+          <button class="btn btn-next" onclick="goTo(4)">
+            Vérifier mon inscription
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 4 – CONFIRMATION ═══ -->
+      <div class="step-panel" id="panel4">
+        <div class="card-header">
+          <div class="step-title">Vérification de vos informations</div>
+          <div class="step-desc">Relisez vos données avant de valider votre inscription.</div>
+        </div>
+        <div class="card-body">
+
+          <div style="display:flex;flex-direction:column;gap:20px">
+
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font-size:.8rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em">Identité</span>
+                <a href="#" class="edit-link" onclick="goTo(1);return false">Modifier</a>
+              </div>
+              <div class="summary-grid">
+                <div class="summary-item"><span class="summary-label">Civilité</span><span class="summary-value" id="sum-civ">M.</span></div>
+                <div class="summary-item"><span class="summary-label">Nom</span><span class="summary-value" id="sum-nom">—</span></div>
+                <div class="summary-item"><span class="summary-label">Prénom</span><span class="summary-value" id="sum-prenom">—</span></div>
+                <div class="summary-item"><span class="summary-label">Date de naissance</span><span class="summary-value" id="sum-ddn">—</span></div>
+              </div>
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--border)">
+
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font-size:.8rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em">Coordonnées</span>
+                <a href="#" class="edit-link" onclick="goTo(2);return false">Modifier</a>
+              </div>
+              <div class="summary-grid">
+                <div class="summary-item"><span class="summary-label">E-mail</span><span class="summary-value" id="sum-email">—</span></div>
+                <div class="summary-item"><span class="summary-label">Téléphone</span><span class="summary-value" id="sum-tel">—</span></div>
+                <div class="summary-item" style="grid-column:1/-1"><span class="summary-label">Adresse</span><span class="summary-value" id="sum-adresse">—</span></div>
+              </div>
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--border)">
+
+            <div class="hint">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Un e-mail de confirmation vous sera envoyé à l'adresse renseignée. Cliquez sur le lien pour activer votre compte.
+            </div>
+
+          </div>
+
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-back" onclick="goTo(3)">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Retour
+          </button>
+          <button class="btn btn-submit-final" onclick="submitForm()">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Créer mon compte
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ SUCCESS ═══ -->
+      <div class="success-view" id="successView">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="success-title">Compte créé avec succès !</div>
+        <div class="success-text">
+          Un e-mail de confirmation a été envoyé à<br>
+          <span class="success-email" id="successEmail">marc.dupont@email.fr</span><br>
+          Cliquez sur le lien pour activer votre espace patient.
+        </div>
+        <a href="#" class="btn btn-next btn-go">
+          <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Se connecter
+        </a>
+      </div>
+
+    </div><!-- /card -->
+
+  </div><!-- /wrapper -->
+</div><!-- /page -->
+
+<footer>
+  <a href="#">Mentions légales</a> · <a href="#">Politique de confidentialité</a> · <a href="#">Aide</a>
+  &nbsp;·&nbsp; Hébergement certifié <strong>HDS</strong> · © 2024 MediCare31
+</footer>
+
+<script>
+  let current = 1;
+
+  function goTo(step) {
+    if (step > current && !validate(current)) return;
+
+    // Update stepper
+    for (let i = 1; i <= 4; i++) {
+      const s = document.getElementById('s' + i);
+      s.classList.remove('active', 'done');
+      if (i < step) s.classList.add('done');
+      if (i === step) s.classList.add('active');
+    }
+
+    // Update panels
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel' + step).classList.add('active');
+
+    // Fill summary on step 4
+    if (step === 4) fillSummary();
+
+    current = step;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── VALIDATE ── */
+  function validate(step) {
+    let ok = true;
+
+    function check(id, errId, condition) {
+      const el  = document.getElementById(id);
+      const err = document.getElementById(errId);
+      if (!condition(el.value)) {
+        el.classList.add('error');
+        err.classList.add('show');
+        ok = false;
+      } else {
+        el.classList.remove('error');
+        el.classList.add('valid');
+        err.classList.remove('show');
+      }
+    }
+
+    if (step === 1) {
+      check('nom',    'err-nom',    v => v.trim().length > 0);
+      check('prenom', 'err-prenom', v => v.trim().length > 0);
+      check('ddn',    'err-ddn',    v => v.length > 0);
+      check('sexe',   'err-sexe',   v => v !== '');
+    }
+
+    if (step === 2) {
+      check('email',   'err-email',   v => /\S+@\S+\.\S+/.test(v));
+      check('tel',     'err-tel',     v => v.replace(/\s/g,'').length >= 10);
+      check('adresse', 'err-adresse', v => v.trim().length > 0);
+      check('cp',      'err-cp',      v => /^\d{5}$/.test(v));
+      check('ville',   'err-ville',   v => v.trim().length > 0);
+    }
+
+    if (step === 3) {
+      const pwd  = document.getElementById('pwd').value;
+      const pwd2 = document.getElementById('pwd2').value;
+      const q1   = document.getElementById('q1');
+      const r1   = document.getElementById('r1');
+      const cgu  = document.getElementById('cgu');
+      const hds  = document.getElementById('hds');
+
+      if (pwd.length < 8) {
+        document.getElementById('pwd').classList.add('error');
+        document.getElementById('err-pwd').classList.add('show');
+        ok = false;
+      } else {
+        document.getElementById('pwd').classList.remove('error');
+        document.getElementById('err-pwd').classList.remove('show');
+      }
+
+      if (pwd !== pwd2 || pwd2.length === 0) {
+        document.getElementById('pwd2').classList.add('error');
+        document.getElementById('err-pwd2').classList.add('show');
+        ok = false;
+      } else {
+        document.getElementById('pwd2').classList.remove('error');
+        document.getElementById('err-pwd2').classList.remove('show');
+      }
+
+      if (!q1.value) {
+        q1.classList.add('error');
+        document.getElementById('err-q1').classList.add('show');
+        ok = false;
+      } else {
+        q1.classList.remove('error');
+        document.getElementById('err-q1').classList.remove('show');
+      }
+
+      if (!r1.value.trim()) {
+        r1.classList.add('error');
+        document.getElementById('err-r1').classList.add('show');
+        ok = false;
+      } else {
+        r1.classList.remove('error');
+        document.getElementById('err-r1').classList.remove('show');
+      }
+
+      if (!cgu.checked) {
+        document.getElementById('err-cgu').classList.add('show');
+        ok = false;
+      } else {
+        document.getElementById('err-cgu').classList.remove('show');
+      }
+
+      if (!hds.checked) {
+        document.getElementById('err-hds').classList.add('show');
+        ok = false;
+      } else {
+        document.getElementById('err-hds').classList.remove('show');
+      }
+    }
+
+    return ok;
+  }
+
+  /* ── SUMMARY ── */
+  function fillSummary() {
+    const civ = document.querySelector('input[name="civilite"]:checked');
+    document.getElementById('sum-civ').textContent    = civ ? civ.value : '—';
+    document.getElementById('sum-nom').textContent    = document.getElementById('nom').value    || '—';
+    document.getElementById('sum-prenom').textContent = document.getElementById('prenom').value || '—';
+    const ddn = document.getElementById('ddn').value;
+    if (ddn) {
+      const d = new Date(ddn);
+      document.getElementById('sum-ddn').textContent = d.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+    }
+    document.getElementById('sum-email').textContent   = document.getElementById('email').value   || '—';
+    document.getElementById('sum-tel').textContent     = document.getElementById('tel').value     || '—';
+    const adr = [document.getElementById('adresse').value, document.getElementById('cp').value, document.getElementById('ville').value].filter(Boolean).join(', ');
+    document.getElementById('sum-adresse').textContent = adr || '—';
+  }
+
+  /* ── FINAL SUBMIT ── */
+  function submitForm() {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('stepper').style.display = 'none';
+    const sv = document.getElementById('successView');
+    sv.classList.add('show');
+    const email = document.getElementById('email').value;
+    if (email) document.getElementById('successEmail').textContent = email;
+  }
+
+  /* ── PASSWORD STRENGTH ── */
+  function checkStrength(v) {
+    let score = 0;
+    if (v.length >= 8)           score++;
+    if (/[A-Z]/.test(v))         score++;
+    if (/[0-9]/.test(v))         score++;
+    if (/[^A-Za-z0-9]/.test(v))  score++;
+
+    const colors  = ['#f04438','#f79009','#e8a838','#12b76a'];
+    const labels  = ['Très faible','Faible','Moyen','Fort'];
+    const bars    = ['sb1','sb2','sb3','sb4'];
+
+    bars.forEach((id, i) => {
+      document.getElementById(id).style.background = i < score ? colors[score - 1] : 'var(--border)';
+    });
+
+    document.getElementById('strengthLabel').textContent = v.length ? labels[score - 1] || 'Très faible' : 'Entrez un mot de passe';
+    document.getElementById('strengthLabel').style.color = v.length ? colors[score - 1] : 'var(--text-light)';
+  }
+
+  /* ── EYE TOGGLE ── */
+  function toggleEye(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    icon.innerHTML = isHidden
+      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+         <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+         <line x1="1" y1="1" x2="23" y2="23"/>`
+      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+         <circle cx="12" cy="12" r="3"/>`;
+  }
+
+  /* ── FORMAT SECU ── */
+  document.getElementById('numsecu').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '').substring(0, 15);
+    this.value = v.replace(/(\d{1})(\d{2})(\d{2})(\d{2})(\d{3})(\d{3})(\d{2})?/, (_, ...g) =>
+      g.filter(Boolean).join(' ')
+    );
+  });
+
+  /* ── FORMAT TEL ── */
+  ['tel','tel2'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+      let v = this.value.replace(/\D/g, '').substring(0, 10);
+      this.value = v.replace(/(\d{2})(?=\d)/g, '$1 ').trim();
+    });
+  });
+</script>
+</body>
+</html>
