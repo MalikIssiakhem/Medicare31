@@ -606,7 +606,7 @@
         <div class="divider"><span>ou se connecter avec</span></div>
 
         <div class="sso-row">
-          <button class="btn-sso">
+          <button class="btn-sso" onclick="loginSSO('france-connect')">
             <!-- FranceConnect logo approximation -->
             <svg viewBox="0 0 40 20" width="40" height="20">
               <rect width="40" height="20" rx="3" fill="#003189"/>
@@ -615,7 +615,7 @@
             </svg>
             FranceConnect
           </button>
-          <button class="btn-sso">
+          <button class="btn-sso" onclick="loginSSO('carte-vitale')">
             <div class="cv-icon"><span>CV</span></div>
             Carte Vitale
           </button>
@@ -623,7 +623,7 @@
 
         <div class="register-row">
           Pas encore de compte ?
-          <a href="#">Créer mon espace patient</a>
+          <a href="/register.html">Créer mon espace patient</a>
         </div>
       </div>
 
@@ -648,7 +648,27 @@
   &nbsp;·&nbsp; Hébergement certifié <strong>HDS</strong> · © 2024 MediCare31
 </footer>
 
+<script src="/js/auth.js"></script>
 <script>
+  /* Redirige si déjà connecté */
+  if (localStorage.getItem('medicare_token')) window.location.replace('/index.html');
+
+  /* Paramètre ?verified après confirmation email */
+  (function() {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('verified') === '1') {
+      showAlert('✅ Adresse e-mail confirmée ! Vous pouvez maintenant vous connecter.');
+      document.getElementById('alertBox').style.background = '#ecfdf3';
+      document.getElementById('alertBox').style.borderColor = '#a6f4c5';
+      document.getElementById('alertBox').style.color = '#027a48';
+      document.querySelector('#alertBox svg').style.stroke = '#027a48';
+    } else if (p.get('verified') === 'already') {
+      showAlert('Votre compte est déjà activé. Connectez-vous normalement.');
+    } else if (p.get('error') === 'token_invalide') {
+      showAlert('Lien de vérification invalide ou expiré. Veuillez vous réinscrire.');
+    }
+  })();
+
   /* ── ROLE TABS ── */
   function setRole(btn, role) {
     document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
@@ -676,42 +696,73 @@
          <circle cx="12" cy="12" r="3"/>`;
   }
 
-  /* ── CHECKBOX ── */
-  document.getElementById('remember').addEventListener('change', function() {
-    const cb = this.nextElementSibling;
-    // handled purely by CSS :checked selector
-  });
-
-  /* ── SUBMIT ── */
-  function handleSubmit(e) {
-    e.preventDefault();
-    const email = document.getElementById('email').value.trim();
-    const pwd   = document.getElementById('password').value;
-    const alert = document.getElementById('alertBox');
-
-    if (!email || !pwd) {
-      showAlert('Veuillez remplir tous les champs.');
-      return;
-    }
-
-    if (!email.includes('@')) {
-      showAlert('Adresse e-mail invalide.');
-      return;
-    }
-
-    if (pwd.length < 4) {
-      showAlert('Mot de passe trop court.');
-      return;
-    }
-
-    // Simulate success
-    alert.classList.remove('show');
+  /* ── AFFICHER SUCCÈS + REDIRECTION ── */
+  function showSuccess() {
     document.getElementById('formView').style.display = 'none';
     const sv = document.getElementById('successView');
     sv.classList.add('show');
-    setTimeout(() => {
-      document.getElementById('progressBar').style.width = '100%';
-    }, 50);
+    setTimeout(() => { document.getElementById('progressBar').style.width = '100%'; }, 50);
+    setTimeout(() => { window.location.replace('/index.html'); }, 1900);
+  }
+
+  /* ── STOCKER LA SESSION ── */
+  function storeSession(data) {
+    localStorage.setItem('medicare_token', data.access_token);
+    localStorage.setItem('medicare_user', JSON.stringify({
+      role:   data.role,
+      nom:    data.nom,
+      prenom: data.prenom,
+    }));
+  }
+
+  /* ── SUBMIT (login email/password) ── */
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const pwd   = document.getElementById('password').value;
+
+    if (!email || !pwd) { showAlert('Veuillez remplir tous les champs.'); return; }
+    if (!email.includes('@')) { showAlert('Adresse e-mail invalide.'); return; }
+
+    const btn = e.target.querySelector('.btn-submit');
+    btn.disabled = true;
+    document.getElementById('alertBox').classList.remove('show');
+
+    try {
+      /* FastAPI OAuth2PasswordRequestForm attend du x-www-form-urlencoded */
+      const body = new URLSearchParams({ username: email, password: pwd });
+      const res  = await fetch('/api/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    body.toString(),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        showAlert(err.detail || 'Identifiants incorrects. Veuillez réessayer.');
+        return;
+      }
+
+      storeSession(await res.json());
+      showSuccess();
+    } catch {
+      showAlert('Impossible de contacter le serveur. Vérifiez votre connexion.');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  /* ── SSO MOCK (FranceConnect / Carte Vitale) ── */
+  async function loginSSO(provider) {
+    document.getElementById('alertBox').classList.remove('show');
+    try {
+      const res = await fetch(`/api/auth/${provider}`, { method: 'POST' });
+      if (!res.ok) { showAlert('Connexion SSO échouée.'); return; }
+      storeSession(await res.json());
+      showSuccess();
+    } catch {
+      showAlert('Impossible de contacter le serveur.');
+    }
   }
 
   function showAlert(msg) {
@@ -720,11 +771,6 @@
     box.classList.add('show');
     box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-
-  /* ── INPUT FOCUS ICON ── */
-  document.querySelectorAll('.input-wrap input').forEach(input => {
-    // The CSS :focus-within handles the icon color
-  });
 </script>
 </body>
 </html>
