@@ -1,776 +1,498 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediCare31 – Connexion</title>
-<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --blue-dark:  #2c5f9e;
-    --blue-mid:   #3a74be;
-    --blue-light: #4f8fda;
-    --blue-pale:  #e8f1fb;
-    --gold:       #e8a838;
-    --text-dark:  #1e2d45;
-    --text-mid:   #4a5f7a;
-    --text-light: #8fa3bc;
-    --bg:         #eef2f7;
-    --white:      #ffffff;
-    --border:     #d6e2f0;
-    --radius:     14px;
-    --shadow:     0 8px 40px rgba(44,95,158,.18);
-  }
-
-  body {
-    font-family: 'Source Sans 3', sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ── BG DECORATIONS ── */
-  .bg-deco {
-    position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
-  }
-
-  .bg-deco::before {
-    content: '';
-    position: absolute;
-    top: -160px; left: -160px;
-    width: 560px; height: 560px;
-    background: radial-gradient(circle, rgba(79,143,218,.18) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-
-  .bg-deco::after {
-    content: '';
-    position: absolute;
-    bottom: -120px; right: -120px;
-    width: 480px; height: 480px;
-    background: radial-gradient(circle, rgba(44,95,158,.14) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-
-  .bg-circles {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  }
-
-  .bg-circles span {
-    position: absolute;
-    border-radius: 50%;
-    border: 1.5px solid rgba(79,143,218,.12);
-  }
-
-  .bg-circles span:nth-child(1) { width: 300px; height: 300px; top: 10%; left: 5%; }
-  .bg-circles span:nth-child(2) { width: 180px; height: 180px; top: 60%; left: 2%; }
-  .bg-circles span:nth-child(3) { width: 220px; height: 220px; top: 5%; right: 8%; }
-  .bg-circles span:nth-child(4) { width: 120px; height: 120px; bottom: 15%; right: 4%; }
-  .bg-circles span:nth-child(5) { width: 400px; height: 400px; bottom: -80px; left: 30%; opacity: .5; }
-
-  /* ── NAV ── */
-  nav {
-    position: relative; z-index: 10;
-    background: var(--blue-dark);
-    display: flex; align-items: center;
-    padding: 0 36px; height: 58px;
-  }
-
-  .logo {
-    display: flex; align-items: center; gap: 10px;
-    color: #fff; font-family: 'Nunito', sans-serif;
-    font-weight: 800; font-size: 1.22rem;
-    letter-spacing: -.3px; text-decoration: none;
-  }
-
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: rgba(255,255,255,.18);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .logo-icon svg { width: 20px; height: 20px; fill: #fff; }
-
-  .nav-tagline {
-    margin-left: auto;
-    color: rgba(255,255,255,.6);
-    font-size: .84rem;
-  }
-
-  /* ── PAGE ── */
-  .page {
-    position: relative; z-index: 1;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 24px;
-  }
-
-  /* ── SPLIT LAYOUT ── */
-  .split {
-    display: flex;
-    width: 100%;
-    max-width: 960px;
-    background: var(--white);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    animation: popIn .5s cubic-bezier(.22,1,.36,1) both;
-  }
-
-  @keyframes popIn {
-    from { opacity: 0; transform: translateY(24px) scale(.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  /* ── LEFT PANEL ── */
-  .panel-left {
-    background: linear-gradient(155deg, #2c5f9e 0%, #1a3a6e 100%);
-    width: 42%;
-    padding: 52px 44px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-
-  /* decorative rings inside panel */
-  .panel-left::before {
-    content: '';
-    position: absolute;
-    width: 340px; height: 340px;
-    border-radius: 50%;
-    border: 40px solid rgba(255,255,255,.05);
-    top: -80px; right: -120px;
-  }
-
-  .panel-left::after {
-    content: '';
-    position: absolute;
-    width: 240px; height: 240px;
-    border-radius: 50%;
-    border: 30px solid rgba(255,255,255,.04);
-    bottom: -60px; left: -60px;
-  }
-
-  .panel-logo {
-    display: flex; align-items: center; gap: 12px;
-    color: #fff; font-family: 'Nunito', sans-serif;
-    font-weight: 800; font-size: 1.4rem;
-    position: relative; z-index: 1;
-  }
-
-  .panel-logo-icon {
-    width: 40px; height: 40px;
-    background: rgba(255,255,255,.2);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .panel-logo-icon svg { width: 24px; height: 24px; fill: #fff; }
-
-  .panel-content {
-    position: relative; z-index: 1;
-  }
-
-  .panel-title {
-    font-size: 1.65rem; font-weight: 700;
-    color: #fff; line-height: 1.35;
-    margin-bottom: 16px;
-  }
-
-  .panel-desc {
-    font-size: .92rem; color: rgba(255,255,255,.7);
-    line-height: 1.7; margin-bottom: 32px;
-  }
-
-  .feature-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
-
-  .feature-list li {
-    display: flex; align-items: center; gap: 12px;
-    color: rgba(255,255,255,.85); font-size: .88rem;
-  }
-
-  .feature-dot {
-    width: 28px; height: 28px; flex-shrink: 0;
-    background: rgba(255,255,255,.15); border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .feature-dot svg {
-    width: 15px; height: 15px;
-    stroke: #fff; fill: none;
-    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-  }
-
-  .panel-footer {
-    position: relative; z-index: 1;
-    font-size: .76rem; color: rgba(255,255,255,.4);
-  }
-
-  /* ── RIGHT PANEL ── */
-  .panel-right {
-    flex: 1;
-    padding: 52px 48px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .form-header { margin-bottom: 32px; }
-
-  .form-title {
-    font-size: 1.55rem; font-weight: 700;
-    color: var(--text-dark); margin-bottom: 6px;
-    font-family: 'Nunito', sans-serif;
-  }
-
-  .form-subtitle { font-size: .88rem; color: var(--text-light); }
-
-  /* ── ROLE TABS ── */
-  .role-tabs {
-    display: flex; gap: 8px;
-    background: var(--bg); border-radius: 10px;
-    padding: 5px; margin-bottom: 28px;
-  }
-
-  .role-tab {
-    flex: 1; padding: 9px 12px; border: none;
-    background: transparent; border-radius: 7px;
-    font-size: .84rem; font-weight: 600;
-    color: var(--text-light); cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 7px;
-    transition: background .2s, color .2s, box-shadow .2s;
-  }
-
-  .role-tab svg {
-    width: 15px; height: 15px;
-    stroke: currentColor; fill: none;
-    stroke-width: 1.8; flex-shrink: 0;
-  }
-
-  .role-tab.active {
-    background: var(--white); color: var(--blue-dark);
-    box-shadow: 0 2px 8px rgba(44,95,158,.14);
-  }
-
-  /* ── FORM ── */
-  .form-group { margin-bottom: 18px; }
-
-  label {
-    display: block;
-    font-size: .83rem; font-weight: 600;
-    color: var(--text-mid); margin-bottom: 7px;
-  }
-
-  .input-wrap {
-    position: relative;
-  }
-
-  .input-wrap svg {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    width: 17px; height: 17px;
-    stroke: var(--text-light); fill: none;
-    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
-    pointer-events: none;
-    transition: stroke .2s;
-  }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="password"] {
-    width: 100%; padding: 11px 14px 11px 42px;
-    border: 1.5px solid var(--border);
-    border-radius: 9px; font-size: .9rem;
-    font-family: inherit; color: var(--text-dark);
-    background: #fff;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
-  }
-
-  input:focus {
-    border-color: var(--blue-light);
-    box-shadow: 0 0 0 3px rgba(79,143,218,.15);
-  }
-
-  input:focus + svg,
-  .input-wrap:focus-within svg { stroke: var(--blue-mid); }
-
-  /* eye toggle */
-  .eye-toggle {
-    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; cursor: pointer; padding: 4px;
-    color: var(--text-light);
-    display: flex; align-items: center;
-  }
-
-  .eye-toggle svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-
-  /* ── OPTIONS ROW ── */
-  .options-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 24px;
-  }
-
-  .checkbox-wrap {
-    display: flex; align-items: center; gap: 8px; cursor: pointer;
-  }
-
-  .checkbox-wrap input[type="checkbox"] { display: none; }
-
-  .custom-cb {
-    width: 18px; height: 18px;
-    border: 1.5px solid var(--border);
-    border-radius: 5px; background: #fff;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: background .15s, border-color .15s;
-  }
-
-  .custom-cb svg { display: none; width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2.5; }
-
-  .checkbox-wrap input:checked ~ .custom-cb {
-    background: var(--blue-mid); border-color: var(--blue-mid);
-  }
-
-  .checkbox-wrap input:checked ~ .custom-cb svg { display: block; }
-
-  .cb-label { font-size: .83rem; color: var(--text-mid); }
-
-  .forgot-link {
-    font-size: .83rem; color: var(--blue-mid);
-    text-decoration: none; font-weight: 600;
-  }
-
-  .forgot-link:hover { text-decoration: underline; }
-
-  /* ── SUBMIT ── */
-  .btn-submit {
-    width: 100%; padding: 13px;
-    background: var(--blue-dark); color: #fff; border: none;
-    border-radius: 10px; font-size: .95rem; font-weight: 700;
-    font-family: inherit; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .15s, transform .1s, box-shadow .15s;
-    box-shadow: 0 4px 14px rgba(44,95,158,.3);
-    margin-bottom: 22px;
-  }
-
-  .btn-submit:hover {
-    background: var(--blue-mid);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(44,95,158,.35);
-  }
-
-  .btn-submit:active { transform: translateY(0); }
-
-  .btn-submit svg { width: 17px; height: 17px; stroke: #fff; fill: none; stroke-width: 2; }
-
-  /* ── DIVIDER ── */
-  .divider {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-  }
-
-  .divider::before, .divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-  }
-
-  .divider span { font-size: .78rem; color: var(--text-light); white-space: nowrap; }
-
-  /* ── SSO BUTTONS ── */
-  .sso-row { display: flex; gap: 10px; margin-bottom: 28px; }
-
-  .btn-sso {
-    flex: 1; padding: 10px; border: 1.5px solid var(--border);
-    border-radius: 9px; background: #fff; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    font-size: .82rem; font-weight: 600; color: var(--text-mid);
-    font-family: inherit; transition: border-color .15s, background .15s;
-  }
-
-  .btn-sso:hover { border-color: var(--blue-light); background: var(--blue-pale); }
-
-  .btn-sso svg { width: 18px; height: 18px; }
-
-  /* Carte Vitale icon */
-  .cv-icon {
-    width: 20px; height: 13px; background: #2c9e5e;
-    border-radius: 3px; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .cv-icon span { font-size: .52rem; font-weight: 800; color: #fff; letter-spacing: -.3px; }
-
-  /* ── REGISTER LINK ── */
-  .register-row {
-    text-align: center;
-    font-size: .84rem; color: var(--text-light);
-  }
-
-  .register-row a { color: var(--blue-mid); font-weight: 600; text-decoration: none; }
-  .register-row a:hover { text-decoration: underline; }
-
-  /* ── ALERT ── */
-  .alert {
-    display: none;
-    background: #fef3f2; border: 1px solid #fda29b;
-    border-radius: 8px; padding: 10px 14px;
-    font-size: .82rem; color: #b42318;
-    margin-bottom: 16px; align-items: center; gap: 8px;
-  }
-
-  .alert.show { display: flex; }
-  .alert svg { width: 16px; height: 16px; stroke: #b42318; fill: none; stroke-width: 2; flex-shrink: 0; }
-
-  /* ── SUCCESS ── */
-  .success-overlay {
-    display: none;
-    flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; gap: 12px;
-    padding: 40px;
-    animation: fadeUp .4s ease both;
-  }
-
-  .success-overlay.show { display: flex; }
-
-  .success-icon {
-    width: 64px; height: 64px; border-radius: 50%;
-    background: #ecfdf3; border: 2px solid #a6f4c5;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 8px;
-  }
-
-  .success-icon svg { width: 30px; height: 30px; stroke: #12b76a; fill: none; stroke-width: 2.5; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    position: relative; z-index: 1;
-    text-align: center; padding: 16px;
-    font-size: .76rem; color: var(--text-light);
-  }
-
-  footer a { color: var(--blue-light); text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
-</style>
-</head>
-<body>
-
-<div class="bg-deco"></div>
-<div class="bg-circles">
-  <span></span><span></span><span></span><span></span><span></span>
-</div>
-
-<!-- NAV -->
-<nav>
-  <a class="logo" href="#">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="7" y="10" width="10" height="4" rx="1"/></svg>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Connexion</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/login.css" />
+  </head>
+  <body>
+    <div class="bg-deco"></div>
+    <div class="bg-circles">
+      <span></span><span></span><span></span><span></span><span></span>
     </div>
-    MediCare31
-  </a>
-  <span class="nav-tagline">Votre espace de santé numérique</span>
-</nav>
 
-<!-- PAGE -->
-<div class="page">
-  <div class="split">
-
-    <!-- LEFT PANEL -->
-    <div class="panel-left">
-      <div class="panel-logo">
-        <div class="panel-logo-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="7" y="10" width="10" height="4" rx="1"/></svg>
+    <!-- NAV -->
+    <nav>
+      <a class="logo" href="#">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
         </div>
         MediCare31
-      </div>
+      </a>
+      <span class="nav-tagline">Votre espace de santé numérique</span>
+    </nav>
 
-      <div class="panel-content">
-        <div class="panel-title">Bienvenue sur votre espace santé</div>
-        <p class="panel-desc">Accédez à vos informations médicales, gérez vos rendez-vous et communiquez avec vos praticiens en toute sécurité.</p>
-        <ul class="feature-list">
-          <li>
-            <div class="feature-dot">
-              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <!-- PAGE -->
+    <div class="page">
+      <div class="split">
+        <!-- LEFT PANEL -->
+        <div class="panel-left">
+          <div class="panel-logo">
+            <div class="panel-logo-icon">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+                />
+                <rect x="10" y="7" width="4" height="10" rx="1" />
+                <rect x="7" y="10" width="10" height="4" rx="1" />
+              </svg>
             </div>
-            Prise de rendez-vous en ligne
-          </li>
-          <li>
-            <div class="feature-dot">
-              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            Accès à vos documents médicaux
-          </li>
-          <li>
-            <div class="feature-dot">
-              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            Messagerie sécurisée avec vos médecins
-          </li>
-          <li>
-            <div class="feature-dot">
-              <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            </div>
-            Suivi de votre santé au quotidien
-          </li>
-        </ul>
-      </div>
-
-      <div class="panel-footer">© 2024 MediCare31 · Données protégées HDS</div>
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="panel-right">
-
-      <!-- FORM VISIBLE -->
-      <div id="formView">
-        <div class="form-header">
-          <div class="form-title">Connexion</div>
-          <div class="form-subtitle">Accédez à votre espace personnel</div>
-        </div>
-
-        <!-- ROLE TABS -->
-        <div class="role-tabs" role="tablist">
-          <button class="role-tab active" onclick="setRole(this, 'patient')" role="tab">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            Patient
-          </button>
-          <button class="role-tab" onclick="setRole(this, 'medecin')" role="tab">
-            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            Médecin
-          </button>
-          <button class="role-tab" onclick="setRole(this, 'secretariat')" role="tab">
-            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-            Secrétariat
-          </button>
-        </div>
-
-        <!-- ALERT -->
-        <div class="alert" id="alertBox">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span id="alertText">Identifiants incorrects. Veuillez réessayer.</span>
-        </div>
-
-        <!-- FORM -->
-        <form id="loginForm" onsubmit="handleSubmit(event)" novalidate>
-
-          <div class="form-group">
-            <label for="email">Adresse e-mail</label>
-            <div class="input-wrap">
-              <input type="email" id="email" placeholder="nom@exemple.fr" autocomplete="email">
-              <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
+            MediCare31
           </div>
 
-          <div class="form-group">
-            <label for="password">Mot de passe</label>
-            <div class="input-wrap">
-              <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <button type="button" class="eye-toggle" onclick="togglePwd()" title="Afficher/masquer">
-                <svg id="eyeIcon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
+          <div class="panel-content">
+            <div class="panel-title">Bienvenue sur votre espace santé</div>
+            <p class="panel-desc">
+              Accédez à vos informations médicales, gérez vos rendez-vous et
+              communiquez avec vos praticiens en toute sécurité.
+            </p>
+            <ul class="feature-list">
+              <li>
+                <div class="feature-dot">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </div>
+                Prise de rendez-vous en ligne
+              </li>
+              <li>
+                <div class="feature-dot">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                </div>
+                Accès à vos documents médicaux
+              </li>
+              <li>
+                <div class="feature-dot">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                    />
+                  </svg>
+                </div>
+                Messagerie sécurisée avec vos médecins
+              </li>
+              <li>
+                <div class="feature-dot">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    />
+                  </svg>
+                </div>
+                Suivi de votre santé au quotidien
+              </li>
+            </ul>
+          </div>
+
+          <div class="panel-footer">
+            © 2024 MediCare31 · Données protégées HDS
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="panel-right">
+          <!-- FORM VISIBLE -->
+          <div id="formView">
+            <div class="form-header">
+              <div class="form-title">Connexion</div>
+              <div class="form-subtitle">Accédez à votre espace personnel</div>
+            </div>
+
+            <!-- ROLE TABS -->
+            <div class="role-tabs" role="tablist">
+              <button
+                class="role-tab active"
+                onclick="setRole(this, 'patient')"
+                role="tab"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
                 </svg>
+                Patient
+              </button>
+              <button
+                class="role-tab"
+                onclick="setRole(this, 'medecin')"
+                role="tab"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
+                </svg>
+                Médecin
+              </button>
+              <button
+                class="role-tab"
+                onclick="setRole(this, 'secretariat')"
+                role="tab"
+              >
+                <svg viewBox="0 0 24 24">
+                  <rect x="2" y="7" width="20" height="14" rx="2" />
+                  <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+                </svg>
+                Secrétariat
               </button>
             </div>
-          </div>
 
-          <div class="options-row">
-            <label class="checkbox-wrap">
-              <input type="checkbox" id="remember">
-              <div class="custom-cb">
-                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <!-- ALERT -->
+            <div class="alert" id="alertBox">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span id="alertText"
+                >Identifiants incorrects. Veuillez réessayer.</span
+              >
+            </div>
+
+            <!-- FORM -->
+            <form id="loginForm" onsubmit="handleSubmit(event)" novalidate>
+              <div class="form-group">
+                <label for="email">Adresse e-mail</label>
+                <div class="input-wrap">
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="nom@exemple.fr"
+                    autocomplete="email"
+                  />
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                    />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                </div>
               </div>
-              <span class="cb-label">Se souvenir de moi</span>
-            </label>
-            <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+
+              <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <div class="input-wrap">
+                  <input
+                    type="password"
+                    id="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                  />
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <button
+                    type="button"
+                    class="eye-toggle"
+                    onclick="togglePwd()"
+                    title="Afficher/masquer"
+                  >
+                    <svg
+                      id="eyeIcon"
+                      viewBox="0 0 24 24"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.8"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="options-row">
+                <label class="checkbox-wrap">
+                  <input type="checkbox" id="remember" />
+                  <div class="custom-cb">
+                    <svg viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <span class="cb-label">Se souvenir de moi</span>
+                </label>
+                <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+              </div>
+
+              <button type="submit" class="btn-submit">
+                <svg viewBox="0 0 24 24">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <polyline points="10 17 15 12 10 7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+                Se connecter
+              </button>
+            </form>
+
+            <div class="divider"><span>ou se connecter avec</span></div>
+
+            <div class="sso-row">
+              <button class="btn-sso" onclick="loginSSO('france-connect')">
+                <!-- FranceConnect logo approximation -->
+                <svg viewBox="0 0 40 20" width="40" height="20">
+                  <rect width="40" height="20" rx="3" fill="#003189" />
+                  <text
+                    x="4"
+                    y="14"
+                    font-size="8"
+                    fill="#fff"
+                    font-family="sans-serif"
+                    font-weight="bold"
+                  >
+                    France
+                  </text>
+                  <text
+                    x="23"
+                    y="14"
+                    font-size="8"
+                    fill="#e1000f"
+                    font-family="sans-serif"
+                    font-weight="bold"
+                  >
+                    Connect
+                  </text>
+                </svg>
+                FranceConnect
+              </button>
+              <button class="btn-sso" onclick="loginSSO('carte-vitale')">
+                <div class="cv-icon"><span>CV</span></div>
+                Carte Vitale
+              </button>
+            </div>
+
+            <div class="register-row">
+              Pas encore de compte ?
+              <a href="/register.html">Créer mon espace patient</a>
+            </div>
           </div>
 
-          <button type="submit" class="btn-submit">
-            <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            Se connecter
-          </button>
-        </form>
-
-        <div class="divider"><span>ou se connecter avec</span></div>
-
-        <div class="sso-row">
-          <button class="btn-sso" onclick="loginSSO('france-connect')">
-            <!-- FranceConnect logo approximation -->
-            <svg viewBox="0 0 40 20" width="40" height="20">
-              <rect width="40" height="20" rx="3" fill="#003189"/>
-              <text x="4" y="14" font-size="8" fill="#fff" font-family="sans-serif" font-weight="bold">France</text>
-              <text x="23" y="14" font-size="8" fill="#e1000f" font-family="sans-serif" font-weight="bold">Connect</text>
-            </svg>
-            FranceConnect
-          </button>
-          <button class="btn-sso" onclick="loginSSO('carte-vitale')">
-            <div class="cv-icon"><span>CV</span></div>
-            Carte Vitale
-          </button>
+          <!-- SUCCESS VIEW (hidden until login) -->
+          <div class="success-overlay" id="successView">
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div
+              style="
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: var(--text-dark);
+                font-family: &quot;Nunito&quot;, sans-serif;
+              "
+            >
+              Connexion réussie !
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-light)">
+              Redirection vers votre tableau de bord…
+            </div>
+            <div
+              style="
+                width: 180px;
+                height: 4px;
+                background: var(--bg);
+                border-radius: 99px;
+                margin-top: 10px;
+                overflow: hidden;
+              "
+            >
+              <div
+                id="progressBar"
+                style="
+                  height: 100%;
+                  width: 0;
+                  background: var(--blue-mid);
+                  border-radius: 99px;
+                  transition: width 1.8s ease;
+                "
+              ></div>
+            </div>
+          </div>
         </div>
-
-        <div class="register-row">
-          Pas encore de compte ?
-          <a href="/register.html">Créer mon espace patient</a>
-        </div>
+        <!-- /panel-right -->
       </div>
+      <!-- /split -->
+    </div>
+    <!-- /page -->
 
-      <!-- SUCCESS VIEW (hidden until login) -->
-      <div class="success-overlay" id="successView">
-        <div class="success-icon">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div style="font-size:1.2rem;font-weight:700;color:var(--text-dark);font-family:'Nunito',sans-serif">Connexion réussie !</div>
-        <div style="font-size:.88rem;color:var(--text-light)">Redirection vers votre tableau de bord…</div>
-        <div style="width:180px;height:4px;background:var(--bg);border-radius:99px;margin-top:10px;overflow:hidden">
-          <div id="progressBar" style="height:100%;width:0;background:var(--blue-mid);border-radius:99px;transition:width 1.8s ease"></div>
-        </div>
-      </div>
+    <footer>
+      <a href="#">Mentions légales</a> ·
+      <a href="#">Politique de confidentialité</a> ·
+      <a href="#">Aide</a> &nbsp;·&nbsp; Hébergement certifié
+      <strong>HDS</strong> · © 2024 MediCare31
+    </footer>
 
-    </div><!-- /panel-right -->
-  </div><!-- /split -->
-</div><!-- /page -->
+    <script src="/js/auth.js"></script>
+    <script>
+      /* Redirige si déjà connecté */
+      if (localStorage.getItem("medicare_token"))
+        window.location.replace("/index.html");
 
-<footer>
-  <a href="#">Mentions légales</a> · <a href="#">Politique de confidentialité</a> · <a href="#">Aide</a>
-  &nbsp;·&nbsp; Hébergement certifié <strong>HDS</strong> · © 2024 MediCare31
-</footer>
+      /* Paramètre ?verified après confirmation email */
+      (function () {
+        const p = new URLSearchParams(window.location.search);
+        if (p.get("verified") === "1") {
+          showAlert(
+            "✅ Adresse e-mail confirmée ! Vous pouvez maintenant vous connecter.",
+          );
+          document.getElementById("alertBox").style.background = "#ecfdf3";
+          document.getElementById("alertBox").style.borderColor = "#a6f4c5";
+          document.getElementById("alertBox").style.color = "#027a48";
+          document.querySelector("#alertBox svg").style.stroke = "#027a48";
+        } else if (p.get("verified") === "already") {
+          showAlert(
+            "Votre compte est déjà activé. Connectez-vous normalement.",
+          );
+        } else if (p.get("error") === "token_invalide") {
+          showAlert(
+            "Lien de vérification invalide ou expiré. Veuillez vous réinscrire.",
+          );
+        }
+      })();
 
-<script src="/js/auth.js"></script>
-<script>
-  /* Redirige si déjà connecté */
-  if (localStorage.getItem('medicare_token')) window.location.replace('/index.html');
-
-  /* Paramètre ?verified après confirmation email */
-  (function() {
-    const p = new URLSearchParams(window.location.search);
-    if (p.get('verified') === '1') {
-      showAlert('✅ Adresse e-mail confirmée ! Vous pouvez maintenant vous connecter.');
-      document.getElementById('alertBox').style.background = '#ecfdf3';
-      document.getElementById('alertBox').style.borderColor = '#a6f4c5';
-      document.getElementById('alertBox').style.color = '#027a48';
-      document.querySelector('#alertBox svg').style.stroke = '#027a48';
-    } else if (p.get('verified') === 'already') {
-      showAlert('Votre compte est déjà activé. Connectez-vous normalement.');
-    } else if (p.get('error') === 'token_invalide') {
-      showAlert('Lien de vérification invalide ou expiré. Veuillez vous réinscrire.');
-    }
-  })();
-
-  /* ── ROLE TABS ── */
-  function setRole(btn, role) {
-    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    const placeholders = {
-      patient:     'nom@exemple.fr',
-      medecin:     'dr.nom@clinique.fr',
-      secretariat: 'secretariat@clinique.fr'
-    };
-    document.getElementById('email').placeholder = placeholders[role];
-  }
-
-  /* ── PASSWORD TOGGLE ── */
-  let pwdVisible = false;
-  function togglePwd() {
-    pwdVisible = !pwdVisible;
-    const input = document.getElementById('password');
-    const icon  = document.getElementById('eyeIcon');
-    input.type = pwdVisible ? 'text' : 'password';
-    icon.innerHTML = pwdVisible
-      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-         <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-         <line x1="1" y1="1" x2="23" y2="23"/>`
-      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-         <circle cx="12" cy="12" r="3"/>`;
-  }
-
-  /* ── AFFICHER SUCCÈS + REDIRECTION ── */
-  function showSuccess() {
-    document.getElementById('formView').style.display = 'none';
-    const sv = document.getElementById('successView');
-    sv.classList.add('show');
-    setTimeout(() => { document.getElementById('progressBar').style.width = '100%'; }, 50);
-    setTimeout(() => { window.location.replace('/index.html'); }, 1900);
-  }
-
-  /* ── STOCKER LA SESSION ── */
-  function storeSession(data) {
-    localStorage.setItem('medicare_token', data.access_token);
-    localStorage.setItem('medicare_user', JSON.stringify({
-      role:   data.role,
-      nom:    data.nom,
-      prenom: data.prenom,
-    }));
-  }
-
-  /* ── SUBMIT (login email/password) ── */
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const email = document.getElementById('email').value.trim();
-    const pwd   = document.getElementById('password').value;
-
-    if (!email || !pwd) { showAlert('Veuillez remplir tous les champs.'); return; }
-    if (!email.includes('@')) { showAlert('Adresse e-mail invalide.'); return; }
-
-    const btn = e.target.querySelector('.btn-submit');
-    btn.disabled = true;
-    document.getElementById('alertBox').classList.remove('show');
-
-    try {
-      /* FastAPI OAuth2PasswordRequestForm attend du x-www-form-urlencoded */
-      const body = new URLSearchParams({ username: email, password: pwd });
-      const res  = await fetch('/api/auth/login', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body:    body.toString(),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        showAlert(err.detail || 'Identifiants incorrects. Veuillez réessayer.');
-        return;
+      /* ── ROLE TABS ── */
+      function setRole(btn, role) {
+        document
+          .querySelectorAll(".role-tab")
+          .forEach((t) => t.classList.remove("active"));
+        btn.classList.add("active");
+        const placeholders = {
+          patient: "nom@exemple.fr",
+          medecin: "dr.nom@clinique.fr",
+          secretariat: "secretariat@clinique.fr",
+        };
+        document.getElementById("email").placeholder = placeholders[role];
       }
 
-      storeSession(await res.json());
-      showSuccess();
-    } catch {
-      showAlert('Impossible de contacter le serveur. Vérifiez votre connexion.');
-    } finally {
-      btn.disabled = false;
-    }
-  }
+      /* ── PASSWORD TOGGLE ── */
+      let pwdVisible = false;
+      function togglePwd() {
+        pwdVisible = !pwdVisible;
+        const input = document.getElementById("password");
+        const icon = document.getElementById("eyeIcon");
+        input.type = pwdVisible ? "text" : "password";
+        icon.innerHTML = pwdVisible
+          ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+         <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+         <line x1="1" y1="1" x2="23" y2="23"/>`
+          : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+         <circle cx="12" cy="12" r="3"/>`;
+      }
 
-  /* ── SSO MOCK (FranceConnect / Carte Vitale) ── */
-  async function loginSSO(provider) {
-    document.getElementById('alertBox').classList.remove('show');
-    try {
-      const res = await fetch(`/api/auth/${provider}`, { method: 'POST' });
-      if (!res.ok) { showAlert('Connexion SSO échouée.'); return; }
-      storeSession(await res.json());
-      showSuccess();
-    } catch {
-      showAlert('Impossible de contacter le serveur.');
-    }
-  }
+      /* ── AFFICHER SUCCÈS + REDIRECTION ── */
+      function showSuccess() {
+        document.getElementById("formView").style.display = "none";
+        const sv = document.getElementById("successView");
+        sv.classList.add("show");
+        setTimeout(() => {
+          document.getElementById("progressBar").style.width = "100%";
+        }, 50);
+        setTimeout(() => {
+          window.location.replace("/index.html");
+        }, 1900);
+      }
 
-  function showAlert(msg) {
-    const box = document.getElementById('alertBox');
-    document.getElementById('alertText').textContent = msg;
-    box.classList.add('show');
-    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-</script>
-</body>
+      /* ── STOCKER LA SESSION ── */
+      function storeSession(data) {
+        localStorage.setItem("medicare_token", data.access_token);
+        localStorage.setItem(
+          "medicare_user",
+          JSON.stringify({
+            role: data.role,
+            nom: data.nom,
+            prenom: data.prenom,
+          }),
+        );
+      }
+
+      /* ── SUBMIT (login email/password) ── */
+      async function handleSubmit(e) {
+        e.preventDefault();
+        const email = document.getElementById("email").value.trim();
+        const pwd = document.getElementById("password").value;
+
+        if (!email || !pwd) {
+          showAlert("Veuillez remplir tous les champs.");
+          return;
+        }
+        if (!email.includes("@")) {
+          showAlert("Adresse e-mail invalide.");
+          return;
+        }
+
+        const btn = e.target.querySelector(".btn-submit");
+        btn.disabled = true;
+        document.getElementById("alertBox").classList.remove("show");
+
+        try {
+          /* FastAPI OAuth2PasswordRequestForm attend du x-www-form-urlencoded */
+          const body = new URLSearchParams({ username: email, password: pwd });
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: body.toString(),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            showAlert(
+              err.detail || "Identifiants incorrects. Veuillez réessayer.",
+            );
+            return;
+          }
+
+          storeSession(await res.json());
+          showSuccess();
+        } catch {
+          showAlert(
+            "Impossible de contacter le serveur. Vérifiez votre connexion.",
+          );
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      /* ── SSO MOCK (FranceConnect / Carte Vitale) ── */
+      async function loginSSO(provider) {
+        document.getElementById("alertBox").classList.remove("show");
+        try {
+          const res = await fetch(`/api/auth/${provider}`, { method: "POST" });
+          if (!res.ok) {
+            showAlert("Connexion SSO échouée.");
+            return;
+          }
+          storeSession(await res.json());
+          showSuccess();
+        } catch {
+          showAlert("Impossible de contacter le serveur.");
+        }
+      }
+
+      function showAlert(msg) {
+        const box = document.getElementById("alertBox");
+        document.getElementById("alertText").textContent = msg;
+        box.classList.add("show");
+        box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    </script>
+  </body>
 </html>

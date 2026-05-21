@@ -1,738 +1,1167 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediCare31 – Patients</title>
-<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --blue-dark:  #2c5f9e;
-  --blue-mid:   #3a74be;
-  --blue-light: #4f8fda;
-  --blue-pale:  #e8f1fb;
-  --gold:       #e8a838;
-  --gold-pale:  #fdf3e0;
-  --green:      #12b76a;
-  --green-pale: #ecfdf3;
-  --red:        #f04438;
-  --red-pale:   #fef3f2;
-  --purple:     #7c3aed;
-  --purple-pale:#f5f3ff;
-  --teal:       #0891b2;
-  --teal-pale:  #ecfeff;
-  --text-dark:  #1e2d45;
-  --text-mid:   #4a5f7a;
-  --text-light: #8fa3bc;
-  --bg:         #eef2f7;
-  --white:      #ffffff;
-  --border:     #d6e2f0;
-  --radius:     12px;
-  --shadow:     0 2px 14px rgba(44,95,158,.10);
-  --shadow-lg:  0 8px 40px rgba(44,95,158,.18);
-}
-
-body { font-family: 'Source Sans 3', sans-serif; background: var(--bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
-
-/* ── NAV ── */
-nav { background: var(--blue-dark); display: flex; align-items: center; padding: 0 24px; height: 58px; gap: 24px; position: sticky; top: 0; z-index: 200; }
-.logo { display: flex; align-items: center; gap: 10px; color: #fff; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.18rem; text-decoration: none; white-space: nowrap; }
-.logo-icon { width: 30px; height: 30px; background: rgba(255,255,255,.18); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
-.logo-icon svg { width: 18px; height: 18px; fill: #fff; }
-.nav-links { display: flex; gap: 4px; list-style: none; flex: 1; }
-.nav-links a { color: rgba(255,255,255,.72); text-decoration: none; font-size: .9rem; font-weight: 500; padding: 6px 13px; border-radius: 6px; transition: color .15s, background .15s; }
-.nav-links a:hover { color: #fff; background: rgba(255,255,255,.12); }
-.nav-links a.active { color: #fff; border-bottom: 2px solid #fff; border-radius: 0; padding-bottom: 4px; }
-.nav-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
-.notif-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,.8); position: relative; padding: 4px; }
-.notif-btn svg { width: 19px; height: 19px; }
-.notif-dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #ef5350; border-radius: 50%; border: 1.5px solid var(--blue-dark); }
-.user-chip { display: flex; align-items: center; gap: 9px; color: #fff; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background .15s; }
-.user-chip:hover { background: rgba(255,255,255,.12); }
-.u-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#9ecfff,#4f8fda); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .78rem; color: #fff; border: 2px solid rgba(255,255,255,.35); flex-shrink: 0; }
-.user-chip > span { font-size: .86rem; font-weight: 600; }
-.user-chip svg { width: 13px; height: 13px; fill: rgba(255,255,255,.6); }
-
-/* ── APP ── */
-.app { display: flex; flex: 1; }
-
-/* ── SIDEBAR ── */
-aside { width: 210px; background: var(--white); padding: 16px 0; border-right: 1px solid var(--border); flex-shrink: 0; }
-.side-nav { list-style: none; }
-.side-nav li a { display: flex; align-items: center; gap: 11px; padding: 10px 20px; color: var(--text-mid); text-decoration: none; font-size: .88rem; font-weight: 500; transition: background .15s, color .15s; }
-.side-nav li a:hover { background: var(--blue-pale); color: var(--blue-dark); }
-.side-nav li.active a { background: var(--blue-dark); color: #fff; }
-.side-nav li a svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-
-/* ── MAIN ── */
-main { flex: 1; padding: 24px; overflow-x: hidden; }
-
-/* ── PAGE HEADER ── */
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 14px; }
-.page-title { font-family: 'Nunito', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text-dark); }
-.page-subtitle { font-size: .84rem; color: var(--text-light); margin-top: 2px; }
-.header-actions { display: flex; align-items: center; gap: 10px; }
-
-/* ── STAT CARDS ── */
-.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 22px; }
-.stat-card { background: var(--white); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); animation: fadeUp .4s ease both; }
-.stat-card:nth-child(1){animation-delay:.05s} .stat-card:nth-child(2){animation-delay:.10s} .stat-card:nth-child(3){animation-delay:.15s} .stat-card:nth-child(4){animation-delay:.20s}
-@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-.stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.stat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-.stat-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-.stat-icon.blue   { background: var(--blue-pale);   color: var(--blue-dark); }
-.stat-icon.green  { background: var(--green-pale);  color: #065f46; }
-.stat-icon.gold   { background: var(--gold-pale);   color: #8a6010; }
-.stat-icon.purple { background: var(--purple-pale); color: var(--purple); }
-.stat-delta { font-size: .72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
-.stat-delta.up   { background: var(--green-pale); color: #065f46; }
-.stat-delta.down { background: var(--red-pale); color: var(--red); }
-.stat-num { font-family: 'Nunito', sans-serif; font-size: 2rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
-.stat-label { font-size: .8rem; color: var(--text-light); margin-top: 4px; font-weight: 500; }
-
-/* ── TOOLBAR ── */
-.toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.search-box { position: relative; flex: 1; min-width: 220px; }
-.search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--text-light); fill: none; stroke-width: 1.8; pointer-events: none; }
-.search-box input { width: 100%; padding: 9px 12px 9px 38px; border: 1.5px solid var(--border); border-radius: 9px; font-size: .88rem; font-family: inherit; color: var(--text-dark); background: var(--white); outline: none; transition: border-color .18s, box-shadow .18s; }
-.search-box input:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(79,143,218,.12); }
-
-.filter-select { padding: 9px 32px 9px 12px; border: 1.5px solid var(--border); border-radius: 9px; font-size: .86rem; font-family: inherit; color: var(--text-mid); background: var(--white); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238fa3bc' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; transition: border-color .18s; }
-.filter-select:focus { border-color: var(--blue-light); }
-
-.view-switch { display: flex; background: var(--white); border: 1.5px solid var(--border); border-radius: 9px; padding: 3px; gap: 2px; }
-.view-btn { padding: 5px 10px; border: none; background: transparent; border-radius: 7px; font-size: .78rem; font-weight: 600; color: var(--text-light); cursor: pointer; font-family: inherit; transition: all .15s; display: flex; align-items: center; gap: 5px; }
-.view-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-.view-btn.active { background: var(--white); color: var(--blue-dark); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-
-/* ── BUTTONS ── */
-.btn-primary { background: var(--blue-dark); color: #fff; border: none; border-radius: 9px; padding: 9px 18px; font-size: .86rem; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 7px; transition: background .15s, transform .1s; box-shadow: 0 3px 10px rgba(44,95,158,.26); }
-.btn-primary:hover { background: var(--blue-mid); transform: translateY(-1px); }
-.btn-primary svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.2; }
-.btn-secondary { background: var(--white); color: var(--text-mid); border: 1.5px solid var(--border); border-radius: 9px; padding: 9px 16px; font-size: .86rem; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 7px; transition: all .15s; }
-.btn-secondary:hover { background: var(--blue-pale); border-color: var(--blue-light); color: var(--blue-dark); }
-.btn-secondary svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-
-/* ── TAGS / BADGES ── */
-.badge { padding: 3px 9px; border-radius: 20px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
-.badge-blue   { background: var(--blue-pale);   color: var(--blue-dark); }
-.badge-green  { background: var(--green-pale);  color: #065f46; }
-.badge-gold   { background: var(--gold-pale);   color: #8a6010; }
-.badge-red    { background: var(--red-pale);    color: var(--red); }
-.badge-purple { background: var(--purple-pale); color: var(--purple); }
-.badge-teal   { background: var(--teal-pale);   color: var(--teal); }
-.badge-grey   { background: var(--bg);          color: var(--text-mid); }
-
-/* ── TABLE VIEW ── */
-.table-wrap { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; animation: fadeUp .4s .22s ease both; }
-table { width: 100%; border-collapse: collapse; }
-thead tr { background: var(--bg); border-bottom: 2px solid var(--border); }
-thead th { padding: 11px 16px; text-align: left; font-size: .74rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; cursor: pointer; user-select: none; }
-thead th:hover { color: var(--blue-dark); }
-thead th svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.2; vertical-align: middle; margin-left: 3px; }
-tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; cursor: pointer; }
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: #fafcff; }
-tbody td { padding: 12px 16px; font-size: .875rem; vertical-align: middle; }
-
-.patient-cell { display: flex; align-items: center; gap: 12px; }
-.pat-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .78rem; color: #fff; flex-shrink: 0; }
-.pat-name { font-weight: 600; color: var(--text-dark); }
-.pat-id   { font-size: .74rem; color: var(--text-light); margin-top: 1px; }
-
-.td-light { color: var(--text-mid); }
-.td-lighter { color: var(--text-light); font-size: .82rem; }
-
-.action-cell { display: flex; align-items: center; gap: 6px; }
-.icon-btn { width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-light); transition: all .15s; }
-.icon-btn:hover { background: var(--blue-pale); border-color: var(--blue-light); color: var(--blue-dark); }
-.icon-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-.icon-btn.danger:hover { background: var(--red-pale); border-color: #fda29b; color: var(--red); }
-
-/* ── GRID VIEW ── */
-.patients-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; animation: fadeUp .4s .22s ease both; }
-.patient-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; cursor: pointer; transition: box-shadow .2s, transform .15s; border: 1.5px solid transparent; }
-.patient-card:hover { box-shadow: 0 6px 28px rgba(44,95,158,.14); transform: translateY(-2px); border-color: var(--blue-pale); }
-.pc-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
-.pc-avatar { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; color: #fff; flex-shrink: 0; }
-.pc-info { flex: 1; }
-.pc-name { font-weight: 700; font-size: .98rem; color: var(--text-dark); }
-.pc-meta { font-size: .75rem; color: var(--text-light); margin-top: 2px; }
-.pc-id { font-size: .7rem; font-weight: 600; color: var(--text-light); background: var(--bg); padding: 2px 7px; border-radius: 5px; display: inline-block; margin-top: 4px; }
-.pc-divider { height: 1px; background: var(--border); margin-bottom: 12px; }
-.pc-rows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-.pc-row { display: flex; align-items: center; gap: 8px; font-size: .79rem; color: var(--text-mid); }
-.pc-row svg { width: 13px; height: 13px; stroke: var(--text-light); fill: none; stroke-width: 1.8; flex-shrink: 0; }
-.pc-foot { display: flex; align-items: center; justify-content: space-between; }
-.pc-actions { display: flex; gap: 6px; }
-.pc-btn { padding: 5px 12px; border-radius: 7px; font-size: .75rem; font-weight: 600; cursor: pointer; font-family: inherit; border: none; transition: background .12s; }
-.pc-btn.primary { background: var(--blue-pale); color: var(--blue-dark); }
-.pc-btn.primary:hover { background: #cde0f6; }
-.pc-btn.ghost { background: var(--bg); color: var(--text-mid); }
-.pc-btn.ghost:hover { background: #e0e8f4; }
-
-/* ── PAGINATION ── */
-.pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-top: 1px solid var(--border); background: var(--white); border-radius: 0 0 var(--radius) var(--radius); }
-.page-info { font-size: .8rem; color: var(--text-light); }
-.page-btns { display: flex; gap: 4px; }
-.page-btn { width: 32px; height: 32px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--white); font-size: .82rem; font-weight: 600; color: var(--text-mid); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; font-family: inherit; }
-.page-btn:hover { background: var(--blue-pale); border-color: var(--blue-light); color: var(--blue-dark); }
-.page-btn.active { background: var(--blue-dark); border-color: var(--blue-dark); color: #fff; }
-.page-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.2; }
-
-/* ── MODAL PATIENT ── */
-.modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(15,30,55,.45); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; padding: 20px; }
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal { background: var(--white); border-radius: 18px; width: 100%; max-width: 720px; max-height: 92vh; overflow-y: auto; box-shadow: var(--shadow-lg); transform: translateY(20px) scale(.97); transition: transform .25s cubic-bezier(.22,1,.36,1); }
-.modal-overlay.open .modal { transform: translateY(0) scale(1); }
-.modal-header { padding: 22px 26px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--white); z-index: 10; }
-.modal-title { font-family: 'Nunito', sans-serif; font-size: 1.12rem; font-weight: 800; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
-.modal-title svg { width: 20px; height: 20px; stroke: var(--blue-dark); fill: none; stroke-width: 1.8; }
-.modal-close { background: none; border: none; cursor: pointer; color: var(--text-light); padding: 6px; border-radius: 7px; transition: background .12s; display: flex; }
-.modal-close:hover { background: var(--bg); color: var(--text-dark); }
-.modal-close svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-/* TABS inside modal */
-.modal-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 26px; gap: 0; }
-.modal-tab { padding: 12px 18px; font-size: .86rem; font-weight: 600; color: var(--text-light); cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; }
-.modal-tab:hover { color: var(--text-mid); }
-.modal-tab.active { color: var(--blue-dark); border-color: var(--blue-dark); }
-
-.modal-body { padding: 24px 26px; }
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-
-/* form inside modal */
-.form-section { margin-bottom: 22px; }
-.form-section-title { font-size: .74rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
-.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
-.full { grid-column: 1/-1; }
-.fg { display: flex; flex-direction: column; gap: 5px; }
-.fg label { font-size: .78rem; font-weight: 600; color: var(--text-mid); }
-.fg label .req { color: var(--red); }
-.inp-wrap { position: relative; }
-.inp-wrap > svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; stroke: var(--text-light); fill: none; stroke-width: 1.8; pointer-events: none; }
-.inp-wrap:focus-within > svg { stroke: var(--blue-mid); }
-.inp-wrap input, .inp-wrap select { width: 100%; padding: 9px 12px 9px 36px; border: 1.5px solid var(--border); border-radius: 8px; font-size: .86rem; font-family: inherit; color: var(--text-dark); background: var(--white); outline: none; transition: border-color .18s, box-shadow .18s; appearance: none; }
-.inp-wrap.no-ico input, .inp-wrap.no-ico select { padding-left: 12px; }
-.inp-wrap select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238fa3bc' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; padding-right: 32px; }
-.inp-wrap input:focus, .inp-wrap select:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(79,143,218,.13); }
-textarea.inp { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: .86rem; font-family: inherit; color: var(--text-dark); resize: vertical; min-height: 72px; outline: none; transition: border-color .18s; }
-textarea.inp:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(79,143,218,.13); }
-
-/* dossier tabs */
-.dossier-list { display: flex; flex-direction: column; gap: 10px; }
-.dossier-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; transition: background .12s, border-color .12s; }
-.dossier-item:hover { background: var(--blue-pale); border-color: var(--blue-light); }
-.dossier-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.dossier-icon svg { width: 17px; height: 17px; stroke: var(--blue-dark); fill: none; stroke-width: 1.8; }
-.dossier-info { flex: 1; min-width: 0; }
-.dossier-name { font-size: .88rem; font-weight: 600; color: var(--text-dark); }
-.dossier-meta { font-size: .74rem; color: var(--text-light); margin-top: 2px; }
-.dossier-date { font-size: .76rem; color: var(--text-light); white-space: nowrap; }
-
-/* History timeline */
-.timeline { display: flex; flex-direction: column; gap: 0; }
-.tl-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
-.tl-item:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 32px; bottom: 0; width: 1px; background: var(--border); }
-.tl-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--blue-pale); border: 2px solid var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; }
-.tl-dot svg { width: 14px; height: 14px; stroke: var(--blue-dark); fill: none; stroke-width: 2; }
-.tl-dot.green { background: var(--green-pale); border-color: var(--green); }
-.tl-dot.green svg { stroke: var(--green); }
-.tl-dot.gold { background: var(--gold-pale); border-color: var(--gold); }
-.tl-dot.gold svg { stroke: var(--gold); }
-.tl-dot.red { background: var(--red-pale); border-color: var(--red); }
-.tl-dot.red svg { stroke: var(--red); }
-.tl-body { flex: 1; padding-top: 4px; }
-.tl-title { font-size: .9rem; font-weight: 700; color: var(--text-dark); }
-.tl-sub { font-size: .78rem; color: var(--text-mid); margin-top: 3px; }
-.tl-date { font-size: .74rem; color: var(--text-light); margin-top: 2px; }
-.tl-note { font-size: .8rem; color: var(--text-mid); background: var(--bg); border-radius: 7px; padding: 7px 10px; margin-top: 6px; line-height: 1.5; }
-
-/* Health stats */
-.health-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 18px; }
-.health-stat { background: var(--bg); border-radius: 10px; padding: 14px; text-align: center; }
-.hs-value { font-family: 'Nunito', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text-dark); }
-.hs-unit { font-size: .72rem; font-weight: 600; color: var(--text-light); }
-.hs-label { font-size: .74rem; color: var(--text-light); margin-top: 4px; }
-
-.modal-footer { padding: 16px 26px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; position: sticky; bottom: 0; background: var(--white); }
-.btn-cancel { background: var(--bg); border: 1.5px solid var(--border); color: var(--text-mid); padding: 9px 18px; border-radius: 9px; font-size: .86rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .12s; }
-.btn-cancel:hover { background: #e0e8f4; }
-.btn-save { background: var(--blue-dark); color: #fff; border: none; padding: 9px 22px; border-radius: 9px; font-size: .86rem; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 7px; transition: background .12s, transform .1s; box-shadow: 0 3px 10px rgba(44,95,158,.26); }
-.btn-save:hover { background: var(--blue-mid); transform: translateY(-1px); }
-.btn-save svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2.2; }
-.btn-delete { background: var(--red-pale); color: var(--red); border: none; padding: 9px 16px; border-radius: 9px; font-size: .86rem; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; transition: background .12s; }
-.btn-delete:hover { background: #fecaca; }
-.btn-delete svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-/* TOAST */
-.toast { position: fixed; bottom: 22px; right: 22px; z-index: 600; background: var(--text-dark); color: #fff; padding: 11px 16px; border-radius: 10px; font-size: .84rem; font-weight: 600; display: flex; align-items: center; gap: 9px; box-shadow: 0 6px 24px rgba(0,0,0,.2); transform: translateY(80px); opacity: 0; transition: transform .3s, opacity .3s; }
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast svg { width: 15px; height: 15px; stroke: var(--green); fill: none; stroke-width: 2.5; }
-
-::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-</style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav>
-  <a class="logo" href="#">
-    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="7" y="10" width="10" height="4" rx="1"/></svg></div>
-    MediCare31
-  </a>
-  <ul class="nav-links">
-    <li><a href="#">Tableau de bord</a></li>
-    <li><a href="#">Agenda</a></li>
-    <li><a href="#" class="active">Patients</a></li>
-    <li><a href="#">Messages</a></li>
-    <li><a href="#">Documents</a></li>
-  </ul>
-  <div class="nav-right">
-    <button class="notif-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-dot"></span></button>
-    <div class="user-chip">
-      <div class="u-avatar">JM</div>
-      <span>Dr. Jean Martin</span>
-      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-  </div>
-</nav>
-
-<div class="app">
-  <!-- SIDEBAR -->
-  <aside>
-    <ul class="side-nav">
-      <li><a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord</a></li>
-      <li><a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a></li>
-      <li class="active"><a href="#"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Patients</a></li>
-      <li><a href="#"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messagerie</a></li>
-      <li><a href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documents</a></li>
-      <li><a href="#"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Statistiques</a></li>
-    </ul>
-  </aside>
-
-  <main>
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-      <div>
-        <div class="page-title">Patients</div>
-        <div class="page-subtitle">Gestion et suivi de votre patientèle</div>
-      </div>
-      <div class="header-actions">
-        <button class="btn-secondary" onclick="showToast('Export en cours…')">
-          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Exporter
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Patients</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/patients.css" />
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a class="logo" href="#">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
+        </div>
+        MediCare31
+      </a>
+      <ul class="nav-links">
+        <li><a href="#">Tableau de bord</a></li>
+        <li><a href="#">Agenda</a></li>
+        <li><a href="#" class="active">Patients</a></li>
+        <li><a href="messages.html">Messages</a></li>
+        <li><a href="#">Documents</a></li>
+      </ul>
+      <div class="nav-right">
+        <button class="notif-btn">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg
+          ><span class="notif-dot"></span>
         </button>
-        <button class="btn-primary" onclick="openModal()">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nouveau patient
-        </button>
+        <div class="user-chip">
+          <div class="u-avatar">JM</div>
+          <span>Dr. Jean Martin</span>
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+        </div>
+      </div>
+    </nav>
+
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside>
+        <ul class="side-nav">
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" /></svg
+              >Tableau de bord</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" /></svg
+              >Agenda</a
+            >
+          </li>
+          <li class="active">
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg
+              >Patients</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                /></svg
+              >Messagerie</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" /></svg
+              >Documents</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" /></svg
+              >Statistiques</a
+            >
+          </li>
+        </ul>
+      </aside>
+
+      <main>
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <div>
+            <div class="page-title">Patients</div>
+            <div class="page-subtitle">
+              Gestion et suivi de votre patientèle
+            </div>
+          </div>
+          <div class="header-actions">
+            <button
+              class="btn-secondary"
+              onclick="showToast('Export en cours…')"
+            >
+              <svg viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Exporter
+            </button>
+            <button class="btn-primary" onclick="openModal()">
+              <svg viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Nouveau patient
+            </button>
+          </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-top">
+              <div class="stat-icon blue">
+                <svg viewBox="0 0 24 24">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                </svg>
+              </div>
+              <span class="stat-delta up">↑ 12%</span>
+            </div>
+            <div class="stat-num" id="statTotal">248</div>
+            <div class="stat-label">Patients au total</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top">
+              <div class="stat-icon green">
+                <svg viewBox="0 0 24 24">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+              </div>
+              <span class="stat-delta up">↑ 4%</span>
+            </div>
+            <div class="stat-num">34</div>
+            <div class="stat-label">Nouveaux ce mois</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top">
+              <div class="stat-icon gold">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </div>
+              <span class="stat-delta up">↑ 8%</span>
+            </div>
+            <div class="stat-num">18</div>
+            <div class="stat-label">RDV cette semaine</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top">
+              <div class="stat-icon purple">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+              </div>
+              <span class="stat-delta down">↓ 2%</span>
+            </div>
+            <div class="stat-num">12</div>
+            <div class="stat-label">Suivis actifs</div>
+          </div>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Rechercher par nom, prénom, numéro de dossier…"
+              oninput="filterPatients()"
+            />
+          </div>
+          <select
+            class="filter-select"
+            id="filterStatus"
+            onchange="filterPatients()"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="Actif">Actif</option>
+            <option value="Nouveau">Nouveau</option>
+            <option value="Suivi">Suivi</option>
+            <option value="Inactif">Inactif</option>
+          </select>
+          <select
+            class="filter-select"
+            id="filterDoc"
+            onchange="filterPatients()"
+          >
+            <option value="">Tous les médecins</option>
+            <option>Dr. Jean Martin</option>
+            <option>Dr. Sophie Blanc</option>
+            <option>Dr. Ahmed Karim</option>
+            <option>Dr. Marie Leclerc</option>
+          </select>
+          <div class="view-switch">
+            <button
+              class="view-btn active"
+              id="vTable"
+              onclick="setView('table')"
+            >
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="3" y1="9" x2="21" y2="9" />
+                <line x1="3" y1="15" x2="21" y2="15" />
+                <line x1="9" y1="9" x2="9" y2="21" /></svg
+              >Liste
+            </button>
+            <button class="view-btn" id="vGrid" onclick="setView('grid')">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" /></svg
+              >Cartes
+            </button>
+          </div>
+        </div>
+
+        <!-- TABLE VIEW -->
+        <div id="tableView">
+          <div class="table-wrap">
+            <table id="patientTable">
+              <thead>
+                <tr>
+                  <th onclick="sortBy('name')">
+                    Patient
+                    <svg viewBox="0 0 24 24">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </th>
+                  <th onclick="sortBy('dossier')">
+                    N° Dossier
+                    <svg viewBox="0 0 24 24">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </th>
+                  <th onclick="sortBy('ddn')">
+                    Date de naissance
+                    <svg viewBox="0 0 24 24">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </th>
+                  <th>Médecin traitant</th>
+                  <th onclick="sortBy('lastVisit')">
+                    Dernière visite
+                    <svg viewBox="0 0 24 24">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+            <div class="pagination">
+              <div class="page-info" id="pageInfo"></div>
+              <div class="page-btns" id="pageBtns"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRID VIEW -->
+        <div id="gridView" style="display: none">
+          <div class="patients-grid" id="patientGrid"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ═══ PATIENT MODAL ═══ -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOut(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title">
+            <svg viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+            </svg>
+            <span id="modalTitleText">Nouveau patient</span>
+          </div>
+          <button class="modal-close" onclick="closeModal()">
+            <svg viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- TABS -->
+        <div class="modal-tabs" id="modalTabs">
+          <div class="modal-tab active" onclick="switchTab(0)">
+            Informations
+          </div>
+          <div class="modal-tab" onclick="switchTab(1)" id="tabDossier">
+            Dossier médical
+          </div>
+          <div class="modal-tab" onclick="switchTab(2)" id="tabHistorique">
+            Historique
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <!-- TAB 0 : INFOS -->
+          <div class="tab-panel active" id="tp0">
+            <div class="form-section">
+              <div class="form-section-title">Identité</div>
+              <div class="form-grid">
+                <div class="fg">
+                  <label>Civilité</label>
+                  <div class="inp-wrap no-ico">
+                    <select id="fCiv">
+                      <option>M.</option>
+                      <option>Mme</option>
+                      <option>Autre</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fNom">Nom <span class="req">*</span></label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" /></svg
+                    ><input type="text" id="fNom" placeholder="DUPONT" />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fPrenom">Prénom <span class="req">*</span></label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" /></svg
+                    ><input type="text" id="fPrenom" placeholder="Marc" />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fDdn"
+                    >Date de naissance <span class="req">*</span></label
+                  >
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" /></svg
+                    ><input type="date" id="fDdn" />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fSecu">N° Sécurité sociale</label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="2" y="5" width="20" height="14" rx="2" />
+                      <line x1="2" y1="10" x2="22" y2="10" /></svg
+                    ><input
+                      type="text"
+                      id="fSecu"
+                      placeholder="1 85 04 75 123 456 78"
+                      maxlength="21"
+                    />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fSexe">Sexe</label>
+                  <div class="inp-wrap no-ico">
+                    <select id="fSexe">
+                      <option value="">--</option>
+                      <option>Masculin</option>
+                      <option>Féminin</option>
+                      <option>Non précisé</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Coordonnées</div>
+              <div class="form-grid">
+                <div class="fg full">
+                  <label for="fEmail">Adresse e-mail</label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                      />
+                      <polyline points="22,6 12,13 2,6" /></svg
+                    ><input
+                      type="email"
+                      id="fEmail"
+                      placeholder="marc.dupont@email.fr"
+                    />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fTel">Téléphone</label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                      /></svg
+                    ><input type="tel" id="fTel" placeholder="06 00 00 00 00" />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fTel2">Téléphone 2</label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                      /></svg
+                    ><input
+                      type="tel"
+                      id="fTel2"
+                      placeholder="05 00 00 00 00"
+                    />
+                  </div>
+                </div>
+                <div class="fg full">
+                  <label for="fAdresse">Adresse</label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                      />
+                      <circle cx="12" cy="10" r="3" /></svg
+                    ><input
+                      type="text"
+                      id="fAdresse"
+                      placeholder="50 Avenue de la Santé"
+                    />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fCp">Code postal</label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                      />
+                      <circle cx="12" cy="10" r="3" /></svg
+                    ><input
+                      type="text"
+                      id="fCp"
+                      placeholder="31000"
+                      maxlength="5"
+                    />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fVille">Ville</label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                      />
+                      <circle cx="12" cy="10" r="3" /></svg
+                    ><input type="text" id="fVille" placeholder="Toulouse" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Prise en charge</div>
+              <div class="form-grid">
+                <div class="fg">
+                  <label for="fMedecin">Médecin traitant</label>
+                  <div class="inp-wrap no-ico">
+                    <select id="fMedecin">
+                      <option value="">-- Choisir --</option>
+                      <option>Dr. Jean Martin</option>
+                      <option>Dr. Sophie Blanc</option>
+                      <option>Dr. Ahmed Karim</option>
+                      <option>Dr. Marie Leclerc</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fStatut">Statut</label>
+                  <div class="inp-wrap no-ico">
+                    <select id="fStatut">
+                      <option>Actif</option>
+                      <option>Nouveau</option>
+                      <option>Suivi</option>
+                      <option>Inactif</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fMutuelle">Mutuelle</label>
+                  <div class="inp-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                      /></svg
+                    ><input
+                      type="text"
+                      id="fMutuelle"
+                      placeholder="MGEN, Malakoff…"
+                    />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="fGroupe">Groupe sanguin</label>
+                  <div class="inp-wrap no-ico">
+                    <select id="fGroupe">
+                      <option value="">--</option>
+                      <option>A+</option>
+                      <option>A-</option>
+                      <option>B+</option>
+                      <option>B-</option>
+                      <option>AB+</option>
+                      <option>AB-</option>
+                      <option>O+</option>
+                      <option>O-</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fg full">
+                  <label for="fAllergie">Allergies connues</label>
+                  <textarea
+                    class="inp"
+                    id="fAllergie"
+                    placeholder="Pénicilline, arachides…"
+                  ></textarea>
+                </div>
+                <div class="fg full">
+                  <label for="fNotes">Notes cliniques</label>
+                  <textarea
+                    class="inp"
+                    id="fNotes"
+                    placeholder="Antécédents, observations particulières…"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 1 : DOSSIER -->
+          <div class="tab-panel" id="tp1">
+            <div class="health-grid">
+              <div class="health-stat">
+                <div class="hs-value" id="hs-taille">—</div>
+                <div class="hs-unit">cm</div>
+                <div class="hs-label">Taille</div>
+              </div>
+              <div class="health-stat">
+                <div class="hs-value" id="hs-poids">—</div>
+                <div class="hs-unit">kg</div>
+                <div class="hs-label">Poids</div>
+              </div>
+              <div class="health-stat">
+                <div class="hs-value" id="hs-ta">—</div>
+                <div class="hs-unit">mmHg</div>
+                <div class="hs-label">Tension</div>
+              </div>
+            </div>
+            <div class="form-grid three" style="margin-bottom: 18px">
+              <div class="fg">
+                <label>Taille (cm)</label>
+                <div class="inp-wrap no-ico">
+                  <input
+                    type="number"
+                    id="fTaille"
+                    placeholder="178"
+                    oninput="
+                      document.getElementById('hs-taille').textContent =
+                        this.value || '—'
+                    "
+                  />
+                </div>
+              </div>
+              <div class="fg">
+                <label>Poids (kg)</label>
+                <div class="inp-wrap no-ico">
+                  <input
+                    type="number"
+                    id="fPoids"
+                    placeholder="78"
+                    oninput="
+                      document.getElementById('hs-poids').textContent =
+                        this.value || '—'
+                    "
+                  />
+                </div>
+              </div>
+              <div class="fg">
+                <label>Tension artérielle</label>
+                <div class="inp-wrap no-ico">
+                  <input
+                    type="text"
+                    id="fTA"
+                    placeholder="125/80"
+                    oninput="
+                      document.getElementById('hs-ta').textContent =
+                        this.value || '—'
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              class="form-section-title"
+              style="
+                font-size: 0.74rem;
+                font-weight: 700;
+                color: var(--text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                margin-bottom: 12px;
+              "
+            >
+              Documents médicaux
+            </div>
+            <div class="dossier-list">
+              <div class="dossier-item">
+                <div class="dossier-icon">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="3" y1="15" x2="21" y2="15" />
+                    <line x1="9" y1="9" x2="9" y2="21" />
+                  </svg>
+                </div>
+                <div class="dossier-info">
+                  <div class="dossier-name">
+                    Résultats d'analyses – Juin 2025
+                  </div>
+                  <div class="dossier-meta">
+                    Laboratoire Cerba · PDF · 420 Ko
+                  </div>
+                </div>
+                <span class="dossier-date">02/06/2025</span>
+              </div>
+              <div class="dossier-item">
+                <div class="dossier-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+                </div>
+                <div class="dossier-info">
+                  <div class="dossier-name">
+                    Ordonnance – Renouvellement traitement
+                  </div>
+                  <div class="dossier-meta">Dr. Jean Martin · PDF · 120 Ko</div>
+                </div>
+                <span class="dossier-date">15/04/2025</span>
+              </div>
+              <div class="dossier-item">
+                <div class="dossier-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                </div>
+                <div class="dossier-info">
+                  <div class="dossier-name">
+                    Certificat médical – Aptitude sport
+                  </div>
+                  <div class="dossier-meta">Dr. Jean Martin · PDF · 98 Ko</div>
+                </div>
+                <span class="dossier-date">08/03/2025</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2 : HISTORIQUE -->
+          <div class="tab-panel" id="tp2">
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </div>
+                <div class="tl-body">
+                  <div class="tl-title">Consultation générale</div>
+                  <div class="tl-sub">Dr. Jean Martin · Cabinet 1</div>
+                  <div class="tl-date">02 juin 2025 · 09:00</div>
+                  <div class="tl-note">
+                    Renouvellement ordonnance. Tension stable. Prochain contrôle
+                    dans 3 mois.
+                  </div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot green">
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                  </svg>
+                </div>
+                <div class="tl-body">
+                  <div class="tl-title">Bilan sanguin</div>
+                  <div class="tl-sub">Laboratoire Cerba</div>
+                  <div class="tl-date">28 mai 2025</div>
+                  <div class="tl-note">
+                    Glycémie normale, cholestérol légèrement élevé (2,1 g/L).
+                    Suivi recommandé.
+                  </div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot gold">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                </div>
+                <div class="tl-body">
+                  <div class="tl-title">Ordonnance délivrée</div>
+                  <div class="tl-sub">Dr. Jean Martin</div>
+                  <div class="tl-date">15 avril 2025</div>
+                  <div class="tl-note">
+                    Renouvellement Amlodipine 5mg, Atorvastatine 10mg – 3 mois.
+                  </div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </div>
+                <div class="tl-body">
+                  <div class="tl-title">Contrôle annuel</div>
+                  <div class="tl-sub">Dr. Jean Martin · Cabinet 1</div>
+                  <div class="tl-date">10 janvier 2025</div>
+                  <div class="tl-note">
+                    Examen complet. Poids stable, tension 125/80. Vaccination
+                    grippe effectuée.
+                  </div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot red">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </div>
+                <div class="tl-body">
+                  <div class="tl-title">Consultation urgente</div>
+                  <div class="tl-sub">Dr. Jean Martin · Urgences cabinet</div>
+                  <div class="tl-date">03 novembre 2024</div>
+                  <div class="tl-note">
+                    Douleurs thoraciques bénignes – origine musculaire. ECG
+                    normal. Paracétamol prescrit.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /modal-body -->
+
+        <div class="modal-footer">
+          <button
+            class="btn-delete"
+            id="btnDelete"
+            onclick="deletePatient()"
+            style="display: none"
+          >
+            <svg viewBox="0 0 24 24">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            </svg>
+            Supprimer
+          </button>
+          <div style="display: flex; gap: 10px; margin-left: auto">
+            <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+            <button class="btn-save" onclick="savePatient()">
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Enregistrer
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- STATS -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-          <span class="stat-delta up">↑ 12%</span>
-        </div>
-        <div class="stat-num" id="statTotal">248</div>
-        <div class="stat-label">Patients au total</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-          <span class="stat-delta up">↑ 4%</span>
-        </div>
-        <div class="stat-num">34</div>
-        <div class="stat-label">Nouveaux ce mois</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon gold"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-          <span class="stat-delta up">↑ 8%</span>
-        </div>
-        <div class="stat-num">18</div>
-        <div class="stat-label">RDV cette semaine</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon purple"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-          <span class="stat-delta down">↓ 2%</span>
-        </div>
-        <div class="stat-num">12</div>
-        <div class="stat-label">Suivis actifs</div>
-      </div>
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+      <span id="toastMsg">Patient enregistré</span>
     </div>
 
-    <!-- TOOLBAR -->
-    <div class="toolbar">
-      <div class="search-box">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="searchInput" placeholder="Rechercher par nom, prénom, numéro de dossier…" oninput="filterPatients()">
-      </div>
-      <select class="filter-select" id="filterStatus" onchange="filterPatients()">
-        <option value="">Tous les statuts</option>
-        <option value="Actif">Actif</option>
-        <option value="Nouveau">Nouveau</option>
-        <option value="Suivi">Suivi</option>
-        <option value="Inactif">Inactif</option>
-      </select>
-      <select class="filter-select" id="filterDoc" onchange="filterPatients()">
-        <option value="">Tous les médecins</option>
-        <option>Dr. Jean Martin</option>
-        <option>Dr. Sophie Blanc</option>
-        <option>Dr. Ahmed Karim</option>
-        <option>Dr. Marie Leclerc</option>
-      </select>
-      <div class="view-switch">
-        <button class="view-btn active" id="vTable" onclick="setView('table')">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>Liste
-        </button>
-        <button class="view-btn" id="vGrid" onclick="setView('grid')">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Cartes
-        </button>
-      </div>
-    </div>
+    <script src="/js/auth.js"></script>
+    <script>
+      authGuard();
+      // ═══ DATA ═══
+      const COLORS = [
+        "#3b82f6",
+        "#10b981",
+        "#8b5cf6",
+        "#f59e0b",
+        "#ef4444",
+        "#14b8a6",
+        "#f97316",
+        "#6366f1",
+        "#ec4899",
+        "#0891b2",
+      ];
 
-    <!-- TABLE VIEW -->
-    <div id="tableView">
-      <div class="table-wrap">
-        <table id="patientTable">
-          <thead>
-            <tr>
-              <th onclick="sortBy('name')">Patient <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></th>
-              <th onclick="sortBy('dossier')">N° Dossier <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></th>
-              <th onclick="sortBy('ddn')">Date de naissance <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></th>
-              <th>Médecin traitant</th>
-              <th onclick="sortBy('lastVisit')">Dernière visite <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-        <div class="pagination">
-          <div class="page-info" id="pageInfo"></div>
-          <div class="page-btns" id="pageBtns"></div>
-        </div>
-      </div>
-    </div>
+      let patients = [
+        {
+          id: 1,
+          nom: "Durand",
+          prenom: "Sophie",
+          ddn: "1985-03-12",
+          sexe: "Féminin",
+          dossier: "P-2024-0721",
+          medecin: "Dr. Jean Martin",
+          statut: "Actif",
+          lastVisit: "02/06/2025",
+          tel: "06 55 44 33 22",
+          email: "sophie.durand@email.fr",
+          ville: "Toulouse",
+          groupe: "A+",
+          allergie: "Aucune connue",
+        },
+        {
+          id: 2,
+          nom: "Robert",
+          prenom: "Alain",
+          ddn: "1962-07-28",
+          sexe: "Masculin",
+          dossier: "P-2024-0834",
+          medecin: "Dr. Jean Martin",
+          statut: "Suivi",
+          lastVisit: "02/06/2025",
+          tel: "06 12 45 78 90",
+          email: "alain.robert@email.fr",
+          ville: "Toulouse",
+          groupe: "O+",
+          allergie: "Pénicilline",
+        },
+        {
+          id: 3,
+          nom: "Lefèvre",
+          prenom: "Julie",
+          ddn: "1990-11-05",
+          sexe: "Féminin",
+          dossier: "P-2024-0902",
+          medecin: "Dr. Sophie Blanc",
+          statut: "Actif",
+          lastVisit: "28/05/2025",
+          tel: "07 88 21 36 54",
+          email: "julie.lefevre@email.fr",
+          ville: "Toulouse",
+          groupe: "B+",
+          allergie: "Aspirine",
+        },
+        {
+          id: 4,
+          nom: "Dupont",
+          prenom: "Marc",
+          ddn: "1978-09-15",
+          sexe: "Masculin",
+          dossier: "P-2024-1182",
+          medecin: "Dr. Ahmed Karim",
+          statut: "Nouveau",
+          lastVisit: "01/06/2025",
+          tel: "06 98 76 54 32",
+          email: "marc.dupont@email.fr",
+          ville: "Blagnac",
+          groupe: "AB-",
+          allergie: "Aucune connue",
+        },
+        {
+          id: 5,
+          nom: "Martin",
+          prenom: "Claire",
+          ddn: "1995-04-22",
+          sexe: "Féminin",
+          dossier: "P-2024-1203",
+          medecin: "Dr. Marie Leclerc",
+          statut: "Actif",
+          lastVisit: "03/06/2025",
+          tel: "06 33 22 11 44",
+          email: "claire.martin@email.fr",
+          ville: "Colomiers",
+          groupe: "O-",
+          allergie: "Latex",
+        },
+        {
+          id: 6,
+          nom: "Lefebvre",
+          prenom: "Paul",
+          ddn: "1955-12-01",
+          sexe: "Masculin",
+          dossier: "P-2024-1098",
+          medecin: "Dr. Jean Martin",
+          statut: "Suivi",
+          lastVisit: "04/06/2025",
+          tel: "05 61 22 33 44",
+          email: "paul.lefebvre@email.fr",
+          ville: "Toulouse",
+          groupe: "A-",
+          allergie: "Aucune connue",
+        },
+        {
+          id: 7,
+          nom: "Lambert",
+          prenom: "Thomas",
+          ddn: "1988-06-17",
+          sexe: "Masculin",
+          dossier: "P-2024-1312",
+          medecin: "Dr. Sophie Blanc",
+          statut: "Actif",
+          lastVisit: "10/05/2025",
+          tel: "06 77 88 99 00",
+          email: "thomas.lambert@email.fr",
+          ville: "Muret",
+          groupe: "B-",
+          allergie: "Aucune connue",
+        },
+        {
+          id: 8,
+          nom: "Moreau",
+          prenom: "Laura",
+          ddn: "2001-02-14",
+          sexe: "Féminin",
+          dossier: "P-2024-0934",
+          medecin: "Dr. Jean Martin",
+          statut: "Actif",
+          lastVisit: "28/04/2025",
+          tel: "06 44 55 66 77",
+          email: "laura.moreau@email.fr",
+          ville: "Toulouse",
+          groupe: "O+",
+          allergie: "Iode",
+        },
+        {
+          id: 9,
+          nom: "Bernard",
+          prenom: "Henri",
+          ddn: "1948-08-30",
+          sexe: "Masculin",
+          dossier: "P-2023-0415",
+          medecin: "Dr. Ahmed Karim",
+          statut: "Inactif",
+          lastVisit: "15/12/2024",
+          tel: "05 61 44 55 66",
+          email: "henri.bernard@email.fr",
+          ville: "Toulouse",
+          groupe: "A+",
+          allergie: "Aucune connue",
+        },
+        {
+          id: 10,
+          nom: "Garcia",
+          prenom: "Isabelle",
+          ddn: "1972-05-09",
+          sexe: "Féminin",
+          dossier: "P-2024-0656",
+          medecin: "Dr. Marie Leclerc",
+          statut: "Actif",
+          lastVisit: "20/05/2025",
+          tel: "06 22 33 44 55",
+          email: "isabelle.garcia@email.fr",
+          ville: "Balma",
+          groupe: "AB+",
+          allergie: "Sulfamides",
+        },
+        {
+          id: 11,
+          nom: "Petit",
+          prenom: "Antoine",
+          ddn: "1982-10-23",
+          sexe: "Masculin",
+          dossier: "P-2024-1024",
+          medecin: "Dr. Jean Martin",
+          statut: "Actif",
+          lastVisit: "18/05/2025",
+          tel: "06 11 22 33 44",
+          email: "antoine.petit@email.fr",
+          ville: "Toulouse",
+          groupe: "O+",
+          allergie: "Aucune connue",
+        },
+        {
+          id: 12,
+          nom: "Giraud",
+          prenom: "Nathalie",
+          ddn: "1968-01-19",
+          sexe: "Féminin",
+          dossier: "P-2023-0789",
+          medecin: "Dr. Sophie Blanc",
+          statut: "Suivi",
+          lastVisit: "12/05/2025",
+          tel: "06 99 00 11 22",
+          email: "nathalie.giraud@email.fr",
+          ville: "Toulouse",
+          groupe: "B+",
+          allergie: "Aucune connue",
+        },
+      ];
+      let nextId = 13;
+      let editingId = null;
+      let currentView = "table";
+      let currentPage = 1;
+      const PER_PAGE = 8;
+      let sortField = "nom",
+        sortAsc = true;
 
-    <!-- GRID VIEW -->
-    <div id="gridView" style="display:none">
-      <div class="patients-grid" id="patientGrid"></div>
-    </div>
+      // ═══ INIT ═══
+      renderAll();
 
-  </main>
-</div>
+      function renderAll() {
+        filterPatients();
+      }
 
-<!-- ═══ PATIENT MODAL ═══ -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalOut(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        <span id="modalTitleText">Nouveau patient</span>
-      </div>
-      <button class="modal-close" onclick="closeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
+      function getColor(id) {
+        return COLORS[(id - 1) % COLORS.length];
+      }
+      function initials(p) {
+        return (p.prenom[0] + p.nom[0]).toUpperCase();
+      }
+      function age(ddn) {
+        if (!ddn) return "—";
+        const d = new Date(ddn);
+        const now = new Date();
+        let a = now.getFullYear() - d.getFullYear();
+        if (now < new Date(now.getFullYear(), d.getMonth(), d.getDate())) a--;
+        return a;
+      }
+      function fmtDdn(ddn) {
+        if (!ddn) return "—";
+        const [y, m, d] = ddn.split("-");
+        return `${d}/${m}/${y}`;
+      }
 
-    <!-- TABS -->
-    <div class="modal-tabs" id="modalTabs">
-      <div class="modal-tab active" onclick="switchTab(0)">Informations</div>
-      <div class="modal-tab" onclick="switchTab(1)" id="tabDossier">Dossier médical</div>
-      <div class="modal-tab" onclick="switchTab(2)" id="tabHistorique">Historique</div>
-    </div>
+      function statusBadge(s) {
+        const map = {
+          Actif: "badge-green",
+          Nouveau: "badge-blue",
+          Suivi: "badge-gold",
+          Inactif: "badge-grey",
+        };
+        return `<span class="badge ${map[s] || "badge-grey"}">${s}</span>`;
+      }
 
-    <div class="modal-body">
+      // ═══ FILTER & RENDER ═══
+      function filterPatients() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        const sta = document.getElementById("filterStatus").value;
+        const doc = document.getElementById("filterDoc").value;
 
-      <!-- TAB 0 : INFOS -->
-      <div class="tab-panel active" id="tp0">
-        <div class="form-section">
-          <div class="form-section-title">Identité</div>
-          <div class="form-grid">
-            <div class="fg">
-              <label>Civilité</label>
-              <div class="inp-wrap no-ico"><select id="fCiv"><option>M.</option><option>Mme</option><option>Autre</option></select></div>
-            </div>
-            <div class="fg">
-              <label for="fNom">Nom <span class="req">*</span></label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input type="text" id="fNom" placeholder="DUPONT"></div>
-            </div>
-            <div class="fg">
-              <label for="fPrenom">Prénom <span class="req">*</span></label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input type="text" id="fPrenom" placeholder="Marc"></div>
-            </div>
-            <div class="fg">
-              <label for="fDdn">Date de naissance <span class="req">*</span></label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><input type="date" id="fDdn"></div>
-            </div>
-            <div class="fg">
-              <label for="fSecu">N° Sécurité sociale</label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><input type="text" id="fSecu" placeholder="1 85 04 75 123 456 78" maxlength="21"></div>
-            </div>
-            <div class="fg">
-              <label for="fSexe">Sexe</label>
-              <div class="inp-wrap no-ico"><select id="fSexe"><option value="">--</option><option>Masculin</option><option>Féminin</option><option>Non précisé</option></select></div>
-            </div>
-          </div>
-        </div>
+        let list = patients.filter((p) => {
+          const full = `${p.prenom} ${p.nom} ${p.dossier}`.toLowerCase();
+          return (
+            (!q || full.includes(q)) &&
+            (!sta || p.statut === sta) &&
+            (!doc || p.medecin === doc)
+          );
+        });
 
-        <div class="form-section">
-          <div class="form-section-title">Coordonnées</div>
-          <div class="form-grid">
-            <div class="fg full">
-              <label for="fEmail">Adresse e-mail</label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><input type="email" id="fEmail" placeholder="marc.dupont@email.fr"></div>
-            </div>
-            <div class="fg">
-              <label for="fTel">Téléphone</label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><input type="tel" id="fTel" placeholder="06 00 00 00 00"></div>
-            </div>
-            <div class="fg">
-              <label for="fTel2">Téléphone 2</label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><input type="tel" id="fTel2" placeholder="05 00 00 00 00"></div>
-            </div>
-            <div class="fg full">
-              <label for="fAdresse">Adresse</label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><input type="text" id="fAdresse" placeholder="50 Avenue de la Santé"></div>
-            </div>
-            <div class="fg">
-              <label for="fCp">Code postal</label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><input type="text" id="fCp" placeholder="31000" maxlength="5"></div>
-            </div>
-            <div class="fg">
-              <label for="fVille">Ville</label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><input type="text" id="fVille" placeholder="Toulouse"></div>
-            </div>
-          </div>
-        </div>
+        list.sort((a, b) => {
+          let va = a[sortField] || "",
+            vb = b[sortField] || "";
+          if (sortField === "name") {
+            va = a.nom;
+            vb = b.nom;
+          }
+          return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+        });
 
-        <div class="form-section">
-          <div class="form-section-title">Prise en charge</div>
-          <div class="form-grid">
-            <div class="fg">
-              <label for="fMedecin">Médecin traitant</label>
-              <div class="inp-wrap no-ico"><select id="fMedecin"><option value="">-- Choisir --</option><option>Dr. Jean Martin</option><option>Dr. Sophie Blanc</option><option>Dr. Ahmed Karim</option><option>Dr. Marie Leclerc</option></select></div>
-            </div>
-            <div class="fg">
-              <label for="fStatut">Statut</label>
-              <div class="inp-wrap no-ico"><select id="fStatut"><option>Actif</option><option>Nouveau</option><option>Suivi</option><option>Inactif</option></select></div>
-            </div>
-            <div class="fg">
-              <label for="fMutuelle">Mutuelle</label>
-              <div class="inp-wrap"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><input type="text" id="fMutuelle" placeholder="MGEN, Malakoff…"></div>
-            </div>
-            <div class="fg">
-              <label for="fGroupe">Groupe sanguin</label>
-              <div class="inp-wrap no-ico"><select id="fGroupe"><option value="">--</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
-            </div>
-            <div class="fg full">
-              <label for="fAllergie">Allergies connues</label>
-              <textarea class="inp" id="fAllergie" placeholder="Pénicilline, arachides…"></textarea>
-            </div>
-            <div class="fg full">
-              <label for="fNotes">Notes cliniques</label>
-              <textarea class="inp" id="fNotes" placeholder="Antécédents, observations particulières…"></textarea>
-            </div>
-          </div>
-        </div>
-      </div>
+        document.getElementById("statTotal").textContent = patients.length;
 
-      <!-- TAB 1 : DOSSIER -->
-      <div class="tab-panel" id="tp1">
-        <div class="health-grid">
-          <div class="health-stat"><div class="hs-value" id="hs-taille">—</div><div class="hs-unit">cm</div><div class="hs-label">Taille</div></div>
-          <div class="health-stat"><div class="hs-value" id="hs-poids">—</div><div class="hs-unit">kg</div><div class="hs-label">Poids</div></div>
-          <div class="health-stat"><div class="hs-value" id="hs-ta">—</div><div class="hs-unit">mmHg</div><div class="hs-label">Tension</div></div>
-        </div>
-        <div class="form-grid three" style="margin-bottom:18px">
-          <div class="fg"><label>Taille (cm)</label><div class="inp-wrap no-ico"><input type="number" id="fTaille" placeholder="178" oninput="document.getElementById('hs-taille').textContent=this.value||'—'"></div></div>
-          <div class="fg"><label>Poids (kg)</label><div class="inp-wrap no-ico"><input type="number" id="fPoids" placeholder="78" oninput="document.getElementById('hs-poids').textContent=this.value||'—'"></div></div>
-          <div class="fg"><label>Tension artérielle</label><div class="inp-wrap no-ico"><input type="text" id="fTA" placeholder="125/80" oninput="document.getElementById('hs-ta').textContent=this.value||'—'"></div></div>
-        </div>
-        <div class="form-section-title" style="font-size:.74rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Documents médicaux</div>
-        <div class="dossier-list">
-          <div class="dossier-item">
-            <div class="dossier-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg></div>
-            <div class="dossier-info"><div class="dossier-name">Résultats d'analyses – Juin 2025</div><div class="dossier-meta">Laboratoire Cerba · PDF · 420 Ko</div></div>
-            <span class="dossier-date">02/06/2025</span>
-          </div>
-          <div class="dossier-item">
-            <div class="dossier-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-            <div class="dossier-info"><div class="dossier-name">Ordonnance – Renouvellement traitement</div><div class="dossier-meta">Dr. Jean Martin · PDF · 120 Ko</div></div>
-            <span class="dossier-date">15/04/2025</span>
-          </div>
-          <div class="dossier-item">
-            <div class="dossier-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-            <div class="dossier-info"><div class="dossier-name">Certificat médical – Aptitude sport</div><div class="dossier-meta">Dr. Jean Martin · PDF · 98 Ko</div></div>
-            <span class="dossier-date">08/03/2025</span>
-          </div>
-        </div>
-      </div>
+        if (currentView === "table") renderTable(list);
+        else renderGrid(list);
+      }
 
-      <!-- TAB 2 : HISTORIQUE -->
-      <div class="tab-panel" id="tp2">
-        <div class="timeline">
-          <div class="tl-item">
-            <div class="tl-dot"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            <div class="tl-body">
-              <div class="tl-title">Consultation générale</div>
-              <div class="tl-sub">Dr. Jean Martin · Cabinet 1</div>
-              <div class="tl-date">02 juin 2025 · 09:00</div>
-              <div class="tl-note">Renouvellement ordonnance. Tension stable. Prochain contrôle dans 3 mois.</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot green"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-            <div class="tl-body">
-              <div class="tl-title">Bilan sanguin</div>
-              <div class="tl-sub">Laboratoire Cerba</div>
-              <div class="tl-date">28 mai 2025</div>
-              <div class="tl-note">Glycémie normale, cholestérol légèrement élevé (2,1 g/L). Suivi recommandé.</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot gold"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-            <div class="tl-body">
-              <div class="tl-title">Ordonnance délivrée</div>
-              <div class="tl-sub">Dr. Jean Martin</div>
-              <div class="tl-date">15 avril 2025</div>
-              <div class="tl-note">Renouvellement Amlodipine 5mg, Atorvastatine 10mg – 3 mois.</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            <div class="tl-body">
-              <div class="tl-title">Contrôle annuel</div>
-              <div class="tl-sub">Dr. Jean Martin · Cabinet 1</div>
-              <div class="tl-date">10 janvier 2025</div>
-              <div class="tl-note">Examen complet. Poids stable, tension 125/80. Vaccination grippe effectuée.</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-            <div class="tl-body">
-              <div class="tl-title">Consultation urgente</div>
-              <div class="tl-sub">Dr. Jean Martin · Urgences cabinet</div>
-              <div class="tl-date">03 novembre 2024</div>
-              <div class="tl-note">Douleurs thoraciques bénignes – origine musculaire. ECG normal. Paracétamol prescrit.</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      function sortBy(field) {
+        if (sortField === field) sortAsc = !sortAsc;
+        else {
+          sortField = field;
+          sortAsc = true;
+        }
+        filterPatients();
+      }
 
-    </div><!-- /modal-body -->
+      // ═══ TABLE ═══
+      function renderTable(list) {
+        const total = list.length;
+        const pages = Math.ceil(total / PER_PAGE);
+        if (currentPage > pages) currentPage = 1;
+        const slice = list.slice(
+          (currentPage - 1) * PER_PAGE,
+          currentPage * PER_PAGE,
+        );
 
-    <div class="modal-footer">
-      <button class="btn-delete" id="btnDelete" onclick="deletePatient()" style="display:none">
-        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-        Supprimer
-      </button>
-      <div style="display:flex;gap:10px;margin-left:auto">
-        <button class="btn-cancel" onclick="closeModal()">Annuler</button>
-        <button class="btn-save" onclick="savePatient()">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          Enregistrer
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast">
-  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-  <span id="toastMsg">Patient enregistré</span>
-</div>
-
-<script src="/js/auth.js"></script>
-<script>
-authGuard();
-// ═══ DATA ═══
-const COLORS = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#14b8a6','#f97316','#6366f1','#ec4899','#0891b2'];
-
-let patients = [
-  { id:1, nom:'Durand',   prenom:'Sophie',  ddn:'1985-03-12', sexe:'Féminin',  dossier:'P-2024-0721', medecin:'Dr. Jean Martin',   statut:'Actif',   lastVisit:'02/06/2025', tel:'06 55 44 33 22', email:'sophie.durand@email.fr',    ville:'Toulouse', groupe:'A+',  allergie:'Aucune connue' },
-  { id:2, nom:'Robert',   prenom:'Alain',   ddn:'1962-07-28', sexe:'Masculin', dossier:'P-2024-0834', medecin:'Dr. Jean Martin',   statut:'Suivi',   lastVisit:'02/06/2025', tel:'06 12 45 78 90', email:'alain.robert@email.fr',      ville:'Toulouse', groupe:'O+',  allergie:'Pénicilline' },
-  { id:3, nom:'Lefèvre',  prenom:'Julie',   ddn:'1990-11-05', sexe:'Féminin',  dossier:'P-2024-0902', medecin:'Dr. Sophie Blanc',  statut:'Actif',   lastVisit:'28/05/2025', tel:'07 88 21 36 54', email:'julie.lefevre@email.fr',     ville:'Toulouse', groupe:'B+',  allergie:'Aspirine' },
-  { id:4, nom:'Dupont',   prenom:'Marc',    ddn:'1978-09-15', sexe:'Masculin', dossier:'P-2024-1182', medecin:'Dr. Ahmed Karim',   statut:'Nouveau', lastVisit:'01/06/2025', tel:'06 98 76 54 32', email:'marc.dupont@email.fr',       ville:'Blagnac',  groupe:'AB-', allergie:'Aucune connue' },
-  { id:5, nom:'Martin',   prenom:'Claire',  ddn:'1995-04-22', sexe:'Féminin',  dossier:'P-2024-1203', medecin:'Dr. Marie Leclerc', statut:'Actif',   lastVisit:'03/06/2025', tel:'06 33 22 11 44', email:'claire.martin@email.fr',     ville:'Colomiers', groupe:'O-', allergie:'Latex' },
-  { id:6, nom:'Lefebvre', prenom:'Paul',    ddn:'1955-12-01', sexe:'Masculin', dossier:'P-2024-1098', medecin:'Dr. Jean Martin',   statut:'Suivi',   lastVisit:'04/06/2025', tel:'05 61 22 33 44', email:'paul.lefebvre@email.fr',     ville:'Toulouse', groupe:'A-',  allergie:'Aucune connue' },
-  { id:7, nom:'Lambert',  prenom:'Thomas',  ddn:'1988-06-17', sexe:'Masculin', dossier:'P-2024-1312', medecin:'Dr. Sophie Blanc',  statut:'Actif',   lastVisit:'10/05/2025', tel:'06 77 88 99 00', email:'thomas.lambert@email.fr',    ville:'Muret',    groupe:'B-',  allergie:'Aucune connue' },
-  { id:8, nom:'Moreau',   prenom:'Laura',   ddn:'2001-02-14', sexe:'Féminin',  dossier:'P-2024-0934', medecin:'Dr. Jean Martin',   statut:'Actif',   lastVisit:'28/04/2025', tel:'06 44 55 66 77', email:'laura.moreau@email.fr',      ville:'Toulouse', groupe:'O+',  allergie:'Iode' },
-  { id:9, nom:'Bernard',  prenom:'Henri',   ddn:'1948-08-30', sexe:'Masculin', dossier:'P-2023-0415', medecin:'Dr. Ahmed Karim',   statut:'Inactif', lastVisit:'15/12/2024', tel:'05 61 44 55 66', email:'henri.bernard@email.fr',     ville:'Toulouse', groupe:'A+',  allergie:'Aucune connue' },
-  {id:10, nom:'Garcia',   prenom:'Isabelle',ddn:'1972-05-09', sexe:'Féminin',  dossier:'P-2024-0656', medecin:'Dr. Marie Leclerc', statut:'Actif',   lastVisit:'20/05/2025', tel:'06 22 33 44 55', email:'isabelle.garcia@email.fr',   ville:'Balma',    groupe:'AB+', allergie:'Sulfamides' },
-  {id:11, nom:'Petit',    prenom:'Antoine', ddn:'1982-10-23', sexe:'Masculin', dossier:'P-2024-1024', medecin:'Dr. Jean Martin',   statut:'Actif',   lastVisit:'18/05/2025', tel:'06 11 22 33 44', email:'antoine.petit@email.fr',     ville:'Toulouse', groupe:'O+',  allergie:'Aucune connue' },
-  {id:12, nom:'Giraud',   prenom:'Nathalie',ddn:'1968-01-19', sexe:'Féminin',  dossier:'P-2023-0789', medecin:'Dr. Sophie Blanc',  statut:'Suivi',   lastVisit:'12/05/2025', tel:'06 99 00 11 22', email:'nathalie.giraud@email.fr',   ville:'Toulouse', groupe:'B+',  allergie:'Aucune connue' },
-];
-let nextId = 13;
-let editingId = null;
-let currentView = 'table';
-let currentPage = 1;
-const PER_PAGE = 8;
-let sortField = 'nom', sortAsc = true;
-
-// ═══ INIT ═══
-renderAll();
-
-function renderAll() { filterPatients(); }
-
-function getColor(id) { return COLORS[(id-1) % COLORS.length]; }
-function initials(p) { return (p.prenom[0]+p.nom[0]).toUpperCase(); }
-function age(ddn) { if(!ddn) return '—'; const d=new Date(ddn); const now=new Date(); let a=now.getFullYear()-d.getFullYear(); if(now<new Date(now.getFullYear(),d.getMonth(),d.getDate())) a--; return a; }
-function fmtDdn(ddn) { if(!ddn) return '—'; const [y,m,d]=ddn.split('-'); return `${d}/${m}/${y}`; }
-
-function statusBadge(s) {
-  const map = { Actif:'badge-green', Nouveau:'badge-blue', Suivi:'badge-gold', Inactif:'badge-grey' };
-  return `<span class="badge ${map[s]||'badge-grey'}">${s}</span>`;
-}
-
-// ═══ FILTER & RENDER ═══
-function filterPatients() {
-  const q   = document.getElementById('searchInput').value.toLowerCase();
-  const sta = document.getElementById('filterStatus').value;
-  const doc = document.getElementById('filterDoc').value;
-
-  let list = patients.filter(p => {
-    const full = `${p.prenom} ${p.nom} ${p.dossier}`.toLowerCase();
-    return (!q || full.includes(q))
-      && (!sta || p.statut === sta)
-      && (!doc || p.medecin === doc);
-  });
-
-  list.sort((a,b) => {
-    let va = a[sortField]||'', vb = b[sortField]||'';
-    if (sortField==='name') { va=a.nom; vb=b.nom; }
-    return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-  });
-
-  document.getElementById('statTotal').textContent = patients.length;
-
-  if (currentView === 'table') renderTable(list);
-  else renderGrid(list);
-}
-
-function sortBy(field) {
-  if (sortField===field) sortAsc=!sortAsc; else { sortField=field; sortAsc=true; }
-  filterPatients();
-}
-
-// ═══ TABLE ═══
-function renderTable(list) {
-  const total = list.length;
-  const pages = Math.ceil(total/PER_PAGE);
-  if (currentPage > pages) currentPage = 1;
-  const slice = list.slice((currentPage-1)*PER_PAGE, currentPage*PER_PAGE);
-
-  document.getElementById('tableBody').innerHTML = slice.map(p => `
+        document.getElementById("tableBody").innerHTML = slice
+          .map(
+            (p) => `
     <tr onclick="openModal(${p.id})">
       <td><div class="patient-cell">
         <div class="pat-av" style="background:${getColor(p.id)}">${initials(p)}</div>
@@ -740,8 +1169,8 @@ function renderTable(list) {
       </div></td>
       <td class="td-light">${p.dossier}</td>
       <td class="td-light">${fmtDdn(p.ddn)} <span class="td-lighter">(${age(p.ddn)} ans)</span></td>
-      <td class="td-light">${p.medecin||'—'}</td>
-      <td class="td-light">${p.lastVisit||'—'}</td>
+      <td class="td-light">${p.medecin || "—"}</td>
+      <td class="td-light">${p.lastVisit || "—"}</td>
       <td>${statusBadge(p.statut)}</td>
       <td onclick="event.stopPropagation()"><div class="action-cell">
         <button class="icon-btn" title="Voir fiche" onclick="openModal(${p.id})"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
@@ -749,42 +1178,48 @@ function renderTable(list) {
         <button class="icon-btn" title="Rendez-vous" onclick="showToast('Agenda ouvert')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
         <button class="icon-btn danger" title="Supprimer" onclick="confirmDelete(${p.id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
       </div></td>
-    </tr>`).join('');
+    </tr>`,
+          )
+          .join("");
 
-  // Pagination
-  document.getElementById('pageInfo').textContent = `${Math.min((currentPage-1)*PER_PAGE+1,total)}–${Math.min(currentPage*PER_PAGE,total)} sur ${total} patients`;
-  const pb = document.getElementById('pageBtns');
-  pb.innerHTML = `<button class="page-btn" onclick="changePage(${currentPage-1})" ${currentPage===1?'disabled':''} style="opacity:${currentPage===1?.4:1}"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>`;
-  for(let i=1;i<=pages;i++) pb.innerHTML += `<button class="page-btn ${i===currentPage?'active':''}" onclick="changePage(${i})">${i}</button>`;
-  pb.innerHTML += `<button class="page-btn" onclick="changePage(${currentPage+1})" ${currentPage===pages?'disabled':''} style="opacity:${currentPage===pages?.4:1}"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>`;
-}
+        // Pagination
+        document.getElementById("pageInfo").textContent =
+          `${Math.min((currentPage - 1) * PER_PAGE + 1, total)}–${Math.min(currentPage * PER_PAGE, total)} sur ${total} patients`;
+        const pb = document.getElementById("pageBtns");
+        pb.innerHTML = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""} style="opacity:${currentPage === 1 ? 0.4 : 1}"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>`;
+        for (let i = 1; i <= pages; i++)
+          pb.innerHTML += `<button class="page-btn ${i === currentPage ? "active" : ""}" onclick="changePage(${i})">${i}</button>`;
+        pb.innerHTML += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === pages ? "disabled" : ""} style="opacity:${currentPage === pages ? 0.4 : 1}"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>`;
+      }
 
-function changePage(p) {
-  const total = patients.length;
-  const pages = Math.ceil(total/PER_PAGE);
-  if (p<1||p>pages) return;
-  currentPage = p;
-  filterPatients();
-}
+      function changePage(p) {
+        const total = patients.length;
+        const pages = Math.ceil(total / PER_PAGE);
+        if (p < 1 || p > pages) return;
+        currentPage = p;
+        filterPatients();
+      }
 
-// ═══ GRID ═══
-function renderGrid(list) {
-  document.getElementById('patientGrid').innerHTML = list.map(p => `
+      // ═══ GRID ═══
+      function renderGrid(list) {
+        document.getElementById("patientGrid").innerHTML = list
+          .map(
+            (p) => `
     <div class="patient-card" onclick="openModal(${p.id})">
       <div class="pc-top">
         <div class="pc-avatar" style="background:${getColor(p.id)}">${initials(p)}</div>
         <div class="pc-info">
           <div class="pc-name">${p.prenom} ${p.nom}</div>
-          <div class="pc-meta">${age(p.ddn)} ans · ${p.sexe||'—'}</div>
+          <div class="pc-meta">${age(p.ddn)} ans · ${p.sexe || "—"}</div>
           <div class="pc-id">${p.dossier}</div>
         </div>
         ${statusBadge(p.statut)}
       </div>
       <div class="pc-divider"></div>
       <div class="pc-rows">
-        <div class="pc-row"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${p.medecin||'—'}</div>
-        <div class="pc-row"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12"/></svg>${p.tel||'—'}</div>
-        <div class="pc-row"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Dernier RDV : ${p.lastVisit||'—'}</div>
+        <div class="pc-row"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${p.medecin || "—"}</div>
+        <div class="pc-row"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12"/></svg>${p.tel || "—"}</div>
+        <div class="pc-row"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Dernier RDV : ${p.lastVisit || "—"}</div>
       </div>
       <div class="pc-foot">
         <div class="pc-actions">
@@ -792,147 +1227,200 @@ function renderGrid(list) {
           <button class="pc-btn ghost" onclick="event.stopPropagation();showToast('Messagerie ouverte')">Message</button>
         </div>
       </div>
-    </div>`).join('');
-}
+    </div>`,
+          )
+          .join("");
+      }
 
-// ═══ VIEW SWITCH ═══
-function setView(v) {
-  currentView = v;
-  document.getElementById('vTable').classList.toggle('active', v==='table');
-  document.getElementById('vGrid').classList.toggle('active', v==='grid');
-  document.getElementById('tableView').style.display = v==='table' ? 'block' : 'none';
-  document.getElementById('gridView').style.display  = v==='grid'  ? 'block' : 'none';
-  filterPatients();
-}
+      // ═══ VIEW SWITCH ═══
+      function setView(v) {
+        currentView = v;
+        document
+          .getElementById("vTable")
+          .classList.toggle("active", v === "table");
+        document
+          .getElementById("vGrid")
+          .classList.toggle("active", v === "grid");
+        document.getElementById("tableView").style.display =
+          v === "table" ? "block" : "none";
+        document.getElementById("gridView").style.display =
+          v === "grid" ? "block" : "none";
+        filterPatients();
+      }
 
-// ═══ MODAL ═══
-let activeTab = 0;
-function openModal(id) {
-  editingId = id || null;
-  activeTab = 0;
+      // ═══ MODAL ═══
+      let activeTab = 0;
+      function openModal(id) {
+        editingId = id || null;
+        activeTab = 0;
 
-  // Reset tabs
-  document.querySelectorAll('.modal-tab').forEach((t,i) => t.classList.toggle('active', i===0));
-  document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', i===0));
+        // Reset tabs
+        document
+          .querySelectorAll(".modal-tab")
+          .forEach((t, i) => t.classList.toggle("active", i === 0));
+        document
+          .querySelectorAll(".tab-panel")
+          .forEach((p, i) => p.classList.toggle("active", i === 0));
 
-  if (id) {
-    const p = patients.find(x=>x.id===id);
-    if (!p) return;
-    document.getElementById('modalTitleText').textContent = `${p.prenom} ${p.nom}`;
-    document.getElementById('btnDelete').style.display = 'flex';
-    document.getElementById('fCiv').value = p.civ||'M.';
-    document.getElementById('fNom').value = p.nom||'';
-    document.getElementById('fPrenom').value = p.prenom||'';
-    document.getElementById('fDdn').value = p.ddn||'';
-    document.getElementById('fEmail').value = p.email||'';
-    document.getElementById('fTel').value = p.tel||'';
-    document.getElementById('fAdresse').value = p.adresse||'';
-    document.getElementById('fCp').value = p.cp||'';
-    document.getElementById('fVille').value = p.ville||'';
-    document.getElementById('fMedecin').value = p.medecin||'';
-    document.getElementById('fStatut').value = p.statut||'Actif';
-    document.getElementById('fMutuelle').value = p.mutuelle||'';
-    document.getElementById('fGroupe').value = p.groupe||'';
-    document.getElementById('fAllergie').value = p.allergie||'';
-    document.getElementById('fNotes').value = p.notes||'';
-    document.getElementById('fSexe').value = p.sexe||'';
-    document.getElementById('fTaille').value = p.taille||'';
-    document.getElementById('fPoids').value = p.poids||'';
-    document.getElementById('fTA').value = p.ta||'';
-    document.getElementById('hs-taille').textContent = p.taille||'—';
-    document.getElementById('hs-poids').textContent = p.poids||'—';
-    document.getElementById('hs-ta').textContent = p.ta||'—';
-  } else {
-    document.getElementById('modalTitleText').textContent = 'Nouveau patient';
-    document.getElementById('btnDelete').style.display = 'none';
-    ['fNom','fPrenom','fDdn','fEmail','fTel','fTel2','fAdresse','fCp','fVille','fMutuelle','fAllergie','fNotes','fSecu','fTaille','fPoids','fTA'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-    ['fCiv','fSexe','fGroupe','fMedecin','fStatut'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
-    document.getElementById('hs-taille').textContent='—';
-    document.getElementById('hs-poids').textContent='—';
-    document.getElementById('hs-ta').textContent='—';
-  }
-  document.getElementById('modalOverlay').classList.add('open');
-}
+        if (id) {
+          const p = patients.find((x) => x.id === id);
+          if (!p) return;
+          document.getElementById("modalTitleText").textContent =
+            `${p.prenom} ${p.nom}`;
+          document.getElementById("btnDelete").style.display = "flex";
+          document.getElementById("fCiv").value = p.civ || "M.";
+          document.getElementById("fNom").value = p.nom || "";
+          document.getElementById("fPrenom").value = p.prenom || "";
+          document.getElementById("fDdn").value = p.ddn || "";
+          document.getElementById("fEmail").value = p.email || "";
+          document.getElementById("fTel").value = p.tel || "";
+          document.getElementById("fAdresse").value = p.adresse || "";
+          document.getElementById("fCp").value = p.cp || "";
+          document.getElementById("fVille").value = p.ville || "";
+          document.getElementById("fMedecin").value = p.medecin || "";
+          document.getElementById("fStatut").value = p.statut || "Actif";
+          document.getElementById("fMutuelle").value = p.mutuelle || "";
+          document.getElementById("fGroupe").value = p.groupe || "";
+          document.getElementById("fAllergie").value = p.allergie || "";
+          document.getElementById("fNotes").value = p.notes || "";
+          document.getElementById("fSexe").value = p.sexe || "";
+          document.getElementById("fTaille").value = p.taille || "";
+          document.getElementById("fPoids").value = p.poids || "";
+          document.getElementById("fTA").value = p.ta || "";
+          document.getElementById("hs-taille").textContent = p.taille || "—";
+          document.getElementById("hs-poids").textContent = p.poids || "—";
+          document.getElementById("hs-ta").textContent = p.ta || "—";
+        } else {
+          document.getElementById("modalTitleText").textContent =
+            "Nouveau patient";
+          document.getElementById("btnDelete").style.display = "none";
+          [
+            "fNom",
+            "fPrenom",
+            "fDdn",
+            "fEmail",
+            "fTel",
+            "fTel2",
+            "fAdresse",
+            "fCp",
+            "fVille",
+            "fMutuelle",
+            "fAllergie",
+            "fNotes",
+            "fSecu",
+            "fTaille",
+            "fPoids",
+            "fTA",
+          ].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.value = "";
+          });
+          ["fCiv", "fSexe", "fGroupe", "fMedecin", "fStatut"].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.selectedIndex = 0;
+          });
+          document.getElementById("hs-taille").textContent = "—";
+          document.getElementById("hs-poids").textContent = "—";
+          document.getElementById("hs-ta").textContent = "—";
+        }
+        document.getElementById("modalOverlay").classList.add("open");
+      }
 
-function switchTab(i) {
-  activeTab = i;
-  document.querySelectorAll('.modal-tab').forEach((t,j) => t.classList.toggle('active', j===i));
-  document.querySelectorAll('.tab-panel').forEach((p,j) => p.classList.toggle('active', j===i));
-}
+      function switchTab(i) {
+        activeTab = i;
+        document
+          .querySelectorAll(".modal-tab")
+          .forEach((t, j) => t.classList.toggle("active", j === i));
+        document
+          .querySelectorAll(".tab-panel")
+          .forEach((p, j) => p.classList.toggle("active", j === i));
+      }
 
-function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingId=null; }
-function closeModalOut(e) { if (e.target===document.getElementById('modalOverlay')) closeModal(); }
+      function closeModal() {
+        document.getElementById("modalOverlay").classList.remove("open");
+        editingId = null;
+      }
+      function closeModalOut(e) {
+        if (e.target === document.getElementById("modalOverlay")) closeModal();
+      }
 
-function savePatient() {
-  const nom    = document.getElementById('fNom').value.trim();
-  const prenom = document.getElementById('fPrenom').value.trim();
-  if (!nom || !prenom) { showToast('Nom et prénom obligatoires.'); return; }
+      function savePatient() {
+        const nom = document.getElementById("fNom").value.trim();
+        const prenom = document.getElementById("fPrenom").value.trim();
+        if (!nom || !prenom) {
+          showToast("Nom et prénom obligatoires.");
+          return;
+        }
 
-  const data = {
-    nom, prenom, civ: document.getElementById('fCiv').value,
-    ddn: document.getElementById('fDdn').value,
-    sexe: document.getElementById('fSexe').value,
-    email: document.getElementById('fEmail').value,
-    tel: document.getElementById('fTel').value,
-    adresse: document.getElementById('fAdresse').value,
-    cp: document.getElementById('fCp').value,
-    ville: document.getElementById('fVille').value,
-    medecin: document.getElementById('fMedecin').value,
-    statut: document.getElementById('fStatut').value,
-    mutuelle: document.getElementById('fMutuelle').value,
-    groupe: document.getElementById('fGroupe').value,
-    allergie: document.getElementById('fAllergie').value,
-    notes: document.getElementById('fNotes').value,
-    taille: document.getElementById('fTaille').value,
-    poids: document.getElementById('fPoids').value,
-    ta: document.getElementById('fTA').value,
-    lastVisit: new Date().toLocaleDateString('fr-FR'),
-  };
+        const data = {
+          nom,
+          prenom,
+          civ: document.getElementById("fCiv").value,
+          ddn: document.getElementById("fDdn").value,
+          sexe: document.getElementById("fSexe").value,
+          email: document.getElementById("fEmail").value,
+          tel: document.getElementById("fTel").value,
+          adresse: document.getElementById("fAdresse").value,
+          cp: document.getElementById("fCp").value,
+          ville: document.getElementById("fVille").value,
+          medecin: document.getElementById("fMedecin").value,
+          statut: document.getElementById("fStatut").value,
+          mutuelle: document.getElementById("fMutuelle").value,
+          groupe: document.getElementById("fGroupe").value,
+          allergie: document.getElementById("fAllergie").value,
+          notes: document.getElementById("fNotes").value,
+          taille: document.getElementById("fTaille").value,
+          poids: document.getElementById("fPoids").value,
+          ta: document.getElementById("fTA").value,
+          lastVisit: new Date().toLocaleDateString("fr-FR"),
+        };
 
-  if (editingId) {
-    const idx = patients.findIndex(p=>p.id===editingId);
-    if (idx!==-1) patients[idx] = { ...patients[idx], ...data };
-    showToast('Patient mis à jour');
-  } else {
-    data.id = nextId++;
-    data.dossier = `P-${new Date().getFullYear()}-${String(data.id).padStart(4,'0')}`;
-    patients.push(data);
-    showToast('Patient créé avec succès');
-  }
-  closeModal();
-  filterPatients();
-}
+        if (editingId) {
+          const idx = patients.findIndex((p) => p.id === editingId);
+          if (idx !== -1) patients[idx] = { ...patients[idx], ...data };
+          showToast("Patient mis à jour");
+        } else {
+          data.id = nextId++;
+          data.dossier = `P-${new Date().getFullYear()}-${String(data.id).padStart(4, "0")}`;
+          patients.push(data);
+          showToast("Patient créé avec succès");
+        }
+        closeModal();
+        filterPatients();
+      }
 
-function confirmDelete(id) {
-  const p = patients.find(x=>x.id===id);
-  if (!p) return;
-  if (confirm(`Supprimer le patient ${p.prenom} ${p.nom} ?`)) {
-    patients = patients.filter(x=>x.id!==id);
-    showToast('Patient supprimé');
-    filterPatients();
-  }
-}
+      function confirmDelete(id) {
+        const p = patients.find((x) => x.id === id);
+        if (!p) return;
+        if (confirm(`Supprimer le patient ${p.prenom} ${p.nom} ?`)) {
+          patients = patients.filter((x) => x.id !== id);
+          showToast("Patient supprimé");
+          filterPatients();
+        }
+      }
 
-function deletePatient() {
-  if (!editingId) return;
-  const p = patients.find(x=>x.id===editingId);
-  if (!p) return;
-  if (confirm(`Supprimer ${p.prenom} ${p.nom} ?`)) {
-    patients = patients.filter(x=>x.id!==editingId);
-    closeModal();
-    showToast('Patient supprimé');
-    filterPatients();
-  }
-}
+      function deletePatient() {
+        if (!editingId) return;
+        const p = patients.find((x) => x.id === editingId);
+        if (!p) return;
+        if (confirm(`Supprimer ${p.prenom} ${p.nom} ?`)) {
+          patients = patients.filter((x) => x.id !== editingId);
+          closeModal();
+          showToast("Patient supprimé");
+          filterPatients();
+        }
+      }
 
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  document.getElementById('toastMsg').textContent=msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
+      function showToast(msg) {
+        const t = document.getElementById("toast");
+        document.getElementById("toastMsg").textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 3000);
+      }
 
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
-</script>
-</body>
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+    </script>
+  </body>
 </html>
