@@ -135,13 +135,59 @@ let current = 1;
   }
 
   /* ── FINAL SUBMIT ── */
-  function submitForm() {
-    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('stepper').style.display = 'none';
-    const sv = document.getElementById('successView');
-    sv.classList.add('show');
-    const email = document.getElementById('email').value;
-    if (email) document.getElementById('successEmail').textContent = email;
+  async function submitForm() {
+    const btn = document.querySelector('.btn-submit-final');
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours…';
+
+    const civ = document.querySelector('input[name="civilite"]:checked');
+    const payload = {
+      civilite:                 civ ? civ.value : null,
+      nom:                      document.getElementById('nom').value.trim(),
+      prenom:                   document.getElementById('prenom').value.trim(),
+      date_naissance:           document.getElementById('ddn').value,
+      sexe:                     document.getElementById('sexe').value || null,
+      numero_securite_sociale:  document.getElementById('numsecu').value.replace(/\s/g, '') || null,
+      email:                    document.getElementById('email').value.trim(),
+      password:                 document.getElementById('pwd').value,
+      telephone_principal:      document.getElementById('tel').value.replace(/\s/g, '') || null,
+      telephone_secondaire:     document.getElementById('tel2').value.replace(/\s/g, '') || null,
+      adresse_ligne1:           document.getElementById('adresse').value.trim() || null,
+      code_postal:              document.getElementById('cp').value.trim() || null,
+      ville:                    document.getElementById('ville').value.trim() || null,
+      question_secrete:         document.getElementById('q1').value || null,
+      reponse_secrete:          document.getElementById('r1').value.trim() || null,
+      cgu_accepted:             document.getElementById('cgu').checked,
+      hds_consent:              document.getElementById('hds').checked,
+      notif_email_sms_consent:  document.getElementById('notifs').checked,
+    };
+
+    try {
+      const res = await fetch('/api/auth/register/patient', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.detail || 'Une erreur est survenue. Veuillez réessayer.');
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Créer mon compte';
+        return;
+      }
+
+      document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('stepper').style.display = 'none';
+      const sv = document.getElementById('successView');
+      sv.classList.add('show');
+      document.getElementById('successEmail').textContent = payload.email;
+
+    } catch {
+      alert('Impossible de contacter le serveur. Vérifiez votre connexion.');
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Créer mon compte';
+    }
   }
 
   /* ── PASSWORD STRENGTH ── */

@@ -761,7 +761,7 @@
 
         <div class="register-row">
           Pas encore de compte ?
-          <a href="#">Créer mon espace patient</a>
+          <a href="/register.html">Créer mon espace patient</a>
         </div>
       </div>
 
@@ -784,6 +784,7 @@
   &nbsp;·&nbsp; Hébergement certifié <strong>HDS</strong> · © 2024 MediCare31
 </footer>
 
+<script src="/js/auth.js"></script>
 <script>
   let pwdVisible = false;
 
@@ -819,6 +820,7 @@
       showAlert('Adresse e-mail invalide.');
       return;
     }
+  }
 
     if (password.length < 4) {
       showAlert('Mot de passe trop court.');
