@@ -20,8 +20,8 @@ Projet réalisé par:
 | Nom | Rôle 
 
 | https://github.com/HugoTHOLLON[Luna Kalaoun] | Chef de projet  
-| https://github.com/KilianDemangel[Issiakhem Malik] | Développeur et Gestion Github  
-| https://github.com/RomainGrassaudPicoreau[Diarra Hassane Junior] |  Développeur
+| https://github.com/KilianDemangel[Issiakhem Malik] | Développeur BackEnd et Gestion Github  
+| https://github.com/RomainGrassaudPicoreau[Diarra Hassane Junior] |  Développeur FrontEnd
 | https://github.com/ElPoraz[Leroy Grimaldi] |  Développeur 
 |===
 

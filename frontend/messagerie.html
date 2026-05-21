@@ -489,10 +489,10 @@ aside {
         <span>Urgents</span>
         <span class="folder-count">3</span>
       </div>
-      <div class="folder-item" onclick="setFolder(this,'archived')">
+      <div class="folder-item" onclick="setFolder(this,'archive')">
         <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
         <span>Archivés</span>
-        <span class="folder-count">89</span>
+        <span class="folder-count">0</span>
       </div>
     </div>
   </aside>
@@ -627,7 +627,9 @@ aside {
   <span id="toastMsg">Message envoyé</span>
 </div>
 
+<script src="/js/auth.js"></script>
 <script>
+authGuard();
 // ═══════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════

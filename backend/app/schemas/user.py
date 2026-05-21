@@ -9,6 +9,32 @@ class UserCreate(BaseModel):
     role: str = "patient"
 
 
+class PatientRegister(BaseModel):
+    # Identité
+    civilite: Optional[str] = None
+    nom: str
+    prenom: str
+    date_naissance: str
+    sexe: Optional[str] = None
+    numero_securite_sociale: Optional[str] = None
+    # Compte
+    email: EmailStr
+    password: str
+    # Coordonnées
+    telephone_principal: Optional[str] = None
+    telephone_secondaire: Optional[str] = None
+    adresse_ligne1: Optional[str] = None
+    code_postal: Optional[str] = None
+    ville: Optional[str] = None
+    # Sécurité
+    question_secrete: Optional[str] = None
+    reponse_secrete: Optional[str] = None
+    # Consentements
+    cgu_accepted: bool = False
+    hds_consent: bool = False
+    notif_email_sms_consent: bool = False
+
+
 class UserOut(BaseModel):
     id_user: int
     email: str

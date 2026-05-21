@@ -6,6 +6,8 @@ from app.db import Base, engine, SessionLocal
 import app.models  # noqa: F401
 
 from app.routers import auth, patients
+from app.routers import auth, patients, messages
+
 
 
 def _seed_roles() -> None:
@@ -48,7 +50,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(patients.router)
-
+app.include_router(messages.router)
 
 
 @app.get("/api/health")
