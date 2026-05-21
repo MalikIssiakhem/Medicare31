@@ -1,1251 +1,1092 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediCare31 – Agenda</title>
-<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --blue-dark:  #2c5f9e;
-  --blue-mid:   #3a74be;
-  --blue-light: #4f8fda;
-  --blue-pale:  #e8f1fb;
-  --gold:       #e8a838;
-  --gold-pale:  #fdf3e0;
-  --green:      #12b76a;
-  --green-pale: #ecfdf3;
-  --red:        #f04438;
-  --red-pale:   #fef3f2;
-  --purple:     #7c3aed;
-  --purple-pale:#f5f3ff;
-  --orange:     #f59e0b;
-  --orange-pale:#fffbeb;
-  --text-dark:  #1e2d45;
-  --text-mid:   #4a5f7a;
-  --text-light: #8fa3bc;
-  --bg:         #eef2f7;
-  --white:      #ffffff;
-  --border:     #d6e2f0;
-  --radius:     12px;
-  --shadow:     0 2px 14px rgba(44,95,158,.10);
-  --shadow-lg:  0 8px 40px rgba(44,95,158,.18);
-}
-
-body {
-  font-family: 'Source Sans 3', sans-serif;
-  background: var(--bg);
-  color: var(--text-dark);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ── NAV ── */
-nav {
-  background: var(--blue-dark);
-  display: flex; align-items: center;
-  padding: 0 24px; height: 58px; gap: 24px;
-  position: sticky; top: 0; z-index: 200;
-}
-.logo {
-  display: flex; align-items: center; gap: 10px;
-  color: #fff; font-family: 'Nunito', sans-serif;
-  font-weight: 800; font-size: 1.18rem; text-decoration: none; white-space: nowrap;
-}
-.logo-icon { width: 30px; height: 30px; background: rgba(255,255,255,.18); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
-.logo-icon svg { width: 18px; height: 18px; fill: #fff; }
-.nav-links { display: flex; gap: 4px; list-style: none; flex: 1; }
-.nav-links a { color: rgba(255,255,255,.72); text-decoration: none; font-size: .9rem; font-weight: 500; padding: 6px 13px; border-radius: 6px; transition: color .15s, background .15s; }
-.nav-links a:hover { color: #fff; background: rgba(255,255,255,.12); }
-.nav-links a.active { color: #fff; border-bottom: 2px solid #fff; border-radius: 0; padding-bottom: 4px; }
-.nav-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
-.notif-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,.8); position: relative; padding: 4px; }
-.notif-btn svg { width: 19px; height: 19px; }
-.notif-dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #ef5350; border-radius: 50%; border: 1.5px solid var(--blue-dark); }
-.user-chip { display: flex; align-items: center; gap: 9px; color: #fff; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background .15s; }
-.user-chip:hover { background: rgba(255,255,255,.12); }
-.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#9ecfff,#4f8fda); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .78rem; color: #fff; border: 2px solid rgba(255,255,255,.35); }
-.user-chip span { font-size: .86rem; font-weight: 600; }
-.user-chip .chev { width: 13px; height: 13px; fill: rgba(255,255,255,.6); }
-
-/* ── APP LAYOUT ── */
-.app { display: flex; flex: 1; }
-
-/* ── SIDEBAR ── */
-aside {
-  width: 220px; background: var(--white);
-  padding: 16px 0; border-right: 1px solid var(--border);
-  flex-shrink: 0; display: flex; flex-direction: column;
-}
-.side-nav { list-style: none; }
-.side-nav li a {
-  display: flex; align-items: center; gap: 11px;
-  padding: 10px 20px; color: var(--text-mid);
-  text-decoration: none; font-size: .88rem; font-weight: 500;
-  transition: background .15s, color .15s;
-}
-.side-nav li a:hover { background: var(--blue-pale); color: var(--blue-dark); }
-.side-nav li.active a { background: var(--blue-dark); color: #fff; }
-.side-nav li a svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-
-/* MINI CALENDAR in sidebar */
-.mini-cal { padding: 18px 16px; border-top: 1px solid var(--border); margin-top: 12px; }
-.mini-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.mini-cal-header span { font-size: .82rem; font-weight: 700; color: var(--text-dark); }
-.mini-nav { background: none; border: none; cursor: pointer; color: var(--text-light); padding: 3px; border-radius: 5px; transition: background .12s; display: flex; }
-.mini-nav:hover { background: var(--blue-pale); color: var(--blue-dark); }
-.mini-nav svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2; }
-.mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
-.mini-day-label { font-size: .66rem; font-weight: 700; color: var(--text-light); text-align: center; padding: 3px 0; }
-.mini-day {
-  font-size: .72rem; text-align: center; padding: 4px 2px;
-  border-radius: 5px; cursor: pointer; color: var(--text-mid);
-  transition: background .12s, color .12s;
-}
-.mini-day:hover { background: var(--blue-pale); color: var(--blue-dark); }
-.mini-day.today { background: var(--blue-dark); color: #fff; font-weight: 700; border-radius: 50%; }
-.mini-day.selected { background: var(--blue-pale); color: var(--blue-dark); font-weight: 700; }
-.mini-day.other-month { color: var(--border); }
-.mini-day.has-appt::after { content: ''; display: block; width: 4px; height: 4px; background: var(--blue-light); border-radius: 50%; margin: 1px auto 0; }
-
-/* DOCTOR FILTER */
-.doctor-filter { padding: 14px 16px; border-top: 1px solid var(--border); }
-.filter-title { font-size: .72rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
-.doctor-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; }
-.doctor-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.doctor-name { font-size: .8rem; color: var(--text-mid); font-weight: 500; }
-.doctor-cb { width: 15px; height: 15px; border: 1.5px solid var(--border); border-radius: 4px; margin-left: auto; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background .12s, border-color .12s; }
-.doctor-item.checked .doctor-cb { background: var(--color, var(--blue-mid)); border-color: var(--color, var(--blue-mid)); }
-.doctor-cb svg { width: 9px; height: 9px; stroke: #fff; fill: none; stroke-width: 2.5; display: none; }
-.doctor-item.checked .doctor-cb svg { display: block; }
-
-/* ── MAIN AREA ── */
-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-/* TOOLBAR */
-.toolbar {
-  background: var(--white); border-bottom: 1px solid var(--border);
-  padding: 12px 22px; display: flex; align-items: center; gap: 14px;
-  flex-wrap: wrap;
-}
-.toolbar-left { display: flex; align-items: center; gap: 10px; }
-.current-period { font-family: 'Nunito', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--text-dark); min-width: 200px; }
-.nav-btn {
-  background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
-  width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  color: var(--text-mid); transition: all .15s;
-}
-.nav-btn:hover { background: var(--blue-pale); border-color: var(--blue-light); color: var(--blue-dark); }
-.nav-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
-.today-btn {
-  background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
-  padding: 6px 14px; font-size: .82rem; font-weight: 600; color: var(--text-mid);
-  cursor: pointer; font-family: inherit; transition: all .15s;
-}
-.today-btn:hover { background: var(--blue-pale); border-color: var(--blue-light); color: var(--blue-dark); }
-
-.toolbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-
-/* VIEW SWITCHER */
-.view-switch { display: flex; background: var(--bg); border: 1.5px solid var(--border); border-radius: 9px; padding: 3px; gap: 2px; }
-.view-btn {
-  padding: 6px 14px; border: none; background: transparent;
-  border-radius: 7px; font-size: .82rem; font-weight: 600;
-  color: var(--text-light); cursor: pointer; font-family: inherit;
-  transition: background .15s, color .15s; display: flex; align-items: center; gap: 5px;
-}
-.view-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-.view-btn.active { background: var(--white); color: var(--blue-dark); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-
-/* ADD BUTTON */
-.btn-add-appt {
-  background: var(--blue-dark); color: #fff; border: none;
-  border-radius: 9px; padding: 8px 16px; font-size: .86rem; font-weight: 700;
-  cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 7px;
-  transition: background .15s, transform .1s; box-shadow: 0 3px 10px rgba(44,95,158,.28);
-}
-.btn-add-appt:hover { background: var(--blue-mid); transform: translateY(-1px); }
-.btn-add-appt svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.2; }
-
-/* ── CALENDAR VIEWS ── */
-.cal-container { flex: 1; overflow: auto; }
-
-/* WEEK VIEW */
-.week-view { display: none; height: 100%; }
-.week-view.active { display: flex; flex-direction: column; }
-
-.week-header {
-  display: grid;
-  grid-template-columns: 60px repeat(7, 1fr);
-  border-bottom: 1px solid var(--border);
-  background: var(--white);
-  position: sticky; top: 0; z-index: 10;
-}
-.week-header-gutter { border-right: 1px solid var(--border); }
-.week-header-day {
-  padding: 10px 8px; text-align: center;
-  border-right: 1px solid var(--border); border-left: 1px solid transparent;
-}
-.week-day-name { font-size: .72rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: .06em; }
-.week-day-num {
-  font-family: 'Nunito', sans-serif; font-size: 1.3rem; font-weight: 800;
-  color: var(--text-dark); line-height: 1.2; margin-top: 2px;
-  width: 36px; height: 36px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; margin: 2px auto 0;
-  transition: background .15s;
-}
-.week-day-num.today { background: var(--blue-dark); color: #fff; }
-
-.week-body {
-  flex: 1; display: grid;
-  grid-template-columns: 60px repeat(7, 1fr);
-  overflow-y: auto; overflow-x: hidden;
-  position: relative;
-}
-
-.time-gutter {
-  border-right: 1px solid var(--border);
-  background: var(--white);
-}
-.time-slot-label {
-  height: 60px; display: flex; align-items: flex-start;
-  justify-content: flex-end; padding: 4px 8px 0 0;
-  font-size: .68rem; color: var(--text-light); font-weight: 500;
-}
-
-.day-col {
-  border-right: 1px solid var(--border);
-  position: relative; background: var(--white);
-}
-.day-col.today-col { background: #fafcff; }
-.hour-cell {
-  height: 60px; border-bottom: 1px solid var(--border);
-  position: relative;
-}
-.hour-cell::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; border-bottom: 1px dashed rgba(214,226,240,.6); }
-
-/* APPOINTMENTS */
-.appt {
-  position: absolute; left: 3px; right: 3px;
-  border-radius: 7px; padding: 4px 7px;
-  font-size: .74rem; font-weight: 600; cursor: pointer;
-  overflow: hidden; transition: filter .15s, transform .12s;
-  border-left: 3px solid transparent; z-index: 5;
-  animation: apptIn .25s ease both;
-}
-@keyframes apptIn { from { opacity:0; transform:scaleY(.8); } to { opacity:1; transform:scaleY(1); } }
-.appt:hover { filter: brightness(.94); transform: scaleX(1.01); }
-.appt-title { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.appt-sub { font-weight: 400; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* Appointment color themes */
-.appt.blue   { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
-.appt.green  { background: #d1fae5; border-color: #10b981; color: #065f46; }
-.appt.purple { background: #ede9fe; border-color: #8b5cf6; color: #5b21b6; }
-.appt.orange { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
-.appt.red    { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
-.appt.teal   { background: #ccfbf1; border-color: #14b8a6; color: #134e4a; }
-
-/* CURRENT TIME LINE */
-.time-line {
-  position: absolute; left: 0; right: 0; z-index: 8; pointer-events: none;
-}
-.time-line::before { content: ''; display: block; height: 2px; background: var(--red); }
-.time-line::after { content: ''; position: absolute; left: -4px; top: -4px; width: 10px; height: 10px; background: var(--red); border-radius: 50%; }
-
-/* MONTH VIEW */
-.month-view { display: none; }
-.month-view.active { display: block; padding: 0; }
-
-.month-grid-header {
-  display: grid; grid-template-columns: repeat(7,1fr);
-  background: var(--white); border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 10;
-}
-.month-grid-header div {
-  padding: 10px; text-align: center;
-  font-size: .74rem; font-weight: 700; color: var(--text-light);
-  text-transform: uppercase; letter-spacing: .05em;
-  border-right: 1px solid var(--border);
-}
-.month-grid-header div:last-child { border-right: none; }
-
-.month-grid {
-  display: grid; grid-template-columns: repeat(7,1fr);
-  background: var(--border); gap: 1px;
-}
-.month-cell {
-  background: var(--white); min-height: 110px; padding: 6px;
-  cursor: pointer; transition: background .12s;
-  position: relative;
-}
-.month-cell:hover { background: #fafcff; }
-.month-cell.other-month { background: #f7f9fc; }
-.month-cell.other-month .month-date { color: var(--border); }
-.month-cell.today { background: #f0f6ff; }
-.month-date {
-  font-size: .8rem; font-weight: 700; color: var(--text-mid);
-  width: 24px; height: 24px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; margin-bottom: 4px;
-}
-.month-cell.today .month-date { background: var(--blue-dark); color: #fff; }
-.month-appt {
-  padding: 2px 6px; border-radius: 4px; font-size: .7rem; font-weight: 600;
-  margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  cursor: pointer; transition: filter .12s;
-}
-.month-appt:hover { filter: brightness(.92); }
-.month-more { font-size: .68rem; color: var(--text-light); font-weight: 600; padding: 2px 4px; }
-
-/* DAY VIEW */
-.day-view { display: none; }
-.day-view.active { display: flex; flex-direction: column; }
-
-/* ── MODAL ── */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 500;
-  background: rgba(15,30,55,.45); backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity .2s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-
-.modal {
-  background: var(--white); border-radius: 18px;
-  width: 100%; max-width: 560px; max-height: 90vh;
-  overflow-y: auto; box-shadow: var(--shadow-lg);
-  transform: translateY(20px) scale(.97);
-  transition: transform .25s cubic-bezier(.22,1,.36,1);
-}
-.modal-overlay.open .modal { transform: translateY(0) scale(1); }
-
-.modal-header {
-  padding: 22px 26px 18px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.modal-title { font-family: 'Nunito', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
-.modal-title svg { width: 20px; height: 20px; stroke: var(--blue-dark); fill: none; stroke-width: 1.8; }
-.modal-close { background: none; border: none; cursor: pointer; color: var(--text-light); padding: 6px; border-radius: 7px; transition: background .12s, color .12s; display: flex; }
-.modal-close:hover { background: var(--bg); color: var(--text-dark); }
-.modal-close svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-.modal-body { padding: 22px 26px; display: flex; flex-direction: column; gap: 16px; }
-
-/* form rows inside modal */
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-row.full { grid-template-columns: 1fr; }
-.fg { display: flex; flex-direction: column; gap: 5px; }
-.fg label { font-size: .78rem; font-weight: 600; color: var(--text-mid); }
-.fg label .req { color: var(--red); }
-
-.inp-wrap { position: relative; }
-.inp-wrap > svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; stroke: var(--text-light); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; z-index: 1; }
-.inp-wrap:focus-within > svg { stroke: var(--blue-mid); }
-
-.inp-wrap input, .inp-wrap select {
-  width: 100%; padding: 9px 12px 9px 36px;
-  border: 1.5px solid var(--border); border-radius: 8px;
-  font-size: .86rem; font-family: inherit; color: var(--text-dark);
-  background: var(--white); outline: none;
-  transition: border-color .18s, box-shadow .18s; appearance: none;
-}
-.inp-wrap.no-ico input, .inp-wrap.no-ico select { padding-left: 12px; }
-.inp-wrap select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238fa3bc' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; padding-right: 32px; }
-.inp-wrap input:focus, .inp-wrap select:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(79,143,218,.13); }
-
-textarea.inp {
-  width: 100%; padding: 9px 12px; border: 1.5px solid var(--border);
-  border-radius: 8px; font-size: .86rem; font-family: inherit;
-  color: var(--text-dark); resize: vertical; min-height: 70px; outline: none;
-  transition: border-color .18s;
-}
-textarea.inp:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(79,143,218,.13); }
-
-/* Color picker */
-.color-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.color-dot {
-  width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-  border: 2px solid transparent; transition: transform .12s, border-color .12s;
-  display: flex; align-items: center; justify-content: center;
-}
-.color-dot:hover { transform: scale(1.15); }
-.color-dot.selected { border-color: var(--text-dark); transform: scale(1.1); }
-.color-dot svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.5; display: none; }
-.color-dot.selected svg { display: block; }
-
-/* Status badge */
-.status-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.status-opt {
-  padding: 5px 13px; border: 1.5px solid var(--border); border-radius: 20px;
-  font-size: .78rem; font-weight: 600; cursor: pointer; color: var(--text-mid);
-  transition: all .15s;
-}
-.status-opt:hover { border-color: var(--blue-light); }
-.status-opt.sel { border-color: var(--blue-dark); background: var(--blue-pale); color: var(--blue-dark); }
-
-.modal-footer {
-  padding: 16px 26px;
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-}
-.btn-cancel {
-  background: var(--bg); border: 1.5px solid var(--border); color: var(--text-mid);
-  padding: 9px 20px; border-radius: 9px; font-size: .86rem; font-weight: 600;
-  cursor: pointer; font-family: inherit; transition: background .12s;
-}
-.btn-cancel:hover { background: #e0e8f4; }
-.btn-save {
-  background: var(--blue-dark); color: #fff; border: none;
-  padding: 9px 22px; border-radius: 9px; font-size: .86rem; font-weight: 700;
-  cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 7px;
-  transition: background .12s, transform .1s; box-shadow: 0 3px 10px rgba(44,95,158,.26);
-}
-.btn-save:hover { background: var(--blue-mid); transform: translateY(-1px); }
-.btn-save svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2.2; }
-.btn-delete {
-  background: var(--red-pale); color: var(--red); border: none;
-  padding: 9px 16px; border-radius: 9px; font-size: .86rem; font-weight: 600;
-  cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px;
-  transition: background .12s;
-}
-.btn-delete:hover { background: #fecaca; }
-.btn-delete svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-/* DETAIL POPUP */
-.detail-popup {
-  position: fixed; z-index: 400;
-  background: var(--white); border-radius: 14px;
-  box-shadow: var(--shadow-lg); width: 300px;
-  padding: 18px 20px;
-  transform: scale(.9); opacity: 0;
-  transition: transform .18s, opacity .18s;
-  pointer-events: none;
-}
-.detail-popup.open { transform: scale(1); opacity: 1; pointer-events: all; }
-.detail-popup-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
-.detail-popup-title { font-weight: 700; font-size: .94rem; color: var(--text-dark); }
-.detail-popup-time { font-size: .78rem; color: var(--text-light); margin-top: 2px; }
-.detail-badge { padding: 3px 9px; border-radius: 20px; font-size: .72rem; font-weight: 700; }
-.detail-info { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
-.detail-row { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--text-mid); }
-.detail-row svg { width: 14px; height: 14px; stroke: var(--text-light); fill: none; stroke-width: 1.8; flex-shrink: 0; }
-.detail-actions { display: flex; gap: 8px; }
-.detail-btn { flex: 1; padding: 7px; border-radius: 8px; font-size: .78rem; font-weight: 600; cursor: pointer; font-family: inherit; border: none; transition: background .12s; display: flex; align-items: center; justify-content: center; gap: 5px; }
-.detail-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
-.detail-btn.edit { background: var(--blue-pale); color: var(--blue-dark); }
-.detail-btn.edit:hover { background: #d0e4f7; }
-.detail-btn.del  { background: var(--red-pale); color: var(--red); }
-.detail-btn.del:hover  { background: #fecaca; }
-
-/* TOAST */
-.toast {
-  position: fixed; bottom: 24px; right: 24px; z-index: 600;
-  background: var(--text-dark); color: #fff;
-  padding: 12px 18px; border-radius: 10px;
-  font-size: .85rem; font-weight: 600;
-  display: flex; align-items: center; gap: 10px;
-  box-shadow: 0 6px 24px rgba(0,0,0,.2);
-  transform: translateY(80px); opacity: 0;
-  transition: transform .3s, opacity .3s;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 2.5; }
-
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-</style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav>
-  <a class="logo" href="#">
-    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="7" y="10" width="10" height="4" rx="1"/></svg></div>
-    MediCare31
-  </a>
-  <ul class="nav-links">
-    <li><a href="#">Tableau de bord</a></li>
-    <li><a href="#" class="active">Agenda</a></li>
-    <li><a href="#">Patients</a></li>
-    <li><a href="#">Messages</a></li>
-    <li><a href="#">Documents</a></li>
-  </ul>
-  <div class="nav-right">
-    <button class="notif-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-dot"></span></button>
-    <div class="user-chip">
-      <div class="avatar">JM</div>
-      <span>Dr. Jean Martin</span>
-      <svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-  </div>
-</nav>
-
-<!-- APP -->
-<div class="app">
-
-  <!-- SIDEBAR -->
-  <aside>
-    <ul class="side-nav">
-      <li><a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord</a></li>
-      <li class="active"><a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a></li>
-      <li><a href="#"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Patients</a></li>
-      <li><a href="#"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messagerie</a></li>
-      <li><a href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documents</a></li>
-      <li><a href="#"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Statistiques</a></li>
-    </ul>
-
-    <!-- MINI CALENDAR -->
-    <div class="mini-cal">
-      <div class="mini-cal-header">
-        <button class="mini-nav" id="miniPrev" onclick="miniNav(-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <span id="miniMonth">juin 2025</span>
-        <button class="mini-nav" id="miniNext" onclick="miniNav(1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Agenda</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="css/calendrier.css" />
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a class="logo" href="#">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
+        </div>
+        MediCare31
+      </a>
+      <ul class="nav-links">
+        <li><a href="#">Tableau de bord</a></li>
+        <li><a href="#" class="active">Agenda</a></li>
+        <li><a href="#">Patients</a></li>
+        <li><a href="#">Messages</a></li>
+        <li><a href="#">Documents</a></li>
+      </ul>
+      <div class="nav-right">
+        <button class="notif-btn">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg
+          ><span class="notif-dot"></span>
+        </button>
+        <div class="user-chip">
+          <div class="avatar">JM</div>
+          <span>Dr. Jean Martin</span>
+          <svg class="chev" viewBox="0 0 24 24">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
       </div>
-      <div class="mini-grid" id="miniGrid"></div>
+    </nav>
+
+    <!-- APP -->
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside>
+        <ul class="side-nav">
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" /></svg
+              >Tableau de bord</a
+            >
+          </li>
+          <li class="active">
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" /></svg
+              >Agenda</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" /></svg
+              >Patients</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                /></svg
+              >Messagerie</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" /></svg
+              >Documents</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" /></svg
+              >Statistiques</a
+            >
+          </li>
+        </ul>
+
+        <!-- MINI CALENDAR -->
+        <div class="mini-cal">
+          <div class="mini-cal-header">
+            <button class="mini-nav" id="miniPrev" onclick="miniNav(-1)">
+              <svg viewBox="0 0 24 24">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <span id="miniMonth">juin 2025</span>
+            <button class="mini-nav" id="miniNext" onclick="miniNav(1)">
+              <svg viewBox="0 0 24 24">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+          <div class="mini-grid" id="miniGrid"></div>
+        </div>
+
+        <!-- DOCTOR FILTER -->
+        <div class="doctor-filter">
+          <div class="filter-title">Praticiens</div>
+          <div id="doctorList"></div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main>
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <button class="nav-btn" onclick="navigate(-1)">
+              <svg viewBox="0 0 24 24">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <button class="nav-btn" onclick="navigate(1)">
+              <svg viewBox="0 0 24 24">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+            <button class="today-btn" onclick="goToday()">Aujourd'hui</button>
+            <div class="current-period" id="currentPeriod">—</div>
+          </div>
+          <div class="toolbar-right">
+            <div class="view-switch">
+              <button class="view-btn" onclick="setView('day')" id="vDay">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="3" y1="10" x2="21" y2="10" /></svg
+                >Jour
+              </button>
+              <button
+                class="view-btn active"
+                onclick="setView('week')"
+                id="vWeek"
+              >
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="9" y1="4" x2="9" y2="22" />
+                  <line x1="15" y1="4" x2="15" y2="22" />
+                  <line x1="3" y1="10" x2="21" y2="10" /></svg
+                >Semaine
+              </button>
+              <button class="view-btn" onclick="setView('month')" id="vMonth">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" /></svg
+                >Mois
+              </button>
+            </div>
+            <button class="btn-add-appt" onclick="openModal()">
+              <svg viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Nouveau rendez-vous
+            </button>
+          </div>
+        </div>
+
+        <!-- CALENDAR CONTAINER -->
+        <div class="cal-container">
+          <!-- WEEK VIEW -->
+          <div class="week-view active" id="weekView">
+            <div class="week-header" id="weekHeader"></div>
+            <div class="week-body" id="weekBody"></div>
+          </div>
+          <!-- MONTH VIEW -->
+          <div class="month-view" id="monthView">
+            <div class="month-grid-header">
+              <div>Lun</div>
+              <div>Mar</div>
+              <div>Mer</div>
+              <div>Jeu</div>
+              <div>Ven</div>
+              <div>Sam</div>
+              <div>Dim</div>
+            </div>
+            <div class="month-grid" id="monthGrid"></div>
+          </div>
+          <!-- DAY VIEW -->
+          <div class="day-view" id="dayView">
+            <div
+              class="week-header"
+              id="dayHeader"
+              style="grid-template-columns: 60px 1fr"
+            ></div>
+            <div
+              class="week-body"
+              id="dayBody"
+              style="grid-template-columns: 60px 1fr"
+            ></div>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <!-- DOCTOR FILTER -->
-    <div class="doctor-filter">
-      <div class="filter-title">Praticiens</div>
-      <div id="doctorList"></div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main>
-    <!-- TOOLBAR -->
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <button class="nav-btn" onclick="navigate(-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <button class="nav-btn" onclick="navigate(1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
-        <button class="today-btn" onclick="goToday()">Aujourd'hui</button>
-        <div class="current-period" id="currentPeriod">—</div>
-      </div>
-      <div class="toolbar-right">
-        <div class="view-switch">
-          <button class="view-btn" onclick="setView('day')" id="vDay">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Jour
-          </button>
-          <button class="view-btn active" onclick="setView('week')" id="vWeek">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="9" y1="4" x2="9" y2="22"/><line x1="15" y1="4" x2="15" y2="22"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Semaine
-          </button>
-          <button class="view-btn" onclick="setView('month')" id="vMonth">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Mois
+    <!-- ═══ ADD/EDIT MODAL ═══ -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <span id="modalTitleText">Nouveau rendez-vous</span>
+          </div>
+          <button class="modal-close" onclick="closeModalBtn()">
+            <svg viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
-        <button class="btn-add-appt" onclick="openModal()">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nouveau rendez-vous
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="fg">
+              <label for="mPatient">Patient <span class="req">*</span></label>
+              <div class="inp-wrap">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <input
+                  type="text"
+                  id="mPatient"
+                  placeholder="Nom du patient"
+                  list="patientList"
+                />
+                <datalist id="patientList">
+                  <option>Sophie Durand</option>
+                  <option>Alain Robert</option>
+                  <option>Julie Lefèvre</option>
+                  <option>Marc Dupont</option>
+                  <option>Claire Martin</option>
+                  <option>Paul Lefebvre</option>
+                  <option>Thomas Lambert</option>
+                  <option>Laura Moreau</option>
+                </datalist>
+              </div>
+            </div>
+            <div class="fg">
+              <label for="mDoctor">Médecin <span class="req">*</span></label>
+              <div class="inp-wrap">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
+                </svg>
+                <select id="mDoctor">
+                  <option value="">-- Choisir --</option>
+                  <option>Dr. Jean Martin</option>
+                  <option>Dr. Sophie Blanc</option>
+                  <option>Dr. Ahmed Karim</option>
+                  <option>Dr. Marie Leclerc</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="fg">
+              <label for="mType"
+                >Type de consultation <span class="req">*</span></label
+              >
+              <div class="inp-wrap">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <circle cx="12" cy="16" r=".5" fill="currentColor" />
+                </svg>
+                <select id="mType">
+                  <option value="">-- Type --</option>
+                  <option>Consultation générale</option>
+                  <option>Contrôle annuel</option>
+                  <option>Suivi diabète</option>
+                  <option>Suivi cholestérol</option>
+                  <option>Urgence</option>
+                  <option>Téléconsultation</option>
+                  <option>Renouvellement ordonnance</option>
+                </select>
+              </div>
+            </div>
+            <div class="fg">
+              <label for="mStatus">Statut</label>
+              <div class="status-row" id="statusRow">
+                <div
+                  class="status-opt sel"
+                  onclick="selectStatus(this, 'Confirmé')"
+                >
+                  Confirmé
+                </div>
+                <div
+                  class="status-opt"
+                  onclick="selectStatus(this, 'En attente')"
+                >
+                  En attente
+                </div>
+                <div class="status-opt" onclick="selectStatus(this, 'Annulé')">
+                  Annulé
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="fg">
+              <label for="mDate">Date <span class="req">*</span></label>
+              <div class="inp-wrap">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                <input type="date" id="mDate" />
+              </div>
+            </div>
+            <div class="fg">
+              <label>Horaire <span class="req">*</span></label>
+              <div style="display: flex; gap: 8px">
+                <div class="inp-wrap" style="flex: 1">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <input type="time" id="mStart" value="09:00" />
+                </div>
+                <div class="inp-wrap" style="flex: 1">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <input type="time" id="mEnd" value="09:30" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row full">
+            <div class="fg">
+              <label for="mRoom">Salle / Cabinet</label>
+              <div class="inp-wrap">
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <input
+                  type="text"
+                  id="mRoom"
+                  placeholder="Cabinet 1, Salle B..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row full">
+            <div class="fg">
+              <label for="mNotes">Notes / Motif</label>
+              <textarea
+                class="inp"
+                id="mNotes"
+                placeholder="Informations complémentaires, motif de consultation..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="form-row full">
+            <div class="fg">
+              <label>Couleur</label>
+              <div class="color-row" id="colorPicker">
+                <div
+                  class="color-dot selected"
+                  style="background: #3b82f6"
+                  data-color="blue"
+                  onclick="pickColor(this)"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div
+                  class="color-dot"
+                  style="background: #10b981"
+                  data-color="green"
+                  onclick="pickColor(this)"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div
+                  class="color-dot"
+                  style="background: #8b5cf6"
+                  data-color="purple"
+                  onclick="pickColor(this)"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div
+                  class="color-dot"
+                  style="background: #f59e0b"
+                  data-color="orange"
+                  onclick="pickColor(this)"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div
+                  class="color-dot"
+                  style="background: #ef4444"
+                  data-color="red"
+                  onclick="pickColor(this)"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div
+                  class="color-dot"
+                  style="background: #14b8a6"
+                  data-color="teal"
+                  onclick="pickColor(this)"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn-delete"
+            id="btnDelete"
+            onclick="deleteAppt()"
+            style="display: none"
+          >
+            <svg viewBox="0 0 24 24">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6" />
+              <path d="M14 11v6" />
+            </svg>
+            Supprimer
+          </button>
+          <div style="display: flex; gap: 10px; margin-left: auto">
+            <button class="btn-cancel" onclick="closeModalBtn()">
+              Annuler
+            </button>
+            <button class="btn-save" onclick="saveAppt()">
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAIL POPUP -->
+    <div class="detail-popup" id="detailPopup">
+      <div class="detail-popup-header">
+        <div>
+          <div class="detail-popup-title" id="dp-title">—</div>
+          <div class="detail-popup-time" id="dp-time">—</div>
+        </div>
+        <div class="detail-badge" id="dp-badge">—</div>
+      </div>
+      <div class="detail-info">
+        <div class="detail-row">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+            /></svg
+          ><span id="dp-doctor">—</span>
+        </div>
+        <div class="detail-row">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" /></svg
+          ><span id="dp-type">—</span>
+        </div>
+        <div class="detail-row" id="dp-notes-row" style="display: none">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+            />
+            <polyline points="14 2 14 8 20 8" /></svg
+          ><span id="dp-notes">—</span>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="detail-btn edit" id="dp-edit">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+            />
+            <path
+              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+            /></svg
+          >Modifier
+        </button>
+        <button class="detail-btn del" id="dp-del">
+          <svg viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14H6L5 6" /></svg
+          >Supprimer
+        </button>
+        <button
+          class="detail-btn"
+          style="background: var(--bg); color: var(--text-mid)"
+          onclick="closeDetail()"
+        >
+          <svg viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" /></svg
+          >Fermer
         </button>
       </div>
     </div>
 
-    <!-- CALENDAR CONTAINER -->
-    <div class="cal-container">
-      <!-- WEEK VIEW -->
-      <div class="week-view active" id="weekView">
-        <div class="week-header" id="weekHeader"></div>
-        <div class="week-body" id="weekBody"></div>
-      </div>
-      <!-- MONTH VIEW -->
-      <div class="month-view" id="monthView">
-        <div class="month-grid-header">
-          <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div>
-        </div>
-        <div class="month-grid" id="monthGrid"></div>
-      </div>
-      <!-- DAY VIEW -->
-      <div class="day-view" id="dayView">
-        <div class="week-header" id="dayHeader" style="grid-template-columns:60px 1fr"></div>
-        <div class="week-body" id="dayBody" style="grid-template-columns:60px 1fr"></div>
-      </div>
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+      <span id="toastMsg">Rendez-vous enregistré</span>
     </div>
-  </main>
-</div>
 
-<!-- ═══ ADD/EDIT MODAL ═══ -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span id="modalTitleText">Nouveau rendez-vous</span>
-      </div>
-      <button class="modal-close" onclick="closeModalBtn()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body">
+    <script src="/js/auth.js"></script>
+    <script>
+      authGuard();
+      // ═══════════════════════════════════════════════
+      // DATA
+      // ═══════════════════════════════════════════════
+      const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+      const DAYS_SHORT = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+      const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 
-      <div class="form-row">
-        <div class="fg">
-          <label for="mPatient">Patient <span class="req">*</span></label>
-          <div class="inp-wrap">
-            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input type="text" id="mPatient" placeholder="Nom du patient" list="patientList">
-            <datalist id="patientList">
-              <option>Sophie Durand</option><option>Alain Robert</option>
-              <option>Julie Lefèvre</option><option>Marc Dupont</option>
-              <option>Claire Martin</option><option>Paul Lefebvre</option>
-              <option>Thomas Lambert</option><option>Laura Moreau</option>
-            </datalist>
-          </div>
-        </div>
-        <div class="fg">
-          <label for="mDoctor">Médecin <span class="req">*</span></label>
-          <div class="inp-wrap">
-            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            <select id="mDoctor">
-              <option value="">-- Choisir --</option>
-              <option>Dr. Jean Martin</option>
-              <option>Dr. Sophie Blanc</option>
-              <option>Dr. Ahmed Karim</option>
-              <option>Dr. Marie Leclerc</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      const DOCTORS = [
+        { name: 'Dr. Jean Martin',   color: '#3b82f6', cls: 'blue'   },
+        { name: 'Dr. Sophie Blanc',  color: '#10b981', cls: 'green'  },
+        { name: 'Dr. Ahmed Karim',   color: '#8b5cf6', cls: 'purple' },
+        { name: 'Dr. Marie Leclerc', color: '#f59e0b', cls: 'orange' },
+      ];
 
-      <div class="form-row">
-        <div class="fg">
-          <label for="mType">Type de consultation <span class="req">*</span></label>
-          <div class="inp-wrap">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
-            <select id="mType">
-              <option value="">-- Type --</option>
-              <option>Consultation générale</option>
-              <option>Contrôle annuel</option>
-              <option>Suivi diabète</option>
-              <option>Suivi cholestérol</option>
-              <option>Urgence</option>
-              <option>Téléconsultation</option>
-              <option>Renouvellement ordonnance</option>
-            </select>
-          </div>
-        </div>
-        <div class="fg">
-          <label for="mStatus">Statut</label>
-          <div class="status-row" id="statusRow">
-            <div class="status-opt sel" onclick="selectStatus(this,'Confirmé')">Confirmé</div>
-            <div class="status-opt" onclick="selectStatus(this,'En attente')">En attente</div>
-            <div class="status-opt" onclick="selectStatus(this,'Annulé')">Annulé</div>
-          </div>
-        </div>
-      </div>
+      let appointments = [
+        { id:1, patient:'Sophie Durand',  doctor:'Dr. Jean Martin',   type:'Consultation générale',   date:'2025-06-02', start:'09:00', end:'09:30', color:'blue',   status:'En attente', notes:'' },
+        { id:2, patient:'Alain Robert',   doctor:'Dr. Jean Martin',   type:'Contrôle annuel',          date:'2025-06-02', start:'09:30', end:'10:00', color:'blue',   status:'Confirmé',  notes:'' },
+        { id:3, patient:'Julie Lefèvre',  doctor:'Dr. Sophie Blanc',  type:'Suivi cholestérol',        date:'2025-06-02', start:'10:15', end:'11:00', color:'green',  status:'Confirmé',  notes:'Patient à jeun' },
+        { id:4, patient:'Marc Dupont',    doctor:'Dr. Ahmed Karim',   type:'Urgence',                  date:'2025-06-03', start:'08:00', end:'08:30', color:'red',    status:'Confirmé',  notes:'Douleurs thoraciques' },
+        { id:5, patient:'Claire Martin',  doctor:'Dr. Marie Leclerc', type:'Téléconsultation',         date:'2025-06-03', start:'14:00', end:'14:30', color:'orange', status:'Confirmé',  notes:'' },
+        { id:6, patient:'Paul Lefebvre',  doctor:'Dr. Jean Martin',   type:'Suivi diabète',            date:'2025-06-04', start:'11:00', end:'11:45', color:'blue',   status:'Confirmé',  notes:'Apporter carnet glycémie' },
+        { id:7, patient:'Thomas Lambert', doctor:'Dr. Sophie Blanc',  type:'Renouvellement ordonnance',date:'2025-06-05', start:'15:30', end:'16:00', color:'teal',   status:'Confirmé',  notes:'' },
+        { id:8, patient:'Laura Moreau',   doctor:'Dr. Ahmed Karim',   type:'Consultation générale',    date:'2025-06-06', start:'09:00', end:'09:30', color:'purple', status:'En attente',notes:'' },
+      ];
+      let nextId = 9;
 
-      <div class="form-row">
-        <div class="fg">
-          <label for="mDate">Date <span class="req">*</span></label>
-          <div class="inp-wrap">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <input type="date" id="mDate">
-          </div>
-        </div>
-        <div class="fg">
-          <label>Horaire <span class="req">*</span></label>
-          <div style="display:flex;gap:8px">
-            <div class="inp-wrap" style="flex:1">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <input type="time" id="mStart" value="09:00">
-            </div>
-            <div class="inp-wrap" style="flex:1">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <input type="time" id="mEnd" value="09:30">
-            </div>
-          </div>
-        </div>
-      </div>
+      let currentView = 'week';
+      let currentDate = new Date(2025, 5, 2); // June 2, 2025
+      let miniDate = new Date(2025, 5, 1);
+      let editingId = null;
+      let selectedStatus = 'Confirmé';
+      let selectedColor = 'blue';
+      let visibleDoctors = new Set(DOCTORS.map(d => d.name));
 
-      <div class="form-row full">
-        <div class="fg">
-          <label for="mRoom">Salle / Cabinet</label>
-          <div class="inp-wrap">
-            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <input type="text" id="mRoom" placeholder="Cabinet 1, Salle B...">
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row full">
-        <div class="fg">
-          <label for="mNotes">Notes / Motif</label>
-          <textarea class="inp" id="mNotes" placeholder="Informations complémentaires, motif de consultation..."></textarea>
-        </div>
-      </div>
-
-      <div class="form-row full">
-        <div class="fg">
-          <label>Couleur</label>
-          <div class="color-row" id="colorPicker">
-            <div class="color-dot selected" style="background:#3b82f6" data-color="blue" onclick="pickColor(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="color-dot" style="background:#10b981" data-color="green" onclick="pickColor(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="color-dot" style="background:#8b5cf6" data-color="purple" onclick="pickColor(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="color-dot" style="background:#f59e0b" data-color="orange" onclick="pickColor(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="color-dot" style="background:#ef4444" data-color="red" onclick="pickColor(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="color-dot" style="background:#14b8a6" data-color="teal" onclick="pickColor(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-    <div class="modal-footer">
-      <button class="btn-delete" id="btnDelete" onclick="deleteAppt()" style="display:none">
-        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        Supprimer
-      </button>
-      <div style="display:flex;gap:10px;margin-left:auto">
-        <button class="btn-cancel" onclick="closeModalBtn()">Annuler</button>
-        <button class="btn-save" onclick="saveAppt()">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          Enregistrer
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- DETAIL POPUP -->
-<div class="detail-popup" id="detailPopup">
-  <div class="detail-popup-header">
-    <div>
-      <div class="detail-popup-title" id="dp-title">—</div>
-      <div class="detail-popup-time" id="dp-time">—</div>
-    </div>
-    <div class="detail-badge" id="dp-badge">—</div>
-  </div>
-  <div class="detail-info">
-    <div class="detail-row"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span id="dp-doctor">—</span></div>
-    <div class="detail-row"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg><span id="dp-type">—</span></div>
-    <div class="detail-row" id="dp-notes-row" style="display:none"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span id="dp-notes">—</span></div>
-  </div>
-  <div class="detail-actions">
-    <button class="detail-btn edit" id="dp-edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Modifier</button>
-    <button class="detail-btn del" id="dp-del"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Supprimer</button>
-    <button class="detail-btn" style="background:var(--bg);color:var(--text-mid)" onclick="closeDetail()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Fermer</button>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast">
-  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-  <span id="toastMsg">Rendez-vous enregistré</span>
-</div>
-
-<script src="/js/auth.js"></script>
-<script>
-authGuard();
-// ═══════════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════════
-const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-const DAYS_SHORT = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-
-const DOCTORS = [
-  { name: 'Dr. Jean Martin',   color: '#3b82f6', cls: 'blue'   },
-  { name: 'Dr. Sophie Blanc',  color: '#10b981', cls: 'green'  },
-  { name: 'Dr. Ahmed Karim',   color: '#8b5cf6', cls: 'purple' },
-  { name: 'Dr. Marie Leclerc', color: '#f59e0b', cls: 'orange' },
-];
-
-let appointments = [
-  { id:1, patient:'Sophie Durand',  doctor:'Dr. Jean Martin',   type:'Consultation générale',   date:'2025-06-02', start:'09:00', end:'09:30', color:'blue',   status:'En attente', notes:'' },
-  { id:2, patient:'Alain Robert',   doctor:'Dr. Jean Martin',   type:'Contrôle annuel',          date:'2025-06-02', start:'09:30', end:'10:00', color:'blue',   status:'Confirmé',  notes:'' },
-  { id:3, patient:'Julie Lefèvre',  doctor:'Dr. Sophie Blanc',  type:'Suivi cholestérol',        date:'2025-06-02', start:'10:15', end:'11:00', color:'green',  status:'Confirmé',  notes:'Patient à jeun' },
-  { id:4, patient:'Marc Dupont',    doctor:'Dr. Ahmed Karim',   type:'Urgence',                  date:'2025-06-03', start:'08:00', end:'08:30', color:'red',    status:'Confirmé',  notes:'Douleurs thoraciques' },
-  { id:5, patient:'Claire Martin',  doctor:'Dr. Marie Leclerc', type:'Téléconsultation',         date:'2025-06-03', start:'14:00', end:'14:30', color:'orange', status:'Confirmé',  notes:'' },
-  { id:6, patient:'Paul Lefebvre',  doctor:'Dr. Jean Martin',   type:'Suivi diabète',            date:'2025-06-04', start:'11:00', end:'11:45', color:'blue',   status:'Confirmé',  notes:'Apporter carnet glycémie' },
-  { id:7, patient:'Thomas Lambert', doctor:'Dr. Sophie Blanc',  type:'Renouvellement ordonnance',date:'2025-06-05', start:'15:30', end:'16:00', color:'teal',   status:'Confirmé',  notes:'' },
-  { id:8, patient:'Laura Moreau',   doctor:'Dr. Ahmed Karim',   type:'Consultation générale',    date:'2025-06-06', start:'09:00', end:'09:30', color:'purple', status:'En attente',notes:'' },
-];
-let nextId = 9;
-
-let currentView = 'week';
-let currentDate = new Date(2025, 5, 2); // June 2, 2025
-let miniDate = new Date(2025, 5, 1);
-let editingId = null;
-let selectedStatus = 'Confirmé';
-let selectedColor = 'blue';
-let visibleDoctors = new Set(DOCTORS.map(d => d.name));
-
-// ═══════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════
-function init() {
-  renderDoctorList();
-  renderMiniCal();
-  renderView();
-  updateCurrentTimeLine();
-  setInterval(updateCurrentTimeLine, 60000);
-}
-
-// ═══════════════════════════════════════════════
-// DOCTOR LIST
-// ═══════════════════════════════════════════════
-function renderDoctorList() {
-  const el = document.getElementById('doctorList');
-  el.innerHTML = DOCTORS.map(d => `
-    <div class="doctor-item checked" style="--color:${d.color}" onclick="toggleDoctor(this,'${d.name}')">
-      <div class="doctor-dot" style="background:${d.color}"></div>
-      <span class="doctor-name">${d.name}</span>
-      <div class="doctor-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-    </div>`).join('');
-}
-
-function toggleDoctor(el, name) {
-  el.classList.toggle('checked');
-  if (visibleDoctors.has(name)) visibleDoctors.delete(name);
-  else visibleDoctors.add(name);
-  renderView();
-}
-
-// ═══════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════
-function navigate(dir) {
-  if (currentView === 'week') currentDate = addDays(currentDate, dir * 7);
-  else if (currentView === 'month') currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + dir, 1);
-  else currentDate = addDays(currentDate, dir);
-  renderView();
-}
-
-function goToday() {
-  currentDate = new Date();
-  renderView();
-}
-
-function setView(v) {
-  currentView = v;
-  ['vDay','vWeek','vMonth'].forEach(id => document.getElementById(id).classList.remove('active'));
-  document.getElementById('v' + v.charAt(0).toUpperCase() + v.slice(1)).classList.add('active');
-  document.getElementById('weekView').classList.remove('active');
-  document.getElementById('monthView').classList.remove('active');
-  document.getElementById('dayView').classList.remove('active');
-  if (v === 'week') document.getElementById('weekView').classList.add('active');
-  else if (v === 'month') document.getElementById('monthView').classList.add('active');
-  else document.getElementById('dayView').classList.add('active');
-  renderView();
-}
-
-// ═══════════════════════════════════════════════
-// RENDER DISPATCHER
-// ═══════════════════════════════════════════════
-function renderView() {
-  if (currentView === 'week') renderWeek();
-  else if (currentView === 'month') renderMonth();
-  else renderDay();
-  renderMiniCal();
-}
-
-// ═══════════════════════════════════════════════
-// WEEK VIEW
-// ═══════════════════════════════════════════════
-function renderWeek() {
-  const monday = getMonday(currentDate);
-  const days = Array.from({length:7}, (_,i) => addDays(monday,i));
-  const today = new Date(); today.setHours(0,0,0,0);
-
-  // Label
-  const endDay = days[6];
-  document.getElementById('currentPeriod').textContent =
-    `${days[0].getDate()} – ${endDay.getDate()} ${MONTHS_FR[endDay.getMonth()]} ${endDay.getFullYear()}`;
-
-  // Header
-  const header = document.getElementById('weekHeader');
-  header.innerHTML = '<div class="week-header-gutter"></div>' +
-    days.map(d => {
-      const isToday = d.getTime() === today.getTime();
-      return `<div class="week-header-day">
-        <div class="week-day-name">${DAYS_SHORT[(d.getDay()+6)%7+1 > 6 ? 0 : (d.getDay()+6)%7]}</div>
-        <div class="week-day-num${isToday?' today':''}">${d.getDate()}</div>
-      </div>`;
-    }).join('');
-
-  // Body
-  const body = document.getElementById('weekBody');
-  body.innerHTML = '';
-
-  // Time gutter
-  const gutter = document.createElement('div');
-  gutter.className = 'time-gutter';
-  for (let h = 7; h <= 20; h++) {
-    const slot = document.createElement('div');
-    slot.className = 'time-slot-label';
-    slot.textContent = `${String(h).padStart(2,'0')}:00`;
-    gutter.appendChild(slot);
-  }
-  body.appendChild(gutter);
-
-  // Day columns
-  days.forEach(d => {
-    const isToday = d.getTime() === today.getTime();
-    const col = document.createElement('div');
-    col.className = 'day-col' + (isToday ? ' today-col' : '');
-    col.dataset.date = fmtDate(d);
-
-    for (let h = 7; h <= 20; h++) {
-      const cell = document.createElement('div');
-      cell.className = 'hour-cell';
-      col.appendChild(cell);
-    }
-
-    // Add time line
-    if (isToday) {
-      const now = new Date();
-      const mins = (now.getHours() - 7) * 60 + now.getMinutes();
-      if (mins >= 0 && mins <= 14 * 60) {
-        const tl = document.createElement('div');
-        tl.className = 'time-line';
-        tl.id = 'timeLine';
-        tl.style.top = (mins) + 'px';
-        col.appendChild(tl);
+      // ═══════════════════════════════════════════════
+      // INIT
+      // ═══════════════════════════════════════════════
+      function init() {
+        renderDoctorList();
+        renderMiniCal();
+        renderView();
+        updateCurrentTimeLine();
+        setInterval(updateCurrentTimeLine, 60000);
       }
-    }
 
-    // Appointments
-    const dayAppts = appointments.filter(a =>
-      a.date === fmtDate(d) && visibleDoctors.has(a.doctor)
-    );
-    dayAppts.forEach(a => {
-      col.appendChild(buildApptEl(a));
-    });
+      // ═══════════════════════════════════════════════
+      // DOCTOR LIST
+      // ═══════════════════════════════════════════════
+      function renderDoctorList() {
+        const el = document.getElementById('doctorList');
+        el.innerHTML = DOCTORS.map(d => `
+          <div class="doctor-item checked" style="--color:${d.color}" onclick="toggleDoctor(this,'${d.name}')">
+            <div class="doctor-dot" style="background:${d.color}"></div>
+            <span class="doctor-name">${d.name}</span>
+            <div class="doctor-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>`).join('');
+      }
 
-    // Click to add
-    col.addEventListener('click', (e) => {
-      if (e.target.closest('.appt')) return;
-      const rect = col.getBoundingClientRect();
-      const y = e.clientY - rect.top + col.scrollTop;
-      const hour = Math.floor(y / 60) + 7;
-      const mins = Math.floor((y % 60) / 15) * 15;
-      openModal(fmtDate(d), `${String(hour).padStart(2,'0')}:${String(mins).padStart(2,'0')}`);
-    });
+      function toggleDoctor(el, name) {
+        el.classList.toggle('checked');
+        if (visibleDoctors.has(name)) visibleDoctors.delete(name);
+        else visibleDoctors.add(name);
+        renderView();
+      }
 
-    body.appendChild(col);
-  });
-}
+      // ═══════════════════════════════════════════════
+      // NAVIGATION
+      // ═══════════════════════════════════════════════
+      function navigate(dir) {
+        if (currentView === 'week') currentDate = addDays(currentDate, dir * 7);
+        else if (currentView === 'month') currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + dir, 1);
+        else currentDate = addDays(currentDate, dir);
+        renderView();
+      }
 
-// ═══════════════════════════════════════════════
-// DAY VIEW
-// ═══════════════════════════════════════════════
-function renderDay() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const isToday = currentDate.getTime() === today.getTime();
-  document.getElementById('currentPeriod').textContent =
-    `${DAYS_FR[currentDate.getDay()]} ${currentDate.getDate()} ${MONTHS_FR[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+      function goToday() {
+        currentDate = new Date();
+        renderView();
+      }
 
-  const header = document.getElementById('dayHeader');
-  header.style.gridTemplateColumns = '60px 1fr';
-  header.innerHTML = `<div class="week-header-gutter"></div>
-    <div class="week-header-day">
-      <div class="week-day-name">${DAYS_SHORT[currentDate.getDay()]}</div>
-      <div class="week-day-num${isToday?' today':''}">${currentDate.getDate()}</div>
-    </div>`;
+      function setView(v) {
+        currentView = v;
+        ['vDay','vWeek','vMonth'].forEach(id => document.getElementById(id).classList.remove('active'));
+        document.getElementById('v' + v.charAt(0).toUpperCase() + v.slice(1)).classList.add('active');
+        document.getElementById('weekView').classList.remove('active');
+        document.getElementById('monthView').classList.remove('active');
+        document.getElementById('dayView').classList.remove('active');
+        if (v === 'week') document.getElementById('weekView').classList.add('active');
+        else if (v === 'month') document.getElementById('monthView').classList.add('active');
+        else document.getElementById('dayView').classList.add('active');
+        renderView();
+      }
 
-  const body = document.getElementById('dayBody');
-  body.style.gridTemplateColumns = '60px 1fr';
-  body.innerHTML = '';
-  const gutter = document.createElement('div');
-  gutter.className = 'time-gutter';
-  for (let h = 7; h <= 20; h++) {
-    const s = document.createElement('div');
-    s.className = 'time-slot-label';
-    s.textContent = `${String(h).padStart(2,'0')}:00`;
-    gutter.appendChild(s);
-  }
-  body.appendChild(gutter);
+      // ═══════════════════════════════════════════════
+      // RENDER DISPATCHER
+      // ═══════════════════════════════════════════════
+      function renderView() {
+        if (currentView === 'week') renderWeek();
+        else if (currentView === 'month') renderMonth();
+        else renderDay();
+        renderMiniCal();
+      }
 
-  const col = document.createElement('div');
-  col.className = 'day-col' + (isToday ? ' today-col' : '');
-  col.dataset.date = fmtDate(currentDate);
-  for (let h = 7; h <= 20; h++) { const c = document.createElement('div'); c.className = 'hour-cell'; col.appendChild(c); }
-  if (isToday) {
-    const now = new Date();
-    const mins = (now.getHours()-7)*60+now.getMinutes();
-    if (mins >= 0 && mins <= 14*60) { const tl = document.createElement('div'); tl.className='time-line'; tl.style.top=mins+'px'; col.appendChild(tl); }
-  }
-  appointments.filter(a => a.date === fmtDate(currentDate) && visibleDoctors.has(a.doctor))
-    .forEach(a => col.appendChild(buildApptEl(a)));
-  col.addEventListener('click', e => {
-    if (e.target.closest('.appt')) return;
-    const rect = col.getBoundingClientRect(); const y = e.clientY - rect.top;
-    const hour = Math.floor(y/60)+7; const mins = Math.floor((y%60)/15)*15;
-    openModal(fmtDate(currentDate), `${String(hour).padStart(2,'0')}:${String(mins).padStart(2,'0')}`);
-  });
-  body.appendChild(col);
-}
+      // ═══════════════════════════════════════════════
+      // WEEK VIEW
+      // ═══════════════════════════════════════════════
+      function renderWeek() {
+        const monday = getMonday(currentDate);
+        const days = Array.from({length:7}, (_,i) => addDays(monday,i));
+        const today = new Date(); today.setHours(0,0,0,0);
 
-// ═══════════════════════════════════════════════
-// MONTH VIEW
-// ═══════════════════════════════════════════════
-function renderMonth() {
-  document.getElementById('currentPeriod').textContent =
-    `${MONTHS_FR[currentDate.getMonth()].charAt(0).toUpperCase() + MONTHS_FR[currentDate.getMonth()].slice(1)} ${currentDate.getFullYear()}`;
+        // Label
+        const endDay = days[6];
+        document.getElementById('currentPeriod').textContent =
+          `${days[0].getDate()} – ${endDay.getDate()} ${MONTHS_FR[endDay.getMonth()]} ${endDay.getFullYear()}`;
 
-  const grid = document.getElementById('monthGrid');
-  grid.innerHTML = '';
-  const today = new Date(); today.setHours(0,0,0,0);
+        // Header
+        const header = document.getElementById('weekHeader');
+        header.innerHTML = '<div class="week-header-gutter"></div>' +
+          days.map(d => {
+            const isToday = d.getTime() === today.getTime();
+            return `<div class="week-header-day">
+              <div class="week-day-name">${DAYS_SHORT[(d.getDay()+6)%7+1 > 6 ? 0 : (d.getDay()+6)%7]}</div>
+              <div class="week-day-num${isToday?' today':''}">${d.getDate()}</div>
+            </div>`;
+          }).join('');
 
-  const first = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const last  = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0);
+        // Body
+        const body = document.getElementById('weekBody');
+        body.innerHTML = '';
 
-  // start from Monday
-  let start = new Date(first);
-  const dow = (first.getDay() + 6) % 7; // Mon=0
-  start.setDate(start.getDate() - dow);
+        // Time gutter
+        const gutter = document.createElement('div');
+        gutter.className = 'time-gutter';
+        for (let h = 7; h <= 20; h++) {
+          const slot = document.createElement('div');
+          slot.className = 'time-slot-label';
+          slot.textContent = `${String(h).padStart(2,'0')}:00`;
+          gutter.appendChild(slot);
+        }
+        body.appendChild(gutter);
 
-  for (let i = 0; i < 42; i++) {
-    const d = addDays(start, i);
-    const cell = document.createElement('div');
-    const isOther = d.getMonth() !== currentDate.getMonth();
-    const isToday = d.getTime() === today.getTime();
-    cell.className = 'month-cell' + (isOther?' other-month':'') + (isToday?' today':'');
+        // Day columns
+        days.forEach(d => {
+          const isToday = d.getTime() === today.getTime();
+          const col = document.createElement('div');
+          col.className = 'day-col' + (isToday ? ' today-col' : '');
+          col.dataset.date = fmtDate(d);
 
-    const dateEl = document.createElement('div');
-    dateEl.className = 'month-date';
-    dateEl.textContent = d.getDate();
-    cell.appendChild(dateEl);
+          for (let h = 7; h <= 20; h++) {
+            const cell = document.createElement('div');
+            cell.className = 'hour-cell';
+            col.appendChild(cell);
+          }
 
-    const dayAppts = appointments.filter(a => a.date === fmtDate(d) && visibleDoctors.has(a.doctor));
-    dayAppts.slice(0,3).forEach(a => {
-      const el = document.createElement('div');
-      el.className = `month-appt appt ${a.color}`;
-      el.textContent = `${a.start} ${a.patient}`;
-      el.onclick = (e) => { e.stopPropagation(); showDetail(a, e); };
-      cell.appendChild(el);
-    });
-    if (dayAppts.length > 3) {
-      const more = document.createElement('div');
-      more.className = 'month-more';
-      more.textContent = `+${dayAppts.length - 3} autres`;
-      cell.appendChild(more);
-    }
+          // Add time line
+          if (isToday) {
+            const now = new Date();
+            const mins = (now.getHours() - 7) * 60 + now.getMinutes();
+            if (mins >= 0 && mins <= 14 * 60) {
+              const tl = document.createElement('div');
+              tl.className = 'time-line';
+              tl.id = 'timeLine';
+              tl.style.top = (mins) + 'px';
+              col.appendChild(tl);
+            }
+          }
 
-    cell.addEventListener('click', () => openModal(fmtDate(d)));
-    grid.appendChild(cell);
-  }
-}
+          // Appointments
+          const dayAppts = appointments.filter(a =>
+            a.date === fmtDate(d) && visibleDoctors.has(a.doctor)
+          );
+          dayAppts.forEach(a => {
+            col.appendChild(buildApptEl(a));
+          });
 
-// ═══════════════════════════════════════════════
-// BUILD APPOINTMENT ELEMENT
-// ═══════════════════════════════════════════════
-function buildApptEl(a) {
-  const el = document.createElement('div');
-  el.className = `appt ${a.color}`;
-  const startMins = timeToMins(a.start) - 7*60;
-  const endMins   = timeToMins(a.end)   - 7*60;
-  el.style.top    = startMins + 'px';
-  el.style.height = Math.max(endMins - startMins, 20) + 'px';
-  el.innerHTML = `<div class="appt-title">${a.patient}</div><div class="appt-sub">${a.start} · ${a.type}</div>`;
-  el.addEventListener('click', e => { e.stopPropagation(); showDetail(a, e); });
-  return el;
-}
+          // Click to add
+          col.addEventListener('click', (e) => {
+            if (e.target.closest('.appt')) return;
+            const rect = col.getBoundingClientRect();
+            const y = e.clientY - rect.top + col.scrollTop;
+            const hour = Math.floor(y / 60) + 7;
+            const mins = Math.floor((y % 60) / 15) * 15;
+            openModal(fmtDate(d), `${String(hour).padStart(2,'0')}:${String(mins).padStart(2,'0')}`);
+          });
 
-// ═══════════════════════════════════════════════
-// MINI CALENDAR
-// ═══════════════════════════════════════════════
-function renderMiniCal() {
-  const y = miniDate.getFullYear(), m = miniDate.getMonth();
-  document.getElementById('miniMonth').textContent = `${MONTHS_FR[m]} ${y}`;
-  const grid = document.getElementById('miniGrid');
-  grid.innerHTML = ['L','M','M','J','V','S','D'].map(d => `<div class="mini-day-label">${d}</div>`).join('');
+          body.appendChild(col);
+        });
+      }
 
-  const first = new Date(y, m, 1);
-  const start = new Date(first);
-  start.setDate(start.getDate() - (first.getDay()+6)%7);
-  const today = new Date(); today.setHours(0,0,0,0);
-  const sel = new Date(currentDate); sel.setHours(0,0,0,0);
+      // ═══════════════════════════════════════════════
+      // DAY VIEW
+      // ═══════════════════════════════════════════════
+      function renderDay() {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const isToday = currentDate.getTime() === today.getTime();
+        document.getElementById('currentPeriod').textContent =
+          `${DAYS_FR[currentDate.getDay()]} ${currentDate.getDate()} ${MONTHS_FR[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
 
-  for (let i = 0; i < 42; i++) {
-    const d = addDays(start, i);
-    const hasAppt = appointments.some(a => a.date === fmtDate(d));
-    const isToday = d.getTime() === today.getTime();
-    const isSel   = d.getTime() === sel.getTime();
-    const isOther = d.getMonth() !== m;
-    const el = document.createElement('div');
-    el.className = 'mini-day' + (isOther?' other-month':'') + (isToday?' today':'') + (isSel&&!isToday?' selected':'') + (hasAppt?' has-appt':'');
-    el.textContent = d.getDate();
-    el.onclick = () => { currentDate = new Date(d); renderView(); };
-    grid.appendChild(el);
-  }
-}
+        const header = document.getElementById('dayHeader');
+        header.style.gridTemplateColumns = '60px 1fr';
+        header.innerHTML = `<div class="week-header-gutter"></div>
+          <div class="week-header-day">
+            <div class="week-day-name">${DAYS_SHORT[currentDate.getDay()]}</div>
+            <div class="week-day-num${isToday?' today':''}">${currentDate.getDate()}</div>
+          </div>`;
 
-function miniNav(dir) {
-  miniDate = new Date(miniDate.getFullYear(), miniDate.getMonth() + dir, 1);
-  renderMiniCal();
-}
+        const body = document.getElementById('dayBody');
+        body.style.gridTemplateColumns = '60px 1fr';
+        body.innerHTML = '';
+        const gutter = document.createElement('div');
+        gutter.className = 'time-gutter';
+        for (let h = 7; h <= 20; h++) {
+          const s = document.createElement('div');
+          s.className = 'time-slot-label';
+          s.textContent = `${String(h).padStart(2,'0')}:00`;
+          gutter.appendChild(s);
+        }
+        body.appendChild(gutter);
 
-// ═══════════════════════════════════════════════
-// TIME LINE
-// ═══════════════════════════════════════════════
-function updateCurrentTimeLine() {
-  const el = document.getElementById('timeLine');
-  if (!el) return;
-  const now = new Date();
-  const mins = (now.getHours()-7)*60+now.getMinutes();
-  el.style.top = mins + 'px';
-}
+        const col = document.createElement('div');
+        col.className = 'day-col' + (isToday ? ' today-col' : '');
+        col.dataset.date = fmtDate(currentDate);
+        for (let h = 7; h <= 20; h++) { const c = document.createElement('div'); c.className = 'hour-cell'; col.appendChild(c); }
+        if (isToday) {
+          const now = new Date();
+          const mins = (now.getHours()-7)*60+now.getMinutes();
+          if (mins >= 0 && mins <= 14*60) { const tl = document.createElement('div'); tl.className='time-line'; tl.style.top=mins+'px'; col.appendChild(tl); }
+        }
+        appointments.filter(a => a.date === fmtDate(currentDate) && visibleDoctors.has(a.doctor))
+          .forEach(a => col.appendChild(buildApptEl(a)));
+        col.addEventListener('click', e => {
+          if (e.target.closest('.appt')) return;
+          const rect = col.getBoundingClientRect(); const y = e.clientY - rect.top;
+          const hour = Math.floor(y/60)+7; const mins = Math.floor((y%60)/15)*15;
+          openModal(fmtDate(currentDate), `${String(hour).padStart(2,'0')}:${String(mins).padStart(2,'0')}`);
+        });
+        body.appendChild(col);
+      }
 
-// ═══════════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════════
-function openModal(date, startTime) {
-  editingId = null;
-  selectedStatus = 'Confirmé';
-  selectedColor  = 'blue';
-  document.getElementById('modalTitleText').textContent = 'Nouveau rendez-vous';
-  document.getElementById('btnDelete').style.display = 'none';
+      // ═══════════════════════════════════════════════
+      // MONTH VIEW
+      // ═══════════════════════════════════════════════
+      function renderMonth() {
+        document.getElementById('currentPeriod').textContent =
+          `${MONTHS_FR[currentDate.getMonth()].charAt(0).toUpperCase() + MONTHS_FR[currentDate.getMonth()].slice(1)} ${currentDate.getFullYear()}`;
 
-  // Reset form
-  document.getElementById('mPatient').value = '';
-  document.getElementById('mDoctor').value = '';
-  document.getElementById('mType').value = '';
-  document.getElementById('mRoom').value = '';
-  document.getElementById('mNotes').value = '';
-  document.getElementById('mDate').value = date || fmtDate(currentDate);
-  document.getElementById('mStart').value = startTime || '09:00';
-  document.getElementById('mEnd').value = startTime ? addMins(startTime, 30) : '09:30';
+        const grid = document.getElementById('monthGrid');
+        grid.innerHTML = '';
+        const today = new Date(); today.setHours(0,0,0,0);
 
-  document.querySelectorAll('.status-opt').forEach(o => { o.classList.toggle('sel', o.textContent === 'Confirmé'); });
-  document.querySelectorAll('.color-dot').forEach(d => { d.classList.toggle('selected', d.dataset.color === 'blue'); });
+        const first = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const last  = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0);
 
-  closeDetail();
-  document.getElementById('modalOverlay').classList.add('open');
-}
+        // start from Monday
+        let start = new Date(first);
+        const dow = (first.getDay() + 6) % 7; // Mon=0
+        start.setDate(start.getDate() - dow);
 
-function openEditModal(a) {
-  editingId = a.id;
-  selectedStatus = a.status;
-  selectedColor  = a.color;
-  document.getElementById('modalTitleText').textContent = 'Modifier le rendez-vous';
-  document.getElementById('btnDelete').style.display = 'flex';
+        for (let i = 0; i < 42; i++) {
+          const d = addDays(start, i);
+          const cell = document.createElement('div');
+          const isOther = d.getMonth() !== currentDate.getMonth();
+          const isToday = d.getTime() === today.getTime();
+          cell.className = 'month-cell' + (isOther?' other-month':'') + (isToday?' today':'');
 
-  document.getElementById('mPatient').value = a.patient;
-  document.getElementById('mDoctor').value  = a.doctor;
-  document.getElementById('mType').value    = a.type;
-  document.getElementById('mRoom').value    = a.room || '';
-  document.getElementById('mNotes').value   = a.notes;
-  document.getElementById('mDate').value    = a.date;
-  document.getElementById('mStart').value   = a.start;
-  document.getElementById('mEnd').value     = a.end;
+          const dateEl = document.createElement('div');
+          dateEl.className = 'month-date';
+          dateEl.textContent = d.getDate();
+          cell.appendChild(dateEl);
 
-  document.querySelectorAll('.status-opt').forEach(o => { o.classList.toggle('sel', o.textContent === a.status); });
-  document.querySelectorAll('.color-dot').forEach(d => { d.classList.toggle('selected', d.dataset.color === a.color); });
+          const dayAppts = appointments.filter(a => a.date === fmtDate(d) && visibleDoctors.has(a.doctor));
+          dayAppts.slice(0,3).forEach(a => {
+            const el = document.createElement('div');
+            el.className = `month-appt appt ${a.color}`;
+            el.textContent = `${a.start} ${a.patient}`;
+            el.onclick = (e) => { e.stopPropagation(); showDetail(a, e); };
+            cell.appendChild(el);
+          });
+          if (dayAppts.length > 3) {
+            const more = document.createElement('div');
+            more.className = 'month-more';
+            more.textContent = `+${dayAppts.length - 3} autres`;
+            cell.appendChild(more);
+          }
 
-  closeDetail();
-  document.getElementById('modalOverlay').classList.add('open');
-}
+          cell.addEventListener('click', () => openModal(fmtDate(d)));
+          grid.appendChild(cell);
+        }
+      }
 
-function closeModal(e) {
-  if (e.target === document.getElementById('modalOverlay')) closeModalBtn();
-}
-function closeModalBtn() { document.getElementById('modalOverlay').classList.remove('open'); editingId = null; }
+      // ═══════════════════════════════════════════════
+      // BUILD APPOINTMENT ELEMENT
+      // ═══════════════════════════════════════════════
+      function buildApptEl(a) {
+        const el = document.createElement('div');
+        el.className = `appt ${a.color}`;
+        const startMins = timeToMins(a.start) - 7*60;
+        const endMins   = timeToMins(a.end)   - 7*60;
+        el.style.top    = startMins + 'px';
+        el.style.height = Math.max(endMins - startMins, 20) + 'px';
+        el.innerHTML = `<div class="appt-title">${a.patient}</div><div class="appt-sub">${a.start} · ${a.type}</div>`;
+        el.addEventListener('click', e => { e.stopPropagation(); showDetail(a, e); });
+        return el;
+      }
 
-function selectStatus(el, val) {
-  document.querySelectorAll('.status-opt').forEach(o => o.classList.remove('sel'));
-  el.classList.add('sel');
-  selectedStatus = val;
-}
+      // ═══════════════════════════════════════════════
+      // MINI CALENDAR
+      // ═══════════════════════════════════════════════
+      function renderMiniCal() {
+        const y = miniDate.getFullYear(), m = miniDate.getMonth();
+        document.getElementById('miniMonth').textContent = `${MONTHS_FR[m]} ${y}`;
+        const grid = document.getElementById('miniGrid');
+        grid.innerHTML = ['L','M','M','J','V','S','D'].map(d => `<div class="mini-day-label">${d}</div>`).join('');
 
-function pickColor(el) {
-  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedColor = el.dataset.color;
-}
+        const first = new Date(y, m, 1);
+        const start = new Date(first);
+        start.setDate(start.getDate() - (first.getDay()+6)%7);
+        const today = new Date(); today.setHours(0,0,0,0);
+        const sel = new Date(currentDate); sel.setHours(0,0,0,0);
 
-function saveAppt() {
-  const patient = document.getElementById('mPatient').value.trim();
-  const doctor  = document.getElementById('mDoctor').value;
-  const type    = document.getElementById('mType').value;
-  const date    = document.getElementById('mDate').value;
-  const start   = document.getElementById('mStart').value;
-  const end     = document.getElementById('mEnd').value;
-  if (!patient || !doctor || !type || !date || !start || !end) { showToast('Veuillez remplir les champs obligatoires.', false); return; }
+        for (let i = 0; i < 42; i++) {
+          const d = addDays(start, i);
+          const hasAppt = appointments.some(a => a.date === fmtDate(d));
+          const isToday = d.getTime() === today.getTime();
+          const isSel   = d.getTime() === sel.getTime();
+          const isOther = d.getMonth() !== m;
+          const el = document.createElement('div');
+          el.className = 'mini-day' + (isOther?' other-month':'') + (isToday?' today':'') + (isSel&&!isToday?' selected':'') + (hasAppt?' has-appt':'');
+          el.textContent = d.getDate();
+          el.onclick = () => { currentDate = new Date(d); renderView(); };
+          grid.appendChild(el);
+        }
+      }
 
-  if (editingId) {
-    const idx = appointments.findIndex(a => a.id === editingId);
-    if (idx !== -1) appointments[idx] = { ...appointments[idx], patient, doctor, type, date, start, end, status: selectedStatus, color: selectedColor, notes: document.getElementById('mNotes').value, room: document.getElementById('mRoom').value };
-    showToast('Rendez-vous modifié avec succès');
-  } else {
-    appointments.push({ id: nextId++, patient, doctor, type, date, start, end, status: selectedStatus, color: selectedColor, notes: document.getElementById('mNotes').value, room: document.getElementById('mRoom').value });
-    showToast('Rendez-vous ajouté avec succès');
-  }
-  closeModalBtn();
-  renderView();
-}
+      function miniNav(dir) {
+        miniDate = new Date(miniDate.getFullYear(), miniDate.getMonth() + dir, 1);
+        renderMiniCal();
+      }
 
-function deleteAppt() {
-  if (!editingId) return;
-  appointments = appointments.filter(a => a.id !== editingId);
-  closeModalBtn();
-  showToast('Rendez-vous supprimé');
-  renderView();
-}
+      // ═══════════════════════════════════════════════
+      // TIME LINE
+      // ═══════════════════════════════════════════════
+      function updateCurrentTimeLine() {
+        const el = document.getElementById('timeLine');
+        if (!el) return;
+        const now = new Date();
+        const mins = (now.getHours()-7)*60+now.getMinutes();
+        el.style.top = mins + 'px';
+      }
 
-// ═══════════════════════════════════════════════
-// DETAIL POPUP
-// ═══════════════════════════════════════════════
-function showDetail(a, e) {
-  const popup = document.getElementById('detailPopup');
-  document.getElementById('dp-title').textContent  = a.patient;
-  document.getElementById('dp-time').textContent   = `${a.date ? fmtDateFr(a.date) : ''} · ${a.start} – ${a.end}`;
-  document.getElementById('dp-doctor').textContent = a.doctor;
-  document.getElementById('dp-type').textContent   = a.type;
-  const badge = document.getElementById('dp-badge');
-  badge.textContent = a.status;
-  badge.className = 'detail-badge';
-  if (a.status === 'Confirmé') { badge.style.background='var(--green-pale)'; badge.style.color='#065f46'; }
-  else if (a.status === 'En attente') { badge.style.background='var(--gold-pale)'; badge.style.color='#92400e'; }
-  else { badge.style.background='var(--red-pale)'; badge.style.color=var(--red); }
+      // ═══════════════════════════════════════════════
+      // MODAL
+      // ═══════════════════════════════════════════════
+      function openModal(date, startTime) {
+        editingId = null;
+        selectedStatus = 'Confirmé';
+        selectedColor  = 'blue';
+        document.getElementById('modalTitleText').textContent = 'Nouveau rendez-vous';
+        document.getElementById('btnDelete').style.display = 'none';
 
-  if (a.notes) {
-    document.getElementById('dp-notes').textContent = a.notes;
-    document.getElementById('dp-notes-row').style.display = 'flex';
-  } else document.getElementById('dp-notes-row').style.display = 'none';
+        // Reset form
+        document.getElementById('mPatient').value = '';
+        document.getElementById('mDoctor').value = '';
+        document.getElementById('mType').value = '';
+        document.getElementById('mRoom').value = '';
+        document.getElementById('mNotes').value = '';
+        document.getElementById('mDate').value = date || fmtDate(currentDate);
+        document.getElementById('mStart').value = startTime || '09:00';
+        document.getElementById('mEnd').value = startTime ? addMins(startTime, 30) : '09:30';
 
-  document.getElementById('dp-edit').onclick = () => openEditModal(a);
-  document.getElementById('dp-del').onclick  = () => { appointments = appointments.filter(x=>x.id!==a.id); closeDetail(); showToast('Rendez-vous supprimé'); renderView(); };
+        document.querySelectorAll('.status-opt').forEach(o => { o.classList.toggle('sel', o.textContent === 'Confirmé'); });
+        document.querySelectorAll('.color-dot').forEach(d => { d.classList.toggle('selected', d.dataset.color === 'blue'); });
 
-  const x = Math.min(e.clientX + 10, window.innerWidth - 320);
-  const y = Math.min(e.clientY + 10, window.innerHeight - 250);
-  popup.style.left = x + 'px';
-  popup.style.top  = y + 'px';
-  popup.classList.add('open');
-}
+        closeDetail();
+        document.getElementById('modalOverlay').classList.add('open');
+      }
 
-function closeDetail() { document.getElementById('detailPopup').classList.remove('open'); }
-document.addEventListener('click', e => { if (!e.target.closest('.detail-popup') && !e.target.closest('.appt') && !e.target.closest('.month-appt')) closeDetail(); });
-document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModalBtn(); closeDetail(); }});
+      function openEditModal(a) {
+        editingId = a.id;
+        selectedStatus = a.status;
+        selectedColor  = a.color;
+        document.getElementById('modalTitleText').textContent = 'Modifier le rendez-vous';
+        document.getElementById('btnDelete').style.display = 'flex';
 
-// ═══════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  document.getElementById('toastMsg').textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
+        document.getElementById('mPatient').value = a.patient;
+        document.getElementById('mDoctor').value  = a.doctor;
+        document.getElementById('mType').value    = a.type;
+        document.getElementById('mRoom').value    = a.room || '';
+        document.getElementById('mNotes').value   = a.notes;
+        document.getElementById('mDate').value    = a.date;
+        document.getElementById('mStart').value   = a.start;
+        document.getElementById('mEnd').value     = a.end;
 
-// ═══════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════
-function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-function fmtDateFr(s) { const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; }
-function getMonday(d) { const dd=new Date(d); const day=dd.getDay(); const diff=day===0?-6:1-day; dd.setDate(dd.getDate()+diff); return dd; }
-function addDays(d, n) { const r=new Date(d); r.setDate(r.getDate()+n); return r; }
-function timeToMins(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
-function addMins(t, n) { const m=timeToMins(t)+n; return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`; }
+        document.querySelectorAll('.status-opt').forEach(o => { o.classList.toggle('sel', o.textContent === a.status); });
+        document.querySelectorAll('.color-dot').forEach(d => { d.classList.toggle('selected', d.dataset.color === a.color); });
 
-// auto-adjust end time when start changes
-document.getElementById('mStart').addEventListener('change', function() {
-  document.getElementById('mEnd').value = addMins(this.value, 30);
-});
+        closeDetail();
+        document.getElementById('modalOverlay').classList.add('open');
+      }
 
-init();
-</script>
-</body>
+      function closeModal(e) {
+        if (e.target === document.getElementById('modalOverlay')) closeModalBtn();
+      }
+      function closeModalBtn() { document.getElementById('modalOverlay').classList.remove('open'); editingId = null; }
+
+      function selectStatus(el, val) {
+        document.querySelectorAll('.status-opt').forEach(o => o.classList.remove('sel'));
+        el.classList.add('sel');
+        selectedStatus = val;
+      }
+
+      function pickColor(el) {
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedColor = el.dataset.color;
+      }
+
+      function saveAppt() {
+        const patient = document.getElementById('mPatient').value.trim();
+        const doctor  = document.getElementById('mDoctor').value;
+        const type    = document.getElementById('mType').value;
+        const date    = document.getElementById('mDate').value;
+        const start   = document.getElementById('mStart').value;
+        const end     = document.getElementById('mEnd').value;
+        if (!patient || !doctor || !type || !date || !start || !end) { showToast('Veuillez remplir les champs obligatoires.', false); return; }
+
+        if (editingId) {
+          const idx = appointments.findIndex(a => a.id === editingId);
+          if (idx !== -1) appointments[idx] = { ...appointments[idx], patient, doctor, type, date, start, end, status: selectedStatus, color: selectedColor, notes: document.getElementById('mNotes').value, room: document.getElementById('mRoom').value };
+          showToast('Rendez-vous modifié avec succès');
+        } else {
+          appointments.push({ id: nextId++, patient, doctor, type, date, start, end, status: selectedStatus, color: selectedColor, notes: document.getElementById('mNotes').value, room: document.getElementById('mRoom').value });
+          showToast('Rendez-vous ajouté avec succès');
+        }
+        closeModalBtn();
+        renderView();
+      }
+
+      function deleteAppt() {
+        if (!editingId) return;
+        appointments = appointments.filter(a => a.id !== editingId);
+        closeModalBtn();
+        showToast('Rendez-vous supprimé');
+        renderView();
+      }
+
+      // ═══════════════════════════════════════════════
+      // DETAIL POPUP
+      // ═══════════════════════════════════════════════
+      function showDetail(a, e) {
+        const popup = document.getElementById('detailPopup');
+        document.getElementById('dp-title').textContent  = a.patient;
+        document.getElementById('dp-time').textContent   = `${a.date ? fmtDateFr(a.date) : ''} · ${a.start} – ${a.end}`;
+        document.getElementById('dp-doctor').textContent = a.doctor;
+        document.getElementById('dp-type').textContent   = a.type;
+        const badge = document.getElementById('dp-badge');
+        badge.textContent = a.status;
+        badge.className = 'detail-badge';
+        if (a.status === 'Confirmé') { badge.style.background='var(--green-pale)'; badge.style.color='#065f46'; }
+        else if (a.status === 'En attente') { badge.style.background='var(--gold-pale)'; badge.style.color='#92400e'; }
+        else { badge.style.background='var(--red-pale)'; badge.style.color=var(--red); }
+
+        if (a.notes) {
+          document.getElementById('dp-notes').textContent = a.notes;
+          document.getElementById('dp-notes-row').style.display = 'flex';
+        } else document.getElementById('dp-notes-row').style.display = 'none';
+
+        document.getElementById('dp-edit').onclick = () => openEditModal(a);
+        document.getElementById('dp-del').onclick  = () => { appointments = appointments.filter(x=>x.id!==a.id); closeDetail(); showToast('Rendez-vous supprimé'); renderView(); };
+
+        const x = Math.min(e.clientX + 10, window.innerWidth - 320);
+        const y = Math.min(e.clientY + 10, window.innerHeight - 250);
+        popup.style.left = x + 'px';
+        popup.style.top  = y + 'px';
+        popup.classList.add('open');
+      }
+
+      function closeDetail() { document.getElementById('detailPopup').classList.remove('open'); }
+      document.addEventListener('click', e => { if (!e.target.closest('.detail-popup') && !e.target.closest('.appt') && !e.target.closest('.month-appt')) closeDetail(); });
+      document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModalBtn(); closeDetail(); }});
+
+      // ═══════════════════════════════════════════════
+      // TOAST
+      // ═══════════════════════════════════════════════
+      function showToast(msg) {
+        const t = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+      }
+
+      // ═══════════════════════════════════════════════
+      // UTILS
+      // ═══════════════════════════════════════════════
+      function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+      function fmtDateFr(s) { const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; }
+      function getMonday(d) { const dd=new Date(d); const day=dd.getDay(); const diff=day===0?-6:1-day; dd.setDate(dd.getDate()+diff); return dd; }
+      function addDays(d, n) { const r=new Date(d); r.setDate(r.getDate()+n); return r; }
+      function timeToMins(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
+      function addMins(t, n) { const m=timeToMins(t)+n; return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`; }
+
+      // auto-adjust end time when start changes
+      document.getElementById('mStart').addEventListener('change', function() {
+        document.getElementById('mEnd').value = addMins(this.value, 30);
+      });
+
+      init();
+    </script>
+  </body>
 </html>

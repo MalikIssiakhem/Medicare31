@@ -1,829 +1,517 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediCare31 – Tableau de bord secrétariat</title>
-<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --blue-dark:  #2c5f9e;
-    --blue-mid:   #3a74be;
-    --blue-light: #4f8fda;
-    --blue-pale:  #e8f1fb;
-    --gold:       #e8a838;
-    --gold-pale:  #fdf3e0;
-    --green:      #3fa66b;
-    --green-pale: #e8f7ef;
-    --red:        #d9534f;
-    --red-pale:   #fdebea;
-    --text-dark:  #1e2d45;
-    --text-mid:   #4a5f7a;
-    --text-light: #8fa3bc;
-    --bg:         #eef2f7;
-    --white:      #ffffff;
-    --border:     #d6e2f0;
-    --radius:     12px;
-    --shadow:     0 2px 12px rgba(44,95,158,.10);
-  }
-
-  body {
-    font-family: 'Source Sans 3', sans-serif;
-    background: var(--bg);
-    color: var(--text-dark);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  nav {
-    background: var(--blue-dark);
-    display: flex;
-    align-items: center;
-    padding: 0 28px;
-    height: 58px;
-    gap: 32px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 800;
-    font-size: 1.22rem;
-    letter-spacing: -.3px;
-    white-space: nowrap;
-    text-decoration: none;
-  }
-
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: rgba(255,255,255,.18);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .logo-icon svg { width: 20px; height: 20px; fill: #fff; }
-
-  .nav-links {
-    display: flex;
-    gap: 6px;
-    list-style: none;
-    flex: 1;
-  }
-
-  .nav-links a {
-    color: rgba(255,255,255,.75);
-    text-decoration: none;
-    font-size: .92rem;
-    font-weight: 500;
-    padding: 6px 14px;
-    border-radius: 6px;
-    transition: color .15s, background .15s;
-  }
-
-  .nav-links a:hover { color: #fff; background: rgba(255,255,255,.12); }
-  .nav-links a.active {
-    color: #fff;
-    border-bottom: 2px solid #fff;
-    border-radius: 0;
-    padding-bottom: 4px;
-  }
-
-  .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-left: auto;
-  }
-
-  .notif-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: rgba(255,255,255,.8);
-    position: relative;
-    padding: 4px;
-  }
-
-  .notif-btn svg { width: 20px; height: 20px; }
-
-  .notif-dot {
-    position: absolute;
-    top: 2px; right: 2px;
-    width: 8px; height: 8px;
-    background: #ef5350;
-    border-radius: 50%;
-    border: 1.5px solid var(--blue-dark);
-  }
-
-  .user-chip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 8px;
-    transition: background .15s;
-  }
-
-  .user-chip:hover { background: rgba(255,255,255,.12); }
-
-  .avatar {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #9ecfff, #4f8fda);
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: .85rem; color: #fff;
-    border: 2px solid rgba(255,255,255,.4);
-    flex-shrink: 0;
-  }
-
-  .user-chip span { font-size: .88rem; font-weight: 600; }
-  .user-chip svg { width: 14px; height: 14px; fill: rgba(255,255,255,.7); }
-
-  .app { display: flex; flex: 1; }
-
-  aside {
-    width: 214px;
-    background: var(--white);
-    padding: 18px 0;
-    border-right: 1px solid var(--border);
-    flex-shrink: 0;
-    min-height: calc(100vh - 58px);
-  }
-
-  .side-nav { list-style: none; }
-
-  .side-nav li a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 22px;
-    color: var(--text-mid);
-    text-decoration: none;
-    font-size: .9rem;
-    font-weight: 500;
-    transition: background .15s, color .15s;
-  }
-
-  .side-nav li a:hover { background: var(--blue-pale); color: var(--blue-dark); }
-  .side-nav li.active a { background: var(--blue-dark); color: #fff; }
-
-  .side-nav li a svg {
-    width: 18px; height: 18px;
-    flex-shrink: 0;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 1.7;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  main {
-    flex: 1;
-    padding: 26px 28px;
-    overflow-x: hidden;
-  }
-
-  .page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-
-  .page-title h1 {
-    font-family: 'Nunito', sans-serif;
-    font-size: 1.6rem;
-    color: var(--text-dark);
-    line-height: 1.1;
-  }
-
-  .page-title p {
-    color: var(--text-mid);
-    font-size: .93rem;
-    margin-top: 4px;
-  }
-
-  .quick-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .btn-primary, .btn-secondary, .btn-add {
-    border: none;
-    border-radius: 8px;
-    padding: 9px 16px;
-    font-size: .85rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: background .15s, transform .1s;
-  }
-
-  .btn-primary { background: var(--blue-dark); color: #fff; }
-  .btn-primary:hover { background: var(--blue-mid); transform: translateY(-1px); }
-  .btn-secondary, .btn-add { background: var(--blue-pale); color: var(--blue-dark); }
-  .btn-secondary:hover, .btn-add:hover { background: #d0e4f7; transform: translateY(-1px); }
-  .btn-primary svg, .btn-secondary svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.2; }
-
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 22px;
-  }
-
-  .stat-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    animation: fadeUp .4s ease both;
-  }
-
-  .stat-card:nth-child(1) { animation-delay: .05s; }
-  .stat-card:nth-child(2) { animation-delay: .10s; }
-  .stat-card:nth-child(3) { animation-delay: .15s; }
-  .stat-card:nth-child(4) { animation-delay: .20s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .stat-label { font-size: .83rem; color: var(--text-mid); font-weight: 500; }
-  .stat-row { display: flex; align-items: center; justify-content: space-between; }
-
-  .stat-num {
-    font-size: 2.4rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    line-height: 1;
-    font-family: 'Nunito', sans-serif;
-  }
-
-  .sparkline { display: flex; align-items: center; }
-  .sparkline svg { width: 72px; height: 30px; }
-  .sparkline path { fill: none; stroke: var(--blue-light); stroke-width: 1.8; }
-
-  .stat-link, .card-link {
-    color: var(--blue-mid);
-    font-size: .82rem;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    margin-top: 4px;
-  }
-
-  .stat-link:hover, .card-link:hover { text-decoration: underline; }
-  .stat-link svg, .card-link svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.2; }
-
-  .content-grid {
-    display: grid;
-    grid-template-columns: 1.15fr .85fr;
-    gap: 18px;
-  }
-
-  .card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 22px 24px;
-    box-shadow: var(--shadow);
-    animation: fadeUp .4s ease both;
-  }
-
-  .card:nth-child(1) { animation-delay: .25s; }
-  .card:nth-child(2) { animation-delay: .30s; }
-  .card:nth-child(3) { animation-delay: .35s; }
-  .card:nth-child(4) { animation-delay: .40s; }
-
-  .card-title {
-    font-size: 1.02rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 18px;
-  }
-
-  .appt-row, .patient-row, .msg-row, .task-item, .doc-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .appt-row:last-of-type,
-  .patient-row:last-of-type,
-  .msg-row:last-of-type,
-  .task-item:last-of-type,
-  .doc-row:last-of-type { border-bottom: none; }
-
-  .appt-time {
-    font-size: .85rem;
-    font-weight: 700;
-    color: var(--blue-dark);
-    width: 42px;
-    flex-shrink: 0;
-  }
-
-  .appt-name, .pat-name, .msg-name, .doc-name {
-    font-size: .9rem;
-    font-weight: 700;
-    color: var(--text-dark);
-  }
-
-  .appt-type, .pat-type, .msg-subject, .doc-type {
-    font-size: .78rem;
-    color: var(--text-light);
-    margin-left: 4px;
-    font-weight: 400;
-  }
-
-  .badge {
-    font-size: .72rem;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 20px;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  .badge-gold  { background: var(--gold-pale); color: #b07a1a; }
-  .badge-blue  { background: var(--blue-pale); color: var(--blue-dark); }
-  .badge-green { background: var(--green-pale); color: var(--green); }
-  .badge-red   { background: var(--red-pale); color: var(--red); }
-
-  .pat-avatar {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #a8d0f5, #5b9bd5);
-    flex-shrink: 0;
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: .82rem; color: #fff;
-  }
-
-  .pat-avatar.green  { background: linear-gradient(135deg, #a5d6b0, #4caf6e); }
-  .pat-avatar.orange { background: linear-gradient(135deg, #f5c99e, #e0853a); }
-  .pat-avatar.purple { background: linear-gradient(135deg, #c4b5fd, #7c3aed); }
-
-  .pat-info, .msg-body, .doc-body { flex: 1; min-width: 0; }
-
-  .msg-icon, .doc-icon {
-    width: 34px; height: 34px;
-    border-radius: 8px;
-    background: var(--blue-pale);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .msg-icon svg, .doc-icon svg {
-    width: 16px; height: 16px;
-    stroke: var(--blue-mid);
-    fill: none;
-    stroke-width: 1.8;
-  }
-
-  .msg-icon.urgent { background: var(--red-pale); }
-  .msg-icon.urgent svg { stroke: var(--red); }
-  .msg-icon.done, .doc-icon.done { background: var(--green-pale); }
-  .msg-icon.done svg, .doc-icon.done svg { stroke: var(--green); }
-
-  .msg-time, .doc-time {
-    font-size: .76rem;
-    color: var(--text-light);
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  .task-cb {
-    width: 18px; height: 18px;
-    border: 2px solid var(--border);
-    border-radius: 4px;
-    flex-shrink: 0;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: border-color .15s, background .15s;
-  }
-
-  .task-cb:hover { border-color: var(--blue-mid); }
-  .task-cb.checked { background: var(--blue-mid); border-color: var(--blue-mid); }
-  .task-cb.checked svg { display: block; }
-  .task-cb svg { display: none; width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2.5; }
-
-  .task-label {
-    font-size: .9rem;
-    color: var(--text-dark);
-    flex: 1;
-    cursor: pointer;
-  }
-
-  .task-label.done { text-decoration: line-through; color: var(--text-light); }
-  .card-footer { text-align: right; margin-top: 14px; }
-
-  @media (max-width: 1100px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .content-grid { grid-template-columns: 1fr; }
-  }
-
-  @media (max-width: 800px) {
-    nav { height: auto; padding: 14px; flex-wrap: wrap; gap: 14px; }
-    .nav-links { order: 3; width: 100%; overflow-x: auto; }
-    .app { flex-direction: column; }
-    aside { width: 100%; min-height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-    .side-nav { display: flex; overflow-x: auto; }
-    .side-nav li a { white-space: nowrap; }
-    main { padding: 20px 16px; }
-    .page-header { align-items: flex-start; flex-direction: column; }
-    .stats-row { grid-template-columns: 1fr; }
-  }
-</style>
-</head>
-<body>
-
-<nav>
-  <a class="logo" href="#">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="7" y="10" width="10" height="4" rx="1"/></svg>
-    </div>
-    MediCare31
-  </a>
-
-  <ul class="nav-links">
-    <li><a href="#" class="active">Accueil</a></li>
-    <li><a href="#">Agenda</a></li>
-    <li><a href="#">Patients</a></li>
-    <li><a href="#">Appels</a></li>
-    <li><a href="#">Documents</a></li>
-  </ul>
-
-  <div class="nav-right">
-    <button class="notif-btn" title="Notifications">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
-      <span class="notif-dot"></span>
-    </button>
-
-    <div class="user-chip">
-      <div class="avatar">SC</div>
-      <span>Secrétariat</span>
-      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-  </div>
-</nav>
-
-<div class="app">
-  <aside>
-    <ul class="side-nav">
-      <li class="active">
-        <a href="#">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          Tableau de bord
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Agenda
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.12.89.32 1.76.59 2.59a2 2 0 0 1-.45 2.11L9 10.5a16 16 0 0 0 4.5 4.5l1.08-1.08a2 2 0 0 1 2.11-.45c.83.27 1.7.47 2.59.59A2 2 0 0 1 22 16.92z"/></svg>
-          Appels
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Patients
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          Documents
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Messages
-        </a>
-      </li>
-    </ul>
-  </aside>
-
-  <main>
-    <div class="page-header">
-      <div class="page-title">
-        <h1>Tableau de bord secrétariat</h1>
-        <p>Gestion des rendez-vous, appels, accueil patients et documents administratifs.</p>
-      </div>
-      <div class="quick-actions">
-        <button class="btn-primary" onclick="newAppointment()">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nouveau RDV
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Tableau de bord secrétariat</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap""
+      
+    />
+    <link rel="stylesheet" href="css/index3.css" />
+
+  </head>
+  <body>
+    <nav>
+      <a class="logo" href="#">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
+        </div>
+        MediCare31
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#" class="active">Accueil</a></li>
+        <li><a href="#">Agenda</a></li>
+        <li><a href="#">Patients</a></li>
+        <li><a href="#">Appels</a></li>
+        <li><a href="#">Documents</a></li>
+      </ul>
+
+      <div class="nav-right">
+        <button class="notif-btn" title="Notifications">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-dot"></span>
         </button>
-        <button class="btn-secondary" onclick="newPatient()">
-          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-          Nouveau patient
-        </button>
+
+        <div class="user-chip">
+          <div class="avatar">SC</div>
+          <span>Secrétariat</span>
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+        </div>
       </div>
+    </nav>
+
+    <div class="app">
+      <aside>
+        <ul class="side-nav">
+          <li class="active">
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              Tableau de bord
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              Agenda
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.12.89.32 1.76.59 2.59a2 2 0 0 1-.45 2.11L9 10.5a16 16 0 0 0 4.5 4.5l1.08-1.08a2 2 0 0 1 2.11-.45c.83.27 1.7.47 2.59.59A2 2 0 0 1 22 16.92z"
+                />
+              </svg>
+              Appels
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              Patients
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+              Documents
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                />
+              </svg>
+              Messages
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+      <main>
+        <div class="page-header">
+          <div class="page-title">
+            <h1>Tableau de bord secrétariat</h1>
+            <p>
+              Gestion des rendez-vous, appels, accueil patients et documents
+              administratifs.
+            </p>
+          </div>
+          <div class="quick-actions">
+            <button class="btn-primary" onclick="newAppointment()">
+              <svg viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Nouveau RDV
+            </button>
+            <button class="btn-secondary" onclick="newPatient()">
+              <svg viewBox="0 0 24 24">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="8.5" cy="7" r="4" />
+                <line x1="20" y1="8" x2="20" y2="14" />
+                <line x1="23" y1="11" x2="17" y2="11" />
+              </svg>
+              Nouveau patient
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">RDV à confirmer</div>
+            <div class="stat-row">
+              <span class="stat-num">6</span>
+              <div class="sparkline">
+                <svg viewBox="0 0 72 30">
+                  <path
+                    d="M0,20 C8,18 14,10 20,12 C26,14 30,22 38,16 C46,10 52,18 60,14 C64,12 68,8 72,10"
+                  />
+                </svg>
+              </div>
+            </div>
+            <a class="stat-link" href="#"
+              >Voir les demandes
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg
+            ></a>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Patients arrivés</div>
+            <div class="stat-row">
+              <span class="stat-num">4</span>
+              <div class="sparkline">
+                <svg viewBox="0 0 72 30">
+                  <path
+                    d="M0,22 C8,20 14,16 22,18 C30,20 36,12 44,14 C52,16 58,20 72,16"
+                  />
+                </svg>
+              </div>
+            </div>
+            <a class="stat-link" href="#"
+              >Salle d'attente
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg
+            ></a>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Appels à traiter</div>
+            <div class="stat-row">
+              <span class="stat-num">9</span>
+              <div class="sparkline">
+                <svg viewBox="0 0 72 30">
+                  <path
+                    d="M0,16 C6,14 12,20 20,18 C28,16 34,8 42,12 C50,16 58,10 72,14"
+                  />
+                </svg>
+              </div>
+            </div>
+            <a class="stat-link" href="#"
+              >Journal des appels
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg
+            ></a>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Documents en attente</div>
+            <div class="stat-row">
+              <span class="stat-num">3</span>
+              <div class="sparkline">
+                <svg viewBox="0 0 72 30">
+                  <path
+                    d="M0,18 C10,16 20,22 30,18 C40,14 50,20 60,16 C65,14 68,12 72,10"
+                  />
+                </svg>
+              </div>
+            </div>
+            <a class="stat-link" href="#"
+              >Voir les dossiers
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg
+            ></a>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="card">
+            <div class="card-title">Demandes de rendez-vous</div>
+
+            <div class="appt-row">
+              <span class="appt-time">08:45</span>
+              <div style="flex: 1">
+                <span class="appt-name">Sophie Durand</span>
+                <span class="appt-type">Demande de consultation</span>
+              </div>
+              <span class="badge badge-gold">À confirmer</span>
+            </div>
+
+            <div class="appt-row">
+              <span class="appt-time">09:20</span>
+              <div style="flex: 1">
+                <span class="appt-name">Alain Robert</span>
+                <span class="appt-type">Déplacement demandé</span>
+              </div>
+              <span class="badge badge-blue">À rappeler</span>
+            </div>
+
+            <div class="appt-row">
+              <span class="appt-time">10:10</span>
+              <div style="flex: 1">
+                <span class="appt-name">Julie Lefèvre</span>
+                <span class="appt-type">Contrôle annuel</span>
+              </div>
+              <span class="badge badge-green">Confirmé</span>
+            </div>
+
+            <div class="appt-row">
+              <span class="appt-time">11:30</span>
+              <div style="flex: 1">
+                <span class="appt-name">Nadia Karim</span>
+                <span class="appt-type">Première consultation</span>
+              </div>
+              <span class="badge badge-red">Urgent</span>
+            </div>
+
+            <a class="card-link" href="#"
+              >Ouvrir l'agenda complet
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg
+            ></a>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Accueil / Salle d'attente</div>
+
+            <div class="patient-row">
+              <div class="pat-avatar">MD</div>
+              <div class="pat-info">
+                <span class="pat-name">Marc Dupont</span>
+                <span class="pat-type">Arrivé à 09:05</span>
+              </div>
+              <span class="badge badge-gold">En attente</span>
+            </div>
+
+            <div class="patient-row">
+              <div class="pat-avatar green">CM</div>
+              <div class="pat-info">
+                <span class="pat-name">Claire Martin</span>
+                <span class="pat-type">Carte Vitale à vérifier</span>
+              </div>
+              <span class="badge badge-blue">À vérifier</span>
+            </div>
+
+            <div class="patient-row">
+              <div class="pat-avatar orange">PL</div>
+              <div class="pat-info">
+                <span class="pat-name">Paul Lefebvre</span>
+                <span class="pat-type">Suivi diabète</span>
+              </div>
+              <span class="badge badge-green">Dossier prêt</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-primary" onclick="checkInPatient()">
+                Enregistrer une arrivée
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Appels et messages</div>
+
+            <div class="msg-row">
+              <div class="msg-icon urgent">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.12.89.32 1.76.59 2.59a2 2 0 0 1-.45 2.11L9 10.5a16 16 0 0 0 4.5 4.5l1.08-1.08a2 2 0 0 1 2.11-.45c.83.27 1.7.47 2.59.59A2 2 0 0 1 22 16.92z"
+                  />
+                </svg>
+              </div>
+              <div class="msg-body">
+                <span class="msg-name">Thomas Lambert</span
+                ><span class="msg-subject">Rappeler pour résultats</span>
+              </div>
+              <div class="msg-time">10 min</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                  />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <div class="msg-body">
+                <span class="msg-name">Laura Moreau</span
+                ><span class="msg-subject">Demande de rendez-vous</span>
+              </div>
+              <div class="msg-time">Hier</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-icon done">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="msg-body">
+                <span class="msg-name">Pharmacie Centrale</span
+                ><span class="msg-subject">Ordonnance transmise</span>
+              </div>
+              <div class="msg-time">Traité</div>
+            </div>
+
+            <a class="card-link" href="#"
+              >Voir tous les appels
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg
+            ></a>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Documents administratifs</div>
+
+            <div class="doc-row">
+              <div class="doc-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+              </div>
+              <div class="doc-body">
+                <span class="doc-name">Attestation ALD</span>
+                <span class="doc-type">Marc Dupont</span>
+              </div>
+              <span class="badge badge-gold">À imprimer</span>
+            </div>
+
+            <div class="doc-row">
+              <div class="doc-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </div>
+              <div class="doc-body">
+                <span class="doc-name">Résultats laboratoire</span>
+                <span class="doc-type">Claire Martin</span>
+              </div>
+              <span class="badge badge-blue">À classer</span>
+            </div>
+
+            <div class="doc-row">
+              <div class="doc-icon done">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="doc-body">
+                <span class="doc-name">Ordonnance</span>
+                <span class="doc-type">Paul Lefebvre</span>
+              </div>
+              <span class="badge badge-green">Envoyé</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Tâches du secrétariat</div>
+
+            <div class="task-item">
+              <div class="task-cb" onclick="toggleTask(this)">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <span class="task-label">Rappeler les patients de demain</span>
+            </div>
+
+            <div class="task-item">
+              <div class="task-cb" onclick="toggleTask(this)">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <span class="task-label">Scanner les documents reçus</span>
+            </div>
+
+            <div class="task-item">
+              <div class="task-cb checked" onclick="toggleTask(this)">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <span class="task-label done">Préparer la salle d'attente</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-add" onclick="addTask()">
+                + Ajouter une tâche
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">RDV à confirmer</div>
-        <div class="stat-row">
-          <span class="stat-num">6</span>
-          <div class="sparkline"><svg viewBox="0 0 72 30"><path d="M0,20 C8,18 14,10 20,12 C26,14 30,22 38,16 C46,10 52,18 60,14 C64,12 68,8 72,10"/></svg></div>
-        </div>
-        <a class="stat-link" href="#">Voir les demandes <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-      </div>
+    <script src="/js/auth.js"></script>
+    <script>
+      authGuard();
+      function toggleTask(cb) {
+        cb.classList.toggle("checked");
+        const label = cb.parentElement.querySelector(".task-label");
+        label.classList.toggle("done");
+      }
 
-      <div class="stat-card">
-        <div class="stat-label">Patients arrivés</div>
-        <div class="stat-row">
-          <span class="stat-num">4</span>
-          <div class="sparkline"><svg viewBox="0 0 72 30"><path d="M0,22 C8,20 14,16 22,18 C30,20 36,12 44,14 C52,16 58,20 72,16"/></svg></div>
-        </div>
-        <a class="stat-link" href="#">Salle d'attente <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-      </div>
+      function addTask() {
+        const label = prompt("Nouvelle tâche du secrétariat :");
+        if (!label || !label.trim()) return;
 
-      <div class="stat-card">
-        <div class="stat-label">Appels à traiter</div>
-        <div class="stat-row">
-          <span class="stat-num">9</span>
-          <div class="sparkline"><svg viewBox="0 0 72 30"><path d="M0,16 C6,14 12,20 20,18 C28,16 34,8 42,12 C50,16 58,10 72,14"/></svg></div>
-        </div>
-        <a class="stat-link" href="#">Journal des appels <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-      </div>
+        const taskCard = document.querySelector(".card:last-child");
+        const footer = taskCard.querySelector(".card-footer");
 
-      <div class="stat-card">
-        <div class="stat-label">Documents en attente</div>
-        <div class="stat-row">
-          <span class="stat-num">3</span>
-          <div class="sparkline"><svg viewBox="0 0 72 30"><path d="M0,18 C10,16 20,22 30,18 C40,14 50,20 60,16 C65,14 68,12 72,10"/></svg></div>
-        </div>
-        <a class="stat-link" href="#">Voir les dossiers <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-      </div>
-    </div>
-
-    <div class="content-grid">
-      <div class="card">
-        <div class="card-title">Demandes de rendez-vous</div>
-
-        <div class="appt-row">
-          <span class="appt-time">08:45</span>
-          <div style="flex:1">
-            <span class="appt-name">Sophie Durand</span>
-            <span class="appt-type">Demande de consultation</span>
-          </div>
-          <span class="badge badge-gold">À confirmer</span>
-        </div>
-
-        <div class="appt-row">
-          <span class="appt-time">09:20</span>
-          <div style="flex:1">
-            <span class="appt-name">Alain Robert</span>
-            <span class="appt-type">Déplacement demandé</span>
-          </div>
-          <span class="badge badge-blue">À rappeler</span>
-        </div>
-
-        <div class="appt-row">
-          <span class="appt-time">10:10</span>
-          <div style="flex:1">
-            <span class="appt-name">Julie Lefèvre</span>
-            <span class="appt-type">Contrôle annuel</span>
-          </div>
-          <span class="badge badge-green">Confirmé</span>
-        </div>
-
-        <div class="appt-row">
-          <span class="appt-time">11:30</span>
-          <div style="flex:1">
-            <span class="appt-name">Nadia Karim</span>
-            <span class="appt-type">Première consultation</span>
-          </div>
-          <span class="badge badge-red">Urgent</span>
-        </div>
-
-        <a class="card-link" href="#">Ouvrir l'agenda complet <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Accueil / Salle d'attente</div>
-
-        <div class="patient-row">
-          <div class="pat-avatar">MD</div>
-          <div class="pat-info">
-            <span class="pat-name">Marc Dupont</span>
-            <span class="pat-type">Arrivé à 09:05</span>
-          </div>
-          <span class="badge badge-gold">En attente</span>
-        </div>
-
-        <div class="patient-row">
-          <div class="pat-avatar green">CM</div>
-          <div class="pat-info">
-            <span class="pat-name">Claire Martin</span>
-            <span class="pat-type">Carte Vitale à vérifier</span>
-          </div>
-          <span class="badge badge-blue">À vérifier</span>
-        </div>
-
-        <div class="patient-row">
-          <div class="pat-avatar orange">PL</div>
-          <div class="pat-info">
-            <span class="pat-name">Paul Lefebvre</span>
-            <span class="pat-type">Suivi diabète</span>
-          </div>
-          <span class="badge badge-green">Dossier prêt</span>
-        </div>
-
-        <div class="card-footer">
-          <button class="btn-primary" onclick="checkInPatient()">Enregistrer une arrivée</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Appels et messages</div>
-
-        <div class="msg-row">
-          <div class="msg-icon urgent">
-            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.12.89.32 1.76.59 2.59a2 2 0 0 1-.45 2.11L9 10.5a16 16 0 0 0 4.5 4.5l1.08-1.08a2 2 0 0 1 2.11-.45c.83.27 1.7.47 2.59.59A2 2 0 0 1 22 16.92z"/></svg>
-          </div>
-          <div class="msg-body">
-            <span class="msg-name">Thomas Lambert</span><span class="msg-subject">Rappeler pour résultats</span>
-          </div>
-          <div class="msg-time">10 min</div>
-        </div>
-
-        <div class="msg-row">
-          <div class="msg-icon">
-            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
-          <div class="msg-body">
-            <span class="msg-name">Laura Moreau</span><span class="msg-subject">Demande de rendez-vous</span>
-          </div>
-          <div class="msg-time">Hier</div>
-        </div>
-
-        <div class="msg-row">
-          <div class="msg-icon done">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div class="msg-body">
-            <span class="msg-name">Pharmacie Centrale</span><span class="msg-subject">Ordonnance transmise</span>
-          </div>
-          <div class="msg-time">Traité</div>
-        </div>
-
-        <a class="card-link" href="#">Voir tous les appels <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Documents administratifs</div>
-
-        <div class="doc-row">
-          <div class="doc-icon">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          </div>
-          <div class="doc-body">
-            <span class="doc-name">Attestation ALD</span>
-            <span class="doc-type">Marc Dupont</span>
-          </div>
-          <span class="badge badge-gold">À imprimer</span>
-        </div>
-
-        <div class="doc-row">
-          <div class="doc-icon">
-            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </div>
-          <div class="doc-body">
-            <span class="doc-name">Résultats laboratoire</span>
-            <span class="doc-type">Claire Martin</span>
-          </div>
-          <span class="badge badge-blue">À classer</span>
-        </div>
-
-        <div class="doc-row">
-          <div class="doc-icon done">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div class="doc-body">
-            <span class="doc-name">Ordonnance</span>
-            <span class="doc-type">Paul Lefebvre</span>
-          </div>
-          <span class="badge badge-green">Envoyé</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Tâches du secrétariat</div>
-
-        <div class="task-item">
-          <div class="task-cb" onclick="toggleTask(this)">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <span class="task-label">Rappeler les patients de demain</span>
-        </div>
-
-        <div class="task-item">
-          <div class="task-cb" onclick="toggleTask(this)">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <span class="task-label">Scanner les documents reçus</span>
-        </div>
-
-        <div class="task-item">
-          <div class="task-cb checked" onclick="toggleTask(this)">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <span class="task-label done">Préparer la salle d'attente</span>
-        </div>
-
-        <div class="card-footer">
-          <button class="btn-add" onclick="addTask()">+ Ajouter une tâche</button>
-        </div>
-      </div>
-    </div>
-  </main>
-</div>
-
-<script src="/js/auth.js"></script>
-<script>
-authGuard();
-  function toggleTask(cb) {
-    cb.classList.toggle('checked');
-    const label = cb.parentElement.querySelector('.task-label');
-    label.classList.toggle('done');
-  }
-
-  function addTask() {
-    const label = prompt('Nouvelle tâche du secrétariat :');
-    if (!label || !label.trim()) return;
-
-    const taskCard = document.querySelector('.card:last-child');
-    const footer = taskCard.querySelector('.card-footer');
-
-    const item = document.createElement('div');
-    item.className = 'task-item';
-    item.innerHTML = `
+        const item = document.createElement("div");
+        item.className = "task-item";
+        item.innerHTML = `
       <div class="task-cb" onclick="toggleTask(this)">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <span class="task-label"></span>
     `;
-    item.querySelector('.task-label').textContent = label.trim();
-    taskCard.insertBefore(item, footer);
-  }
+        item.querySelector(".task-label").textContent = label.trim();
+        taskCard.insertBefore(item, footer);
+      }
 
-  function newAppointment() {
-    alert('Action : ouvrir le formulaire de création de rendez-vous.');
-  }
+      function newAppointment() {
+        alert("Action : ouvrir le formulaire de création de rendez-vous.");
+      }
 
-  function newPatient() {
-    alert('Action : ouvrir le formulaire de création de patient.');
-  }
+      function newPatient() {
+        alert("Action : ouvrir le formulaire de création de patient.");
+      }
 
-  function checkInPatient() {
-    alert('Action : enregistrer l’arrivée du patient.');
-  }
+      function checkInPatient() {
+        alert("Action : enregistrer l’arrivée du patient.");
+      }
 
-  document.querySelectorAll('.nav-links a, .side-nav a').forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      const group = a.closest('ul');
-      group.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-      group.querySelectorAll('a').forEach(x => x.classList.remove('active'));
-      if (a.closest('li')) a.closest('li').classList.add('active');
-      a.classList.add('active');
-    });
-  });
-</script>
-</body>
+      document.querySelectorAll(".nav-links a, .side-nav a").forEach((a) => {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          const group = a.closest("ul");
+          group
+            .querySelectorAll("li")
+            .forEach((li) => li.classList.remove("active"));
+          group
+            .querySelectorAll("a")
+            .forEach((x) => x.classList.remove("active"));
+          if (a.closest("li")) a.closest("li").classList.add("active");
+          a.classList.add("active");
+        });
+      });
+    </script>
+  </body>
 </html>
