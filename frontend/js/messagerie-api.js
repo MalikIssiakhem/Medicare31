@@ -9,7 +9,7 @@ let replyMsg = null;
 window.__blockConvClick = false;
 
 function token() {
-  return localStorage.getItem("access_token");
+  return localStorage.getItem("medicare_token") || localStorage.getItem("access_token");
 }
 
 function authHeaders(extra = {}) {
@@ -42,6 +42,7 @@ async function api(path, options = {}) {
 
 function displayName(user) {
   if (!user) return "Utilisateur";
+
   const full = `${user.prenom || ""} ${user.nom || ""}`.trim();
   return full || user.email || "Utilisateur";
 }
@@ -109,13 +110,17 @@ function otherParticipants(conv) {
 
 function convName(conv) {
   const others = otherParticipants(conv);
+
   if (!others.length) return "Moi";
+
   return others.map(displayName).join(", ");
 }
 
 function convRole(conv) {
   const others = otherParticipants(conv);
+
   if (!others.length) return "";
+
   return roleLabel(others[0].role);
 }
 
@@ -178,13 +183,19 @@ async function init() {
 
 function updateLoggedUserUI() {
   const chipName = document.querySelector(".user-chip span");
-  const avatar = document.querySelector(".user-chip .avatar");
+  const avatar = document.querySelector(".user-chip .u-avatar");
 
   if (!currentUser) return;
 
   const name = displayName(currentUser);
-  if (chipName) chipName.textContent = name;
-  if (avatar) avatar.textContent = initials(name);
+
+  if (chipName) {
+    chipName.textContent = currentUser.role === "medecin" ? `Dr. ${name}` : name;
+  }
+
+  if (avatar) {
+    avatar.textContent = initials(name);
+  }
 }
 
 async function loadConversations(archived = false) {
@@ -202,11 +213,13 @@ async function loadConversations(archived = false) {
 function sortConversations(a, b) {
   const dateA = new Date(a.last_message_at || a.updated_at || a.created_at || 0).getTime();
   const dateB = new Date(b.last_message_at || b.updated_at || b.created_at || 0).getTime();
+
   return dateB - dateA;
 }
 
 function populateRecipients() {
   const list = document.getElementById("recipientsList");
+
   if (!list) return;
 
   list.innerHTML = users.map(user => {
@@ -225,6 +238,7 @@ async function getActiveAndArchivedConversationsForCounts() {
     : api("/api/messages/conversations?archived=true");
 
   const [active, archived] = await Promise.all([activePromise, archivedPromise]);
+
   return { active, archived };
 }
 
@@ -251,6 +265,7 @@ async function updateFolderCounts() {
 
 function setFolderCount(folder, count, showZero = true) {
   const item = document.querySelector(`.folder-item[onclick*="'${folder}'"] .folder-count`);
+
   if (!item) return;
 
   item.textContent = count;
@@ -259,6 +274,7 @@ function setFolderCount(folder, count, showZero = true) {
 
 function updateUnreadFolderLabel(count) {
   const item = document.querySelector(`.folder-item[onclick*="'unread'"] .folder-count`);
+
   if (!item) return;
 
   item.textContent = count;
@@ -276,6 +292,7 @@ function updateSideMessageBadge(count) {
 
 function renderConvList(list) {
   const el = document.getElementById("convList");
+
   if (!el) return;
 
   if (!list.length) {
@@ -314,7 +331,9 @@ function renderConvList(list) {
             <div class="conv-name">${escapeHtml(name)}</div>
             <div class="conv-time ${unread > 0 ? "bold" : ""}">${escapeHtml(time)}</div>
           </div>
+
           <div class="conv-preview">${escapeHtml(preview)}</div>
+
           <div class="conv-tags">
             <span class="tag ${tagClass}">${escapeHtml(tagText)}</span>
           </div>
@@ -350,6 +369,7 @@ function enableSwipeArchive() {
 
       if (currentX > 0) {
         const move = Math.min(currentX, 130);
+
         item.style.transform = `translateX(${move}px)`;
         item.style.background = currentX > 90
           ? (currentFolder === "archive" ? "#e8f1fb" : "#ecfdf3")
@@ -444,6 +464,7 @@ async function openConv(threadId) {
     currentConv = conv;
 
     const index = conversations.findIndex(c => c.id_thread === threadId);
+
     if (index !== -1) {
       conversations[index] = {
         ...conversations[index],
@@ -456,9 +477,10 @@ async function openConv(threadId) {
     renderConvList(getFilteredConvs());
 
     const empty = document.getElementById("chatEmpty");
+    const chatActive = document.getElementById("chatActive");
+
     if (empty) empty.style.display = "none";
 
-    const chatActive = document.getElementById("chatActive");
     if (chatActive) {
       chatActive.style.display = "flex";
       chatActive.style.flexDirection = "column";
@@ -489,6 +511,7 @@ function renderChatHeader(conv) {
   const role = convRole(conv);
 
   const header = document.getElementById("chatHeader");
+
   if (!header) return;
 
   const archiveButton = currentFolder === "archive"
@@ -514,7 +537,9 @@ function renderChatHeader(conv) {
       <button class="icon-btn" title="Rechercher" onclick="showToast('Recherche bientôt disponible')">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
+
       ${archiveButton}
+
       <button class="icon-btn" title="Infos" onclick="toggleInfo()">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       </button>
@@ -524,6 +549,7 @@ function renderChatHeader(conv) {
 
 function renderMessages(conv) {
   const body = document.getElementById("chatBody");
+
   if (!body) return;
 
   let lastDate = null;
@@ -548,11 +574,16 @@ function renderMessages(conv) {
     html += `
       <div class="msg-group ${isMe ? "outgoing" : "incoming"}">
         ${!isMe ? `<div class="msg-sender-name">${escapeHtml(senderName)}</div>` : ""}
+
         <div class="msg-row">
           <div class="msg-avatar-sm" style="background:${av.color}">${escapeHtml(av.initials)}</div>
+
           <div>
             <div class="bubble">${escapeHtml(m.body)}</div>
-            <div class="msg-time-small">${escapeHtml(messageTime(m.sent_at))} ${isMe ? '<span class="msg-status">✓✓</span>' : ""}</div>
+            <div class="msg-time-small">
+              ${escapeHtml(messageTime(m.sent_at))}
+              ${isMe ? '<span class="msg-status">✓✓</span>' : ""}
+            </div>
           </div>
         </div>
       </div>
@@ -575,6 +606,7 @@ function renderInfoPanel(conv) {
   const main = others[0];
 
   const infoProfile = document.getElementById("infoProfile");
+
   if (infoProfile) {
     infoProfile.innerHTML = `
       <div class="info-avatar" style="background:${av.color}">${escapeHtml(av.initials)}</div>
@@ -585,13 +617,16 @@ function renderInfoPanel(conv) {
   }
 
   const infoDetails = document.getElementById("infoDetails");
+
   if (infoDetails) {
     infoDetails.innerHTML = `
       <div class="info-section-title">Coordonnées</div>
+
       <div class="info-row">
         <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><polyline points="22,6 12,13 2,6"/></svg>
         ${escapeHtml(main?.email || "—")}
       </div>
+
       <div class="info-row">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
         Conversation #${conv.id_thread}
@@ -600,15 +635,15 @@ function renderInfoPanel(conv) {
   }
 
   const files = document.getElementById("sharedFilesList");
+
   if (files) {
-    files.innerHTML = `
-      <div style="font-size:.78rem;color:var(--text-light)">Aucun fichier partagé</div>
-    `;
+    files.innerHTML = `<div style="font-size:.78rem;color:var(--text-light)">Aucun fichier partagé</div>`;
   }
 }
 
 async function sendMessage() {
   const input = document.getElementById("msgInput");
+
   if (!input) return;
 
   const text = input.value.trim();
@@ -681,9 +716,11 @@ async function sendComposed() {
 
     currentFolder = "inbox";
     currentFilter = "all";
+
     activateFilterButton("all");
 
     await loadConversations(false);
+
     showToast("Message envoyé avec succès. Cliquez sur la conversation pour l’ouvrir.");
   } catch (error) {
     console.error(error);
@@ -693,14 +730,17 @@ async function sendComposed() {
 
 async function refreshConversationsKeepCurrent() {
   const archived = currentFolder === "archive";
+
   conversations = await api(`/api/messages/conversations?archived=${archived ? "true" : "false"}`);
   conversations.sort(sortConversations);
+
   await updateFolderCounts();
   renderConvList(getFilteredConvs());
 }
 
 async function archiveCurrentConversation() {
   if (!currentConv) return;
+
   await archiveConversationById(currentConv.id_thread);
 }
 
@@ -771,6 +811,7 @@ function filterPill(el, filter) {
 function activateFilterButton(filter) {
   document.querySelectorAll(".filter-pill").forEach(button => {
     button.classList.remove("active");
+
     if (button.getAttribute("onclick")?.includes(`'${filter}'`)) {
       button.classList.add("active");
     }
@@ -783,9 +824,11 @@ async function setFolder(el, folder) {
 
   currentFolder = folder;
   currentConv = null;
+
   showEmptyChat();
 
   const archived = folder === "archive";
+
   conversations = await api(`/api/messages/conversations?archived=${archived ? "true" : "false"}`);
   conversations.sort(sortConversations);
 
@@ -795,6 +838,7 @@ async function setFolder(el, folder) {
 
 function openCompose() {
   const modal = document.getElementById("composeModal");
+
   if (modal) modal.classList.add("open");
 }
 
@@ -806,12 +850,15 @@ function closeCompose(e) {
 
 function closeReply() {
   const el = document.getElementById("replyBanner");
+
   if (el) el.classList.remove("show");
+
   replyMsg = null;
 }
 
 function toggleInfo() {
   const panel = document.getElementById("infoPanel");
+
   if (panel) panel.classList.toggle("hidden");
 }
 
@@ -830,6 +877,7 @@ function showToast(msg) {
 
   toastMsg.textContent = msg;
   toast.classList.add("show");
+
   setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
@@ -845,6 +893,7 @@ function escapeHtml(value) {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     const modal = document.getElementById("composeModal");
+
     if (modal) modal.classList.remove("open");
   }
 });

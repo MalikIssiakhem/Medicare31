@@ -5,9 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import Base, engine, SessionLocal
 import app.models  # noqa: F401
 
-from app.routers import auth, patients
 from app.routers import auth, patients, messages
-
 
 
 def _seed_roles() -> None:

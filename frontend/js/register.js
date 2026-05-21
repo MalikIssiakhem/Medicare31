@@ -33,11 +33,15 @@ function goTo(step) {
   for (let i = 1; i <= 4; i++) {
     const s = document.getElementById('s' + i);
     s.classList.remove('active', 'done');
+
     if (i < step) s.classList.add('done');
     if (i === step) s.classList.add('active');
   }
 
-  document.querySelectorAll('.step-panel').forEach(panel => panel.classList.remove('active'));
+  document.querySelectorAll('.step-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+
   document.getElementById('panel' + step).classList.add('active');
 
   current = step;
@@ -72,6 +76,7 @@ function validate(step) {
 
     const email = generateEmail();
     const errEmail = document.getElementById('err-email');
+
     if (!email) {
       errEmail.classList.add('show');
       ok = false;
@@ -88,26 +93,28 @@ function validate(step) {
   }
 
   if (step === 3) {
-    const pwd = document.getElementById('pwd').value;
-    const pwd2 = document.getElementById('pwd2').value;
+    const pwd = document.getElementById('pwd');
+    const pwd2 = document.getElementById('pwd2');
     const cgu = document.getElementById('cgu');
     const hds = document.getElementById('hds');
 
-    if (pwd.length < 8) {
-      document.getElementById('pwd').classList.add('error');
+    if (pwd.value.length < 8) {
+      pwd.classList.add('error');
       document.getElementById('err-pwd').classList.add('show');
       ok = false;
     } else {
-      document.getElementById('pwd').classList.remove('error');
+      pwd.classList.remove('error');
+      pwd.classList.add('valid');
       document.getElementById('err-pwd').classList.remove('show');
     }
 
-    if (pwd !== pwd2 || pwd2.length === 0) {
-      document.getElementById('pwd2').classList.add('error');
+    if (pwd.value !== pwd2.value || pwd2.value.length === 0) {
+      pwd2.classList.add('error');
       document.getElementById('err-pwd2').classList.add('show');
       ok = false;
     } else {
-      document.getElementById('pwd2').classList.remove('error');
+      pwd2.classList.remove('error');
+      pwd2.classList.add('valid');
       document.getElementById('err-pwd2').classList.remove('show');
     }
 
@@ -126,61 +133,8 @@ function validate(step) {
     }
   }
 
-  /* ── FINAL SUBMIT ── */
-  async function submitForm() {
-    const btn = document.querySelector('.btn-submit-final');
-    btn.disabled = true;
-    btn.textContent = 'Envoi en cours…';
-
-    const civ = document.querySelector('input[name="civilite"]:checked');
-    const payload = {
-      civilite:                 civ ? civ.value : null,
-      nom:                      document.getElementById('nom').value.trim(),
-      prenom:                   document.getElementById('prenom').value.trim(),
-      date_naissance:           document.getElementById('ddn').value,
-      sexe:                     document.getElementById('sexe').value || null,
-      numero_securite_sociale:  document.getElementById('numsecu').value.replace(/\s/g, '') || null,
-      email:                    document.getElementById('email').value.trim(),
-      password:                 document.getElementById('pwd').value,
-      telephone_principal:      document.getElementById('tel').value.replace(/\s/g, '') || null,
-      telephone_secondaire:     document.getElementById('tel2').value.replace(/\s/g, '') || null,
-      adresse_ligne1:           document.getElementById('adresse').value.trim() || null,
-      code_postal:              document.getElementById('cp').value.trim() || null,
-      ville:                    document.getElementById('ville').value.trim() || null,
-      question_secrete:         document.getElementById('q1').value || null,
-      reponse_secrete:          document.getElementById('r1').value.trim() || null,
-      cgu_accepted:             document.getElementById('cgu').checked,
-      hds_consent:              document.getElementById('hds').checked,
-      notif_email_sms_consent:  document.getElementById('notifs').checked,
-    };
-
-    try {
-      const res = await fetch('/api/auth/register/patient', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        alert(err.detail || 'Une erreur est survenue. Veuillez réessayer.');
-        btn.disabled = false;
-        btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Créer mon compte';
-        return;
-      }
-
-      document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-      document.getElementById('stepper').style.display = 'none';
-      const sv = document.getElementById('successView');
-      sv.classList.add('show');
-      document.getElementById('successEmail').textContent = payload.email;
-
-    } catch {
-      alert('Impossible de contacter le serveur. Vérifiez votre connexion.');
-      btn.disabled = false;
-      btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Créer mon compte';
-    }
-  }
+  return ok;
+}
 
 function fillSummary() {
   generateEmail();
@@ -248,29 +202,34 @@ async function submitForm() {
       })
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       alert(data.detail || 'Erreur pendant la création du compte.');
       submitBtn.disabled = false;
-      submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Créer mon compte';
+      submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Créer mon compte';
       return;
     }
 
-    document.querySelectorAll('.step-panel').forEach(panel => panel.classList.remove('active'));
+    document.querySelectorAll('.step-panel').forEach(panel => {
+      panel.classList.remove('active');
+    });
+
     document.getElementById('stepper').style.display = 'none';
     document.getElementById('successEmail').textContent = email;
     document.getElementById('successView').classList.add('show');
+
   } catch (error) {
     console.error(error);
     alert('Erreur serveur. Vérifiez que le backend est lancé.');
     submitBtn.disabled = false;
-    submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Créer mon compte';
+    submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Créer mon compte';
   }
 }
 
 function checkStrength(value) {
   let score = 0;
+
   if (value.length >= 8) score++;
   if (/[A-Z]/.test(value)) score++;
   if (/[0-9]/.test(value)) score++;
@@ -282,10 +241,13 @@ function checkStrength(value) {
 
   bars.forEach((id, index) => {
     const bar = document.getElementById(id);
+    if (!bar) return;
     bar.style.background = index < score ? colors[score - 1] : 'var(--border)';
   });
 
   const label = document.getElementById('strengthLabel');
+  if (!label) return;
+
   label.textContent = value.length ? labels[score - 1] || 'Très faible' : 'Entrez un mot de passe';
   label.style.color = value.length ? colors[score - 1] : 'var(--text-light)';
 }
@@ -296,6 +258,7 @@ function toggleEye(inputId, iconId) {
   const isHidden = input.type === 'password';
 
   input.type = isHidden ? 'text' : 'password';
+
   icon.innerHTML = isHidden
     ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
@@ -309,15 +272,18 @@ document.addEventListener('DOMContentLoaded', function () {
   const prenomInput = document.getElementById('prenom');
   const numSecuInput = document.getElementById('numsecu');
 
-  nomInput.addEventListener('input', generateEmail);
-  prenomInput.addEventListener('input', generateEmail);
+  if (nomInput) nomInput.addEventListener('input', generateEmail);
+  if (prenomInput) prenomInput.addEventListener('input', generateEmail);
 
   if (numSecuInput) {
     numSecuInput.addEventListener('input', function () {
       let value = this.value.replace(/\D/g, '').substring(0, 15);
-      this.value = value.replace(/(\d{1})(\d{2})(\d{2})(\d{2})(\d{3})(\d{3})(\d{2})?/, function (_, a, b, c, d, e, f, g) {
-        return [a, b, c, d, e, f, g].filter(Boolean).join(' ');
-      });
+      this.value = value.replace(
+        /(\d{1})(\d{2})(\d{2})(\d{2})(\d{3})(\d{3})(\d{2})?/,
+        function (_, a, b, c, d, e, f, g) {
+          return [a, b, c, d, e, f, g].filter(Boolean).join(' ');
+        }
+      );
     });
   }
 

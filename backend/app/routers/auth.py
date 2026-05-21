@@ -9,11 +9,13 @@ from sqlalchemy.sql import func
 from app.db import get_db
 from app.models.user import User
 from app.models.role import Role
-from app.schemas.user import UserCreate, UserOut, Token
+from app.schemas.user import UserCreate, UserOut, Token, PatientRegister
 from app.services.auth import (
     hash_password,
     verify_password,
     create_access_token,
+    create_verification_token,
+    decode_verification_token,
     get_current_user,
 )
 

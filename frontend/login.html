@@ -784,7 +784,6 @@
   &nbsp;·&nbsp; Hébergement certifié <strong>HDS</strong> · © 2024 MediCare31
 </footer>
 
-<script src="/js/auth.js"></script>
 <script>
   let pwdVisible = false;
 
@@ -820,7 +819,6 @@
       showAlert('Adresse e-mail invalide.');
       return;
     }
-  }
 
     if (password.length < 4) {
       showAlert('Mot de passe trop court.');
@@ -845,10 +843,20 @@
       }
 
       localStorage.setItem('access_token', data.access_token || '');
-      localStorage.setItem('token_type', data.token_type || 'bearer');
-      localStorage.setItem('user_role', data.role || '');
-      localStorage.setItem('user_nom', data.nom || '');
-      localStorage.setItem('user_prenom', data.prenom || '');
+localStorage.setItem('medicare_token', data.access_token || '');
+localStorage.setItem('token_type', data.token_type || 'bearer');
+
+localStorage.setItem('user_role', data.role || '');
+localStorage.setItem('role', data.role || '');
+localStorage.setItem('user_nom', data.nom || '');
+localStorage.setItem('user_prenom', data.prenom || '');
+
+localStorage.setItem('medicare_user', JSON.stringify({
+  role: data.role || '',
+  nom: data.nom || '',
+  prenom: data.prenom || '',
+  email: email
+}));
 
       alertBox.classList.remove('show');
       document.getElementById('formView').style.display = 'none';
