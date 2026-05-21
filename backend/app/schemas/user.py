@@ -1,5 +1,4 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
 
 
 class UserCreate(BaseModel):
@@ -7,7 +6,7 @@ class UserCreate(BaseModel):
     password: str
     nom: str
     prenom: str
-    role: str = "patient"  # code_role: patient, medecin, secretariat, admin
+    role: str = "patient"
 
 
 class PatientRegister(BaseModel):
@@ -41,7 +40,7 @@ class UserOut(BaseModel):
     email: str
     nom: str
     prenom: str
-    role: str  # code_role du role lié
+    role: str
     is_active: bool
 
     model_config = {"from_attributes": True}
