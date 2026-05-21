@@ -51,5 +51,5 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     role: str
-    nom: str
-    prenom: str
+    nom: str | None = ""
+    prenom: str | None = ""
