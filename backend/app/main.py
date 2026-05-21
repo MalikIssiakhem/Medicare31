@@ -1,25 +1,29 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.db import Base, engine, SessionLocal
-import app.models  # noqa: F401 — enregistre tous les models avant create_all
+import app.models  # noqa: F401
+
 from app.routers import auth, patients
 
 
 def _seed_roles() -> None:
-    """Insère les rôles de base s'ils n'existent pas encore."""
     from app.models.role import Role
+
     db = SessionLocal()
     try:
         defaults = [
-            ("patient",      "Patient"),
-            ("medecin",      "Médecin"),
-            ("secretariat",  "Secrétariat"),
-            ("admin",        "Administrateur"),
+            ("patient", "Patient"),
+            ("medecin", "Médecin"),
+            ("secretariat", "Secrétariat"),
+            ("admin", "Administrateur"),
         ]
+
         for code, libelle in defaults:
             if not db.query(Role).filter(Role.code_role == code).first():
                 db.add(Role(code_role=code, libelle=libelle))
+
         db.commit()
     finally:
         db.close()
@@ -44,6 +48,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(patients.router)
+
 
 
 @app.get("/api/health")
