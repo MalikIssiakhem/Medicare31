@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
@@ -111,6 +112,90 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
         "role": role.code_role,
         "is_active": user.is_active,
     }
+
+
+@router.post("/register/patient", status_code=201)
+def register_patient(data: PatientRegister, db: Session = Depends(get_db)):
+    if db.query(User).filter(User.email == data.email).first():
+        raise HTTPException(status_code=400, detail="Cette adresse e-mail est déjà utilisée.")
+
+    role = db.query(Role).filter(Role.code_role == "patient").first()
+    if not role:
+        raise HTTPException(status_code=500, detail="Rôle patient introuvable.")
+
+    user = User(
+        email=data.email,
+        password_hash=hash_password(data.password),
+        id_role=role.id_role,
+        is_active=False,
+        email_verified=False,
+    )
+    db.add(user)
+    db.flush()
+
+    from app.models.patient import Patient, PatientContact, PatientSecurity
+    import time
+
+    patient = Patient(
+        id_user=user.id_user,
+        numero_dossier=f"PAT-{int(time.time() * 1000) % 10_000_000:07d}",
+        civilite=data.civilite,
+        nom=data.nom,
+        prenom=data.prenom,
+        date_naissance=data.date_naissance,
+        sexe=data.sexe,
+        numero_securite_sociale=data.numero_securite_sociale,
+    )
+    db.add(patient)
+    db.flush()
+
+    db.add(PatientContact(
+        id_patient=patient.id_patient,
+        telephone_principal=data.telephone_principal,
+        telephone_secondaire=data.telephone_secondaire,
+        adresse_ligne1=data.adresse_ligne1,
+        code_postal=data.code_postal,
+        ville=data.ville,
+    ))
+
+    db.add(PatientSecurity(
+        id_patient=patient.id_patient,
+        question_secrete=data.question_secrete,
+        reponse_secrete_hash=hash_password(data.reponse_secrete) if data.reponse_secrete else None,
+        cgu_accepted=data.cgu_accepted,
+        hds_consent=data.hds_consent,
+        notif_email_sms_consent=data.notif_email_sms_consent,
+    ))
+
+    db.commit()
+
+    token = create_verification_token(user.id_user)
+    try:
+        from app.services.email import send_verification_email
+        send_verification_email(data.email, data.prenom, token)
+    except Exception:
+        pass
+
+    return {"message": "Compte créé. Vérifiez votre boîte mail pour activer votre compte."}
+
+
+@router.get("/verify-email")
+def verify_email(token: str, db: Session = Depends(get_db)):
+    from app.config import settings
+    user_id = decode_verification_token(token)
+    if user_id is None:
+        return RedirectResponse(url="/login.html?error=token_invalide")
+
+    user = db.query(User).filter(User.id_user == user_id).first()
+    if not user:
+        return RedirectResponse(url="/login.html?error=token_invalide")
+    if user.email_verified:
+        return RedirectResponse(url="/login.html?verified=already")
+
+    user.email_verified = True
+    user.is_active = True
+    db.commit()
+    return RedirectResponse(url="/login.html?verified=1")
 
 
 @router.post("/login", response_model=Token)

@@ -27,6 +27,22 @@ def create_access_token(data: dict) -> str:
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
+def create_verification_token(user_id: int) -> str:
+    expire = datetime.utcnow() + timedelta(hours=24)
+    payload = {"sub": str(user_id), "purpose": "email_verification", "exp": expire}
+    return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
+
+
+def decode_verification_token(token: str) -> int | None:
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        if payload.get("purpose") != "email_verification":
+            return None
+        return int(payload["sub"])
+    except JWTError:
+        return None
+
+
 def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> User:
