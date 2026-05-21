@@ -12,9 +12,8 @@
 <div class="bg-deco"></div>
 <div class="bg-circles"><span></span><span></span><span></span><span></span></div>
 
-<!-- NAV -->
 <nav>
-  <a class="logo" href="#">
+  <a class="logo" href="login.html">
     <div class="logo-icon">
       <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"/><rect x="10" y="7" width="4" height="10" rx="1"/><rect x="7" y="10" width="10" height="4" rx="1"/></svg>
     </div>
@@ -24,63 +23,36 @@
   <a href="/login.html" class="nav-login">Déjà un compte ? Se connecter</a>
 </nav>
 
-<!-- PAGE -->
 <div class="page">
   <div class="wrapper">
 
-    <!-- STEPPER -->
     <div class="stepper" id="stepper">
       <div class="step active" id="s1">
-        <div class="step-num">
-          <span>1</span>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="step-label">
-          <strong>Identité</strong>
-          <small>Informations personnelles</small>
-        </div>
+        <div class="step-num"><span>1</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-label"><strong>Identité</strong><small>Informations personnelles</small></div>
       </div>
       <div class="step" id="s2">
-        <div class="step-num">
-          <span>2</span>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="step-label">
-          <strong>Coordonnées</strong>
-          <small>Contact & adresse</small>
-        </div>
+        <div class="step-num"><span>2</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-label"><strong>Coordonnées</strong><small>Email généré & contact</small></div>
       </div>
       <div class="step" id="s3">
-        <div class="step-num">
-          <span>3</span>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="step-label">
-          <strong>Sécurité</strong>
-          <small>Mot de passe & accès</small>
-        </div>
+        <div class="step-num"><span>3</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-label"><strong>Sécurité</strong><small>Mot de passe & accès</small></div>
       </div>
       <div class="step" id="s4">
-        <div class="step-num">
-          <span>4</span>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="step-label">
-          <strong>Confirmation</strong>
-          <small>Vérification</small>
-        </div>
+        <div class="step-num"><span>4</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-label"><strong>Confirmation</strong><small>Vérification</small></div>
       </div>
     </div>
 
-    <!-- CARD -->
     <div class="card" id="mainCard">
 
-      <!-- ═══ STEP 1 – IDENTITÉ ═══ -->
       <div class="step-panel active" id="panel1">
         <div class="card-header">
           <div class="step-title">Vos informations personnelles</div>
-          <div class="step-desc">Ces informations seront utilisées par vos professionnels de santé.</div>
+          <div class="step-desc">L'adresse e-mail sera générée automatiquement avec votre prénom et votre nom.</div>
         </div>
+
         <div class="card-body">
           <div class="form-grid">
 
@@ -91,22 +63,12 @@
               </div>
             </div>
 
-            <!-- Civilité -->
             <div class="form-group full">
               <label>Civilité <span class="req">*</span></label>
               <div class="radio-group">
-                <label class="radio-opt">
-                  <input type="radio" name="civilite" value="M" checked>
-                  <div class="radio-dot"></div> M.
-                </label>
-                <label class="radio-opt">
-                  <input type="radio" name="civilite" value="Mme">
-                  <div class="radio-dot"></div> Mme
-                </label>
-                <label class="radio-opt">
-                  <input type="radio" name="civilite" value="Autre">
-                  <div class="radio-dot"></div> Autre
-                </label>
+                <label class="radio-opt"><input type="radio" name="civilite" value="M" checked><div class="radio-dot"></div> M.</label>
+                <label class="radio-opt"><input type="radio" name="civilite" value="Mme"><div class="radio-dot"></div> Mme</label>
+                <label class="radio-opt"><input type="radio" name="civilite" value="Autre"><div class="radio-dot"></div> Autre</label>
               </div>
             </div>
 
@@ -114,7 +76,7 @@
               <label for="nom">Nom de famille <span class="req">*</span></label>
               <div class="input-wrap">
                 <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input type="text" id="nom" placeholder="DUPONT">
+                <input type="text" id="nom" placeholder="DUPONT" autocomplete="family-name">
               </div>
               <span class="field-error" id="err-nom">Ce champ est requis.</span>
             </div>
@@ -123,7 +85,7 @@
               <label for="prenom">Prénom <span class="req">*</span></label>
               <div class="input-wrap">
                 <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input type="text" id="prenom" placeholder="Marc">
+                <input type="text" id="prenom" placeholder="Marc" autocomplete="given-name">
               </div>
               <span class="field-error" id="err-prenom">Ce champ est requis.</span>
             </div>
@@ -151,6 +113,16 @@
             </div>
 
             <div class="form-group full">
+              <label for="email">Adresse e-mail générée</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <input type="email" id="email" placeholder="mdupont@clinique.fr" readonly>
+              </div>
+              <span style="font-size:.73rem;color:var(--text-light);margin-top:3px">Format : première lettre du prénom + nom de famille + @clinique.fr</span>
+              <span class="field-error" id="err-email">Impossible de générer l'adresse e-mail.</span>
+            </div>
+
+            <div class="form-group full">
               <label for="numsecu">Numéro de sécurité sociale</label>
               <div class="input-wrap">
                 <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
@@ -161,32 +133,24 @@
 
           </div>
         </div>
+
         <div class="card-footer">
           <div></div>
-          <button class="btn btn-next" onclick="goTo(2)">
+          <button type="button" class="btn btn-next" onclick="goTo(2)">
             Suivant
             <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- ═══ STEP 2 – COORDONNÉES ═══ -->
       <div class="step-panel" id="panel2">
         <div class="card-header">
           <div class="step-title">Vos coordonnées</div>
-          <div class="step-desc">Adresse e-mail, numéro de téléphone et adresse postale.</div>
+          <div class="step-desc">Ajoutez votre téléphone et votre adresse postale.</div>
         </div>
+
         <div class="card-body">
           <div class="form-grid">
-
-            <div class="form-group full">
-              <label for="email">Adresse e-mail <span class="req">*</span></label>
-              <div class="input-wrap">
-                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                <input type="email" id="email" placeholder="marc.dupont@email.fr">
-              </div>
-              <span class="field-error" id="err-email">Adresse e-mail invalide.</span>
-            </div>
 
             <div class="form-group">
               <label for="tel">Téléphone mobile <span class="req">*</span></label>
@@ -244,24 +208,25 @@
 
           </div>
         </div>
+
         <div class="card-footer">
-          <button class="btn btn-back" onclick="goTo(1)">
+          <button type="button" class="btn btn-back" onclick="goTo(1)">
             <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             Retour
           </button>
-          <button class="btn btn-next" onclick="goTo(3)">
+          <button type="button" class="btn btn-next" onclick="goTo(3)">
             Suivant
             <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- ═══ STEP 3 – SÉCURITÉ ═══ -->
       <div class="step-panel" id="panel3">
         <div class="card-header">
           <div class="step-title">Sécurité de votre compte</div>
           <div class="step-desc">Créez un mot de passe fort pour protéger vos données de santé.</div>
         </div>
+
         <div class="card-body">
           <div class="form-grid">
 
@@ -271,15 +236,10 @@
                 <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 <input type="password" id="pwd" placeholder="Minimum 8 caractères" oninput="checkStrength(this.value)">
                 <button type="button" class="eye-toggle" onclick="toggleEye('pwd','eye1')">
-                  <svg id="eye1" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
+                  <svg id="eye1" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
-              <div class="strength-bar">
-                <span id="sb1"></span><span id="sb2"></span><span id="sb3"></span><span id="sb4"></span>
-              </div>
+              <div class="strength-bar"><span id="sb1"></span><span id="sb2"></span><span id="sb3"></span><span id="sb4"></span></div>
               <div class="strength-label" id="strengthLabel">Entrez un mot de passe</div>
               <span class="field-error" id="err-pwd">Mot de passe trop court (min. 8 caractères).</span>
             </div>
@@ -290,44 +250,15 @@
                 <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 <input type="password" id="pwd2" placeholder="Répétez votre mot de passe">
                 <button type="button" class="eye-toggle" onclick="toggleEye('pwd2','eye2')">
-                  <svg id="eye2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
+                  <svg id="eye2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
               <span class="field-error" id="err-pwd2">Les mots de passe ne correspondent pas.</span>
             </div>
 
-            <div class="section-divider full"><span>Questions de sécurité</span></div>
-
-            <div class="form-group full">
-              <label for="q1">Question secrète <span class="req">*</span></label>
-              <div class="input-wrap no-icon">
-                <select id="q1">
-                  <option value="">-- Choisir une question --</option>
-                  <option>Quel est le nom de votre premier animal de compagnie ?</option>
-                  <option>Quelle est la ville de naissance de votre mère ?</option>
-                  <option>Quel était le nom de votre école primaire ?</option>
-                  <option>Quel est le prénom de votre meilleur(e) ami(e) d'enfance ?</option>
-                </select>
-              </div>
-              <span class="field-error" id="err-q1">Veuillez choisir une question.</span>
-            </div>
-
-            <div class="form-group full">
-              <label for="r1">Réponse <span class="req">*</span></label>
-              <div class="input-wrap">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <input type="text" id="r1" placeholder="Votre réponse">
-              </div>
-              <span class="field-error" id="err-r1">Ce champ est requis.</span>
-            </div>
-
             <div class="section-divider full"><span>Consentements</span></div>
 
             <div class="form-group full" style="gap:12px">
-
               <label class="checkbox-wrap">
                 <input type="checkbox" id="cgu">
                 <div class="custom-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
@@ -338,42 +269,34 @@
               <label class="checkbox-wrap">
                 <input type="checkbox" id="hds">
                 <div class="custom-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-                <span class="cb-label">Je consens au stockage de mes données de santé sur un hébergement certifié <strong>HDS</strong> (Hébergeur de Données de Santé). <span class="req">*</span></span>
+                <span class="cb-label">Je consens au stockage de mes données de santé sur un hébergement certifié <strong>HDS</strong>. <span class="req">*</span></span>
               </label>
               <span class="field-error" id="err-hds">Ce consentement est obligatoire.</span>
-
-              <label class="checkbox-wrap">
-                <input type="checkbox" id="notifs">
-                <div class="custom-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-                <span class="cb-label">J'accepte de recevoir des rappels de rendez-vous et notifications par e-mail / SMS.</span>
-              </label>
-
             </div>
 
           </div>
         </div>
+
         <div class="card-footer">
-          <button class="btn btn-back" onclick="goTo(2)">
+          <button type="button" class="btn btn-back" onclick="goTo(2)">
             <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             Retour
           </button>
-          <button class="btn btn-next" onclick="goTo(4)">
+          <button type="button" class="btn btn-next" onclick="goTo(4)">
             Vérifier mon inscription
             <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- ═══ STEP 4 – CONFIRMATION ═══ -->
       <div class="step-panel" id="panel4">
         <div class="card-header">
           <div class="step-title">Vérification de vos informations</div>
           <div class="step-desc">Relisez vos données avant de valider votre inscription.</div>
         </div>
+
         <div class="card-body">
-
           <div style="display:flex;flex-direction:column;gap:20px">
-
             <div>
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
                 <span style="font-size:.8rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em">Identité</span>
@@ -405,34 +328,30 @@
 
             <div class="hint">
               <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Un e-mail de confirmation vous sera envoyé à l'adresse renseignée. Cliquez sur le lien pour activer votre compte.
+              Votre compte patient sera créé via l'API <strong>/api/auth/register</strong>.
             </div>
-
           </div>
-
         </div>
+
         <div class="card-footer">
-          <button class="btn btn-back" onclick="goTo(3)">
+          <button type="button" class="btn btn-back" onclick="goTo(3)">
             <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             Retour
           </button>
-          <button class="btn btn-submit-final" onclick="submitForm()">
+          <button type="button" class="btn btn-submit-final" onclick="submitForm()" id="submitBtn">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
             Créer mon compte
           </button>
         </div>
       </div>
 
-      <!-- ═══ SUCCESS ═══ -->
       <div class="success-view" id="successView">
-        <div class="success-icon">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="success-title">Compte créé avec succès !</div>
         <div class="success-text">
-          Un e-mail de confirmation a été envoyé à<br>
-          <span class="success-email" id="successEmail">marc.dupont@email.fr</span><br>
-          Cliquez sur le lien pour activer votre espace patient.
+          Votre compte patient a été créé avec l'adresse :<br>
+          <span class="success-email" id="successEmail">—</span><br>
+          Vous pouvez maintenant vous connecter.
         </div>
         <a href="/login.html" class="btn btn-next btn-go">
           <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -440,10 +359,9 @@
         </a>
       </div>
 
-    </div><!-- /card -->
-
-  </div><!-- /wrapper -->
-</div><!-- /page -->
+    </div>
+  </div>
+</div>
 
 <footer>
   <a href="#">Mentions légales</a> · <a href="#">Politique de confidentialité</a> · <a href="#">Aide</a>
@@ -451,6 +369,5 @@
 </footer>
 
 <script src="js/register.js"></script>
-  
 </body>
 </html>
