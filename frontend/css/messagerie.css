@@ -994,6 +994,7 @@ aside {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
   opacity: 0;
   pointer-events: none;
   transition: opacity .2s;
@@ -1008,9 +1009,175 @@ aside {
   background: var(--white);
   border-radius: 18px;
   width: 100%;
-  max-width: 580px;
+  max-width: 680px;
+  min-width: 0;
   box-shadow: var(--shadow-lg);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-compose-wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  max-height: 88vh;
+  width: 100%;
+  max-width: 980px;
+}
+
+.contact-panel {
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.contact-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 18px 16px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.contact-panel-header svg {
+  width: 17px;
+  height: 17px;
+  stroke: var(--blue-dark);
+  fill: none;
+  stroke-width: 1.8;
+}
+
+.contact-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.contact-search-wrap svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--text-light);
+  fill: none;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+.contact-search-wrap input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: .83rem;
+  font-family: inherit;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.contact-search-wrap input::placeholder {
+  color: var(--text-light);
+}
+
+.contact-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.contact-group-title {
+  padding: 9px 14px 4px;
+  font-size: .67rem;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: background .13s;
+}
+
+.contact-item:hover {
+  background: #f5f7fa;
+}
+
+.contact-item.selected {
+  background: #eef3fb;
+}
+
+.contact-item.selected .contact-name {
+  color: var(--blue-dark);
+  font-weight: 700;
+}
+
+.contact-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .74rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.contact-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-name {
+  font-size: .83rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-role-label {
+  font-size: .71rem;
+  color: var(--text-light);
+  margin-top: 1px;
+}
+
+.contact-check {
+  width: 15px;
+  height: 15px;
+  stroke: var(--blue-dark);
+  fill: none;
+  stroke-width: 2.5;
+  flex-shrink: 0;
+}
+
+.contact-empty {
+  padding: 24px 14px;
+  text-align: center;
+  font-size: .8rem;
+  color: var(--text-light);
 }
 
 .modal-header {
@@ -1054,6 +1221,8 @@ aside {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .modal-field {
@@ -1084,7 +1253,7 @@ aside {
 
 .modal-field textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 180px;
 }
 
 .modal-footer {

@@ -5,6 +5,7 @@ let currentConv = null;
 let currentFilter = "all";
 let currentFolder = "inbox";
 let replyMsg = null;
+let selectedContact = null;
 
 window.__blockConvClick = false;
 
@@ -170,13 +171,24 @@ async function init() {
 
   try {
     currentUser = await api("/api/auth/me");
-    users = await api("/api/messages/users");
+  } catch (error) {
+    console.error("Erreur auth/me:", error);
+    showToast(error.message || "Erreur d'authentification");
+    return;
+  }
 
-    updateLoggedUserUI();
-    populateRecipients();
+  updateLoggedUserUI();
+
+  try {
+    users = await api("/api/messages/users");
+  } catch (error) {
+    console.error("Erreur chargement utilisateurs:", error);
+  }
+
+  try {
     await loadConversations(false);
   } catch (error) {
-    console.error(error);
+    console.error("Erreur chargement conversations:", error);
     showToast(error.message || "Erreur de chargement");
   }
 }
@@ -217,15 +229,90 @@ function sortConversations(a, b) {
   return dateB - dateA;
 }
 
-function populateRecipients() {
-  const list = document.getElementById("recipientsList");
+function getContactsForCurrentUser() {
+  if (!currentUser) return [];
+  if (currentUser.role === "patient") {
+    return users.filter(u => u.role === "medecin" || u.role === "secretariat");
+  }
+  return users;
+}
 
-  if (!list) return;
+function renderContactList(search = "") {
+  const el = document.getElementById("contactList");
+  if (!el) return;
 
-  list.innerHTML = users.map(user => {
-    const name = displayName(user);
-    return `<option value="${escapeHtml(user.email)}">${escapeHtml(name)} – ${escapeHtml(roleLabel(user.role))}</option>`;
-  }).join("");
+  const lSearch = search.trim().toLowerCase();
+  let contacts = getContactsForCurrentUser();
+
+  if (lSearch) {
+    contacts = contacts.filter(u => {
+      return displayName(u).toLowerCase().includes(lSearch) ||
+             (u.email || "").toLowerCase().includes(lSearch);
+    });
+  }
+
+  if (!contacts.length) {
+    el.innerHTML = `<div class="contact-empty">Aucun contact trouvé</div>`;
+    return;
+  }
+
+  const roleOrder = ["medecin", "secretariat", "admin", "patient"];
+  const groups = {};
+  contacts.forEach(u => {
+    const r = u.role || "other";
+    if (!groups[r]) groups[r] = [];
+    groups[r].push(u);
+  });
+
+  const sortedRoles = Object.keys(groups).sort((a, b) => {
+    const ia = roleOrder.indexOf(a);
+    const ib = roleOrder.indexOf(b);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+
+  let html = "";
+  sortedRoles.forEach(role => {
+    html += `<div class="contact-group-title">${escapeHtml(roleLabel(role))}</div>`;
+    groups[role].forEach(u => {
+      const name = displayName(u);
+      const color = avatarColor(u.id_user);
+      const isSelected = selectedContact && selectedContact.id_user === u.id_user;
+      html += `
+        <div class="contact-item${isSelected ? " selected" : ""}" onclick="selectContact(${u.id_user})">
+          <div class="contact-avatar" style="background:${color}">${escapeHtml(initials(name))}</div>
+          <div class="contact-info">
+            <div class="contact-name">${escapeHtml(name)}</div>
+            <div class="contact-role-label">${escapeHtml(roleLabel(u.role))}</div>
+          </div>
+          ${isSelected ? `<svg class="contact-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>` : ""}
+        </div>
+      `;
+    });
+  });
+
+  el.innerHTML = html;
+}
+
+function selectContact(userId) {
+  const user = users.find(u => u.id_user === userId);
+  if (!user) return;
+
+  selectedContact = user;
+
+  const cTo = document.getElementById("cTo");
+  if (cTo) cTo.value = displayName(user);
+
+  filterContactList();
+}
+
+function filterContactList() {
+  const search = document.getElementById("contactSearch")?.value || "";
+  renderContactList(search);
+}
+
+function onComposeToClear() {
+  selectedContact = null;
+  filterContactList();
 }
 
 async function getActiveAndArchivedConversationsForCounts() {
@@ -675,23 +762,23 @@ async function sendMessage() {
 }
 
 async function sendComposed() {
-  const to = document.getElementById("cTo").value.trim().toLowerCase();
+  const toRaw = document.getElementById("cTo").value.trim().toLowerCase();
   const subject = document.getElementById("cSubject").value.trim() || "Nouvelle conversation";
   const body = document.getElementById("cBody").value.trim();
   const priority = document.getElementById("cPriority").value || "normal";
 
-  if (!to || !body) {
+  if (!toRaw || !body) {
     showToast("Veuillez remplir les champs requis.");
     return;
   }
 
-  const recipient = users.find(u =>
-    String(u.email || "").toLowerCase() === to ||
-    displayName(u).toLowerCase() === to
+  const recipient = selectedContact || users.find(u =>
+    String(u.email || "").toLowerCase() === toRaw ||
+    displayName(u).toLowerCase() === toRaw
   );
 
   if (!recipient) {
-    showToast("Destinataire introuvable. Choisissez un e-mail de la liste.");
+    showToast("Destinataire introuvable. Sélectionnez un contact dans la liste.");
     return;
   }
 
@@ -714,6 +801,7 @@ async function sendComposed() {
     document.getElementById("cBody").value = "";
     document.getElementById("cPriority").value = "normal";
 
+    selectedContact = null;
     currentFolder = "inbox";
     currentFilter = "all";
 
@@ -836,10 +924,33 @@ async function setFolder(el, folder) {
   renderConvList(getFilteredConvs());
 }
 
-function openCompose() {
+async function openCompose() {
   const modal = document.getElementById("composeModal");
-
   if (modal) modal.classList.add("open");
+
+  selectedContact = null;
+
+  const contactSearch = document.getElementById("contactSearch");
+  if (contactSearch) contactSearch.value = "";
+
+  if (!currentUser) {
+    try {
+      currentUser = await api("/api/auth/me");
+      updateLoggedUserUI();
+    } catch (error) {
+      console.error("Erreur chargement utilisateur courant:", error);
+    }
+  }
+
+  if (!users.length) {
+    try {
+      users = await api("/api/messages/users");
+    } catch (error) {
+      console.error("Erreur chargement contacts:", error);
+    }
+  }
+
+  renderContactList();
 }
 
 function closeCompose(e) {
