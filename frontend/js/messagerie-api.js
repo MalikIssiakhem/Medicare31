@@ -379,7 +379,6 @@ function updateSideMessageBadge(count) {
 
 function renderConvList(list) {
   const el = document.getElementById("convList");
-
   if (!el) return;
 
   if (!list.length) {
@@ -403,11 +402,15 @@ function renderConvList(list) {
     const active = currentConv?.id_thread === c.id_thread ? "active" : "";
     const unreadClass = unread > 0 ? "unread" : "";
 
+    const actionButton = currentFolder === "archive"
+      ? `<button type="button" onclick="unarchiveConversationById(${c.id_thread})">Restaurer</button>`
+      : `<button type="button" onclick="archiveConversationById(${c.id_thread})">Archiver</button>`;
+
     return `
       <div class="conv-item ${active} ${unreadClass}"
-           onclick="if (!window.__blockConvClick) openConv(${c.id_thread})"
-           data-id="${c.id_thread}"
-           data-cat="${escapeHtml(c.category || "patients")}">
+           onclick="openConv(${c.id_thread})"
+           data-id="${c.id_thread}">
+
         <div class="conv-avatar" style="background:${av.color}">
           ${escapeHtml(av.initials)}
           <div class="online-dot"></div>
@@ -427,77 +430,39 @@ function renderConvList(list) {
         </div>
 
         ${unread > 0 ? `<div class="unread-badge">${unread}</div>` : ""}
+
+        <div class="conv-menu-wrap" onclick="event.stopPropagation()">
+          <button type="button" class="conv-menu-btn" onclick="toggleConvMenu(event, ${c.id_thread})">⋮</button>
+
+          <div class="conv-menu" id="conv-menu-${c.id_thread}">
+            ${actionButton}
+            <button type="button" class="danger" onclick="deleteConversationById(${c.id_thread})">Supprimer</button>
+          </div>
+        </div>
       </div>
     `;
   }).join("");
-
-  enableSwipeArchive();
 }
 
-function enableSwipeArchive() {
-  document.querySelectorAll(".conv-item").forEach(item => {
-    let startX = 0;
-    let currentX = 0;
-    let dragging = false;
+function toggleConvMenu(event, threadId) {
+  event.stopPropagation();
 
-    item.style.touchAction = "pan-y";
-
-    item.addEventListener("pointerdown", e => {
-      startX = e.clientX;
-      currentX = 0;
-      dragging = true;
-      item.style.transition = "none";
-    });
-
-    item.addEventListener("pointermove", e => {
-      if (!dragging) return;
-
-      currentX = e.clientX - startX;
-
-      if (currentX > 0) {
-        const move = Math.min(currentX, 130);
-
-        item.style.transform = `translateX(${move}px)`;
-        item.style.background = currentX > 90
-          ? (currentFolder === "archive" ? "#e8f1fb" : "#ecfdf3")
-          : "";
-      }
-    });
-
-    item.addEventListener("pointerup", async () => {
-      if (!dragging) return;
-
-      dragging = false;
-      item.style.transition = "transform .2s ease, background .2s ease";
-
-      if (currentX > 90) {
-        window.__blockConvClick = true;
-
-        const threadId = Number(item.dataset.id);
-        item.style.transform = "translateX(100%)";
-
-        if (currentFolder === "archive") {
-          await unarchiveConversationById(threadId);
-        } else {
-          await archiveConversationById(threadId);
-        }
-
-        setTimeout(() => {
-          window.__blockConvClick = false;
-        }, 350);
-      } else {
-        item.style.transform = "";
-        item.style.background = "";
-      }
-    });
-
-    item.addEventListener("pointercancel", () => {
-      dragging = false;
-      item.style.transform = "";
-      item.style.background = "";
-    });
+  document.querySelectorAll(".conv-menu").forEach(menu => {
+    if (menu.id !== `conv-menu-${threadId}`) {
+      menu.classList.remove("show");
+    }
   });
+
+  const menu = document.getElementById(`conv-menu-${threadId}`);
+  if (menu) menu.classList.toggle("show");
 }
+
+document.addEventListener("click", () => {
+  document.querySelectorAll(".conv-menu").forEach(menu => {
+    menu.classList.remove("show");
+  });
+});
+
 
 async function archiveConversationById(threadId) {
   try {
@@ -542,6 +507,32 @@ async function unarchiveConversationById(threadId) {
   } catch (error) {
     console.error(error);
     showToast(error.message || "Erreur restauration");
+  }
+}
+
+async function deleteConversationById(threadId) {
+  const ok = confirm("Voulez-vous vraiment supprimer cette conversation ?");
+  if (!ok) return;
+
+  try {
+    await api(`/api/messages/conversations/${threadId}`, {
+      method: "DELETE"
+    });
+
+    conversations = conversations.filter(c => c.id_thread !== threadId);
+
+    if (currentConv && currentConv.id_thread === threadId) {
+      currentConv = null;
+      showEmptyChat();
+    }
+
+    await updateFolderCounts();
+    renderConvList(getFilteredConvs());
+
+    showToast("Conversation supprimée");
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Erreur suppression");
   }
 }
 

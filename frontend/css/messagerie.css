@@ -1333,6 +1333,90 @@ aside {
   stroke-width: 2.5;
 }
 
+.conv-item {
+  padding-right: 48px !important;
+  min-height: 82px;
+  position: relative;
+  overflow: visible;
+}
+
+.conv-body {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.conv-menu-wrap {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+}
+
+.conv-menu-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conv-menu-btn:hover {
+  background: var(--blue-pale);
+  color: var(--blue-dark);
+}
+
+.conv-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 32px;
+  width: 135px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(30,45,69,.18);
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.conv-menu.show {
+  display: block;
+}
+
+.conv-menu button {
+  width: 100%;
+  border: none;
+  background: var(--white);
+  padding: 9px 12px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .82rem;
+  color: var(--text-mid);
+}
+
+.conv-menu button:hover {
+  background: var(--blue-pale);
+  color: var(--blue-dark);
+}
+
+.conv-menu button.danger {
+  color: var(--red);
+}
+
+.conv-menu button.danger:hover {
+  background: var(--red-pale);
+  color: var(--red);
+}
+
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
