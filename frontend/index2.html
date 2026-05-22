@@ -24,14 +24,6 @@
         </div>
         MediCare31
       </a>
-
-      <ul class="nav-links">
-        <li><a href="#" class="active">Tableau de bord</a></li>
-        <li><a href="#">Mes rendez-vous</a></li>
-        <li><a href="#">Mes documents</a></li>
-        <li><a href="#">Ma messagerie</a></li>
-      </ul>
-
       <div class="nav-right">
         <button class="notif-btn" title="Notifications">
           <svg
@@ -556,31 +548,7 @@
     </div>
 
     <script src="/js/auth.js"></script>
-    <script>
-      authGuard();
-      /* Nav / sidebar active state */
-      document.querySelectorAll(".nav-links a, .side-nav a").forEach((a) => {
-        a.addEventListener("click", (e) => {
-          e.preventDefault();
-          const ul = a.closest("ul");
-          ul.querySelectorAll("li").forEach((li) =>
-            li.classList.remove("active"),
-          );
-          ul.querySelectorAll("a").forEach((x) => x.classList.remove("active"));
-          if (a.closest("li")) a.closest("li").classList.add("active");
-          a.classList.add("active");
-        });
-      });
 
-      /* Quick access toggle */
-      document.querySelectorAll(".quick-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          document
-            .querySelectorAll(".quick-btn")
-            .forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-        });
-      });
-    </script>
+    <script src="js/index2.js"></script>
   </body>
 </html>
