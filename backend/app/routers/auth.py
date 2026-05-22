@@ -295,3 +295,13 @@ def me(current_user: User = Depends(get_current_user)):
         "role": current_user.role.code_role,
         "is_active": current_user.is_active,
     }
+
+@router.post("/ping")
+def ping(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    current_user.last_login_at = func.now()
+    db.commit()
+
+    return {"status": "ok"}
