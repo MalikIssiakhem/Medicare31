@@ -17,7 +17,7 @@ from app.schemas.message import (
     ConversationCreate,
 )
 from app.services.auth import get_current_user
-
+from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/api/messages", tags=["messages"])
 
@@ -30,6 +30,13 @@ def _profile_name(user: User) -> tuple[str, str]:
     return "", ""
 
 
+def _is_online(user: User) -> bool:
+    if not user.last_login_at:
+        return False
+
+    return datetime.utcnow() - user.last_login_at < timedelta(minutes=2)
+
+
 def _user_to_mini(user: User) -> UserMiniOut:
     nom, prenom = _profile_name(user)
 
@@ -39,8 +46,9 @@ def _user_to_mini(user: User) -> UserMiniOut:
         nom=nom,
         prenom=prenom,
         role=user.role.code_role if user.role else "",
+        is_online=_is_online(user),
+        last_seen_at=user.last_login_at,
     )
-
 
 def _require_participant(thread_id: int, user_id: int, db: Session) -> ConversationParticipant:
     participant = (

@@ -9,7 +9,8 @@ class UserMiniOut(BaseModel):
     nom: str = ""
     prenom: str = ""
     role: str = ""
-
+    is_online: bool = False
+    last_seen_at: Optional[datetime] = None
 
 class MessageAttachmentOut(BaseModel):
     id_attachment: int

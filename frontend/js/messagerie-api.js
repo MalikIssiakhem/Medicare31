@@ -139,6 +139,14 @@ function isUnread(conv) {
   return (conv.unread_count || 0) > 0;
 }
 
+function isUserOnline(user) {
+  return Boolean(user && user.is_online);
+}
+
+function convOnline(conv) {
+  return otherParticipants(conv).some(user => isUserOnline(user));
+}
+
 function isPatientConversation(conv) {
   const others = otherParticipants(conv);
 
@@ -177,6 +185,7 @@ async function init() {
     return;
   }
 
+  startHeartbeat();
   updateLoggedUserUI();
 
   try {
@@ -190,6 +199,21 @@ async function init() {
   } catch (error) {
     console.error("Erreur chargement conversations:", error);
     showToast(error.message || "Erreur de chargement");
+  }
+}
+
+function startHeartbeat() {
+  pingOnline();
+  setInterval(pingOnline, 60000);
+}
+
+async function pingOnline() {
+  try {
+    await api("/api/auth/ping", {
+      method: "POST"
+    });
+  } catch (error) {
+    console.error("Ping error:", error);
   }
 }
 
@@ -413,7 +437,7 @@ function renderConvList(list) {
 
         <div class="conv-avatar" style="background:${av.color}">
           ${escapeHtml(av.initials)}
-          <div class="online-dot"></div>
+          ${convOnline(c) ? '<div class="online-dot"></div>' : ''}
         </div>
 
         <div class="conv-body">
@@ -602,13 +626,19 @@ function renderChatHeader(conv) {
 
   header.innerHTML = `
     <div class="chat-header-avatar" style="background:${av.color}">
-      ${escapeHtml(av.initials)}
-      <div class="online-dot"></div>
-    </div>
+  ${escapeHtml(av.initials)}
+  ${convOnline(conv) ? '<div class="online-dot"></div>' : ''}
+</div>
 
     <div class="chat-header-info">
       <div class="chat-header-name">${escapeHtml(name)}</div>
-      <div class="chat-header-sub">${escapeHtml(role)} · <span style="color:var(--green);font-weight:600">En ligne</span></div>
+      <div class="chat-header-sub">
+  ${escapeHtml(role)} · ${
+    convOnline(conv)
+      ? '<span style="color:var(--green);font-weight:600">En ligne</span>'
+      : '<span>Hors ligne</span>'
+  }
+</div>
     </div>
 
     <div class="chat-header-actions">
@@ -690,7 +720,11 @@ function renderInfoPanel(conv) {
       <div class="info-avatar" style="background:${av.color}">${escapeHtml(av.initials)}</div>
       <div class="info-name">${escapeHtml(name)}</div>
       <div class="info-role">${escapeHtml(role)}</div>
-      <div class="info-online"><span></span> En ligne maintenant</div>
+      ${
+  convOnline(conv)
+    ? '<div class="info-online"><span></span> En ligne maintenant</div>'
+    : '<div style="font-size:.74rem;color:var(--text-light);font-weight:600">Hors ligne</div>'
+}
     `;
   }
 
