@@ -100,7 +100,7 @@
             >
           </li>
           <li>
-            <a href="#"
+            <a href="documents.html"
               ><svg viewBox="0 0 24 24">
                 <path
                   d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
@@ -272,7 +272,6 @@
 
     <div class="modal-overlay" id="composeModal" onclick="closeCompose(event)">
       <div class="modal-compose-wrapper" onclick="event.stopPropagation()">
-
         <div class="modal">
           <div class="modal-header">
             <div class="modal-title">
@@ -288,7 +287,9 @@
             </div>
             <button
               class="modal-close"
-              onclick="document.getElementById('composeModal').classList.remove('open')"
+              onclick="
+                document.getElementById('composeModal').classList.remove('open')
+              "
             >
               ×
             </button>
@@ -333,7 +334,11 @@
             <div style="display: flex; gap: 10px">
               <button
                 class="btn-cancel"
-                onclick="document.getElementById('composeModal').classList.remove('open')"
+                onclick="
+                  document
+                    .getElementById('composeModal')
+                    .classList.remove('open')
+                "
               >
                 Annuler
               </button>
@@ -372,7 +377,6 @@
           </div>
           <div class="contact-list" id="contactList"></div>
         </div>
-
       </div>
     </div>
 
@@ -382,7 +386,6 @@
     </div>
 
     <script src="/js/auth.js"></script>
-
 
     <script src="js/messagerie-api.js"></script>
     <script>
