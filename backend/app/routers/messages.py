@@ -328,3 +328,35 @@ def archive_conversation(
     db.commit()
 
     return {"status": "ok", "archived": archived}
+
+@router.delete("/conversations/{thread_id}")
+def delete_conversation(
+    thread_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    _require_participant(thread_id, current_user.id_user, db)
+
+    thread = db.query(ConversationThread).filter(
+        ConversationThread.id_thread == thread_id
+    ).first()
+
+    if not thread:
+        raise HTTPException(status_code=404, detail="Conversation introuvable")
+
+    db.query(MessageAttachment).join(Message).filter(
+        Message.id_thread == thread_id
+    ).delete(synchronize_session=False)
+
+    db.query(Message).filter(
+        Message.id_thread == thread_id
+    ).delete(synchronize_session=False)
+
+    db.query(ConversationParticipant).filter(
+        ConversationParticipant.id_thread == thread_id
+    ).delete(synchronize_session=False)
+
+    db.delete(thread)
+    db.commit()
+
+    return {"status": "ok", "deleted": True}
