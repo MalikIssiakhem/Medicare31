@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Tâches secrétariat</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/taches.css" />
+  </head>
+  <body>
+    <nav>
+      <a class="logo" href="index3.html">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
+        </div>
+        MediCare31
+      </a>
+
+      <div class="nav-right">
+        <button class="notif-btn" title="Notifications">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+
+        <div class="user-chip" onclick="logout()" title="Se déconnecter">
+          <div class="avatar" id="user-nav-avatar">SC</div>
+          <span id="user-nav-name">Secrétaire</span>
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+        </div>
+      </div>
+    </nav>
+
+    <div class="app">
+      <aside>
+        <ul class="side-nav">
+          <li>
+            <a href="index3.html">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              Tableau de bord
+            </a>
+          </li>
+          <li>
+            <a href="calendrier.html">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              Agenda
+            </a>
+          </li>
+          <li>
+            <a href="appels.html">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.12.89.32 1.76.59 2.59a2 2 0 0 1-.45 2.11L9 10.5a16 16 0 0 0 4.5 4.5l1.08-1.08a2 2 0 0 1 2.11-.45c.83.27 1.7.47 2.59.59A2 2 0 0 1 22 16.92z"
+                />
+              </svg>
+              Appels
+            </a>
+          </li>
+          <li>
+            <a href="patients.html">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              Patients
+            </a>
+          </li>
+          <li>
+            <a href="documents.html">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+              Documents
+            </a>
+          </li>
+          <li>
+            <a href="messagerie.html">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                />
+              </svg>
+              Messagerie
+            </a>
+          </li>
+          <li class="active">
+            <a href="taches.html">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 7h16" />
+                <path d="M4 12h10" />
+                <path d="M4 17h16" />
+                <path d="M17 14l3-3 3 3" transform="translate(-12 -8)" />
+              </svg>
+              Tâches
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+      <main>
+        <div class="page-header">
+          <div class="page-title">
+            <h1>Tâches secrétariat</h1>
+            <p>
+              Organise les actions du secrétariat et suis l’avancement de chaque
+              dossier.
+            </p>
+          </div>
+          <div class="quick-actions">
+            <button class="btn-primary" onclick="addTask()">
+              <svg viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Nouvelle tâche
+            </button>
+            <button class="btn-secondary" onclick="markAllDone()">
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Tout terminer
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Tâches totales</div>
+            <div class="stat-row">
+              <span class="stat-num" id="totalTasks">7</span>
+              <div class="sparkline">
+                <svg viewBox="0 0 72 30">
+                  <path
+                    d="M0,20 C8,18 18,12 28,16 C36,18 44,10 56,12 C64,14 70,8 72,10"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">À faire</div>
+            <div class="stat-row">
+              <span class="stat-num" id="pendingTasks">4</span>
+              <div class="sparkline">
+                <svg viewBox="0 0 72 30">
+                  <path
+                    d="M0,22 C10,19 20,14 30,16 C40,18 50,12 60,15 C68,17 72,16 72,16"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Urgent</div>
+            <div class="stat-row">
+              <span class="stat-num" id="urgentTasks">2</span>
+              <div class="sparkline">
+                <svg viewBox="0 0 72 30">
+                  <path
+                    d="M0,18 C10,16 20,22 30,19 C40,17 50,23 60,15 C70,12 72,14 72,14"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="card">
+            <div class="card-title">Filtrer les tâches</div>
+            <div class="filter-bar">
+              <button
+                class="filter-btn active"
+                data-filter="all"
+                onclick="filterTasks('all')"
+              >
+                Toutes
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="pending"
+                onclick="filterTasks('pending')"
+              >
+                En attente
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="done"
+                onclick="filterTasks('done')"
+              >
+                Terminées
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="urgent"
+                onclick="filterTasks('urgent')"
+              >
+                Urgentes
+              </button>
+            </div>
+            <div class="task-list">
+              <div
+                class="task-item"
+                data-status="pending"
+                data-priority="normal"
+              >
+                <div class="task-cb" onclick="toggleTask(this)">
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div class="task-content">
+                  <span class="task-label"
+                    >Relancer le laboratoire pour ordonnance</span
+                  >
+                  <span class="task-meta">Patient : Claire Martin</span>
+                </div>
+                <span class="badge badge-gold">Urgent</span>
+              </div>
+
+              <div
+                class="task-item"
+                data-status="pending"
+                data-priority="normal"
+              >
+                <div class="task-cb" onclick="toggleTask(this)">
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div class="task-content">
+                  <span class="task-label"
+                    >Envoyer le dossier d’admission au médecin</span
+                  >
+                  <span class="task-meta">Service : Accueil</span>
+                </div>
+                <span class="badge badge-blue">Normal</span>
+              </div>
+
+              <div class="task-item" data-status="done" data-priority="normal">
+                <div class="task-cb checked" onclick="toggleTask(this)">
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div class="task-content">
+                  <span class="task-label done"
+                    >Préparer les dossiers pour la réunion de 10h</span
+                  >
+                  <span class="task-meta">Salle d’attente</span>
+                </div>
+                <span class="badge badge-green">Fait</span>
+              </div>
+
+              <div
+                class="task-item"
+                data-status="pending"
+                data-priority="urgent"
+              >
+                <div class="task-cb" onclick="toggleTask(this)">
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div class="task-content">
+                  <span class="task-label"
+                    >Appeler la pharmacie pour l’ordonnance urgente</span
+                  >
+                  <span class="task-meta">Patient : Marc Dupont</span>
+                </div>
+                <span class="badge badge-gold">Urgent</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-secondary">
+            <div class="card-title">Notes rapides</div>
+            <div class="note">
+              <p>
+                Rappel : vérifier les cartes Vitale avant 11h pour les nouveaux
+                patients.
+              </p>
+            </div>
+            <div class="note">
+              <p>
+                Astuce : utilise le bouton <strong>Nouvelle tâche</strong> pour
+                ajouter une action depuis le tableau de bord.
+              </p>
+            </div>
+            <a class="card-link" href="index3.html"
+              >Retour au tableau de bord secrétariat</a
+            >
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/taches.js"></script>
+  </body>
+</html>
