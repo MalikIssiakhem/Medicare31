@@ -1,4 +1,4 @@
-authGuard();
+staffGuard();
 function toggleTask(cb) {
   cb.classList.toggle("checked");
   const label = cb.parentElement.querySelector(".task-label");

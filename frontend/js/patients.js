@@ -1,4 +1,4 @@
-authGuard();
+staffGuard();
 
 const COLORS = [
   "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444",

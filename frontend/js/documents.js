@@ -1,4 +1,4 @@
-authGuard();
+staffGuard();
 initUserNav();
 
 const TYPE_LABELS = {
