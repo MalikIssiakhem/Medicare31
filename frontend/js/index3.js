@@ -37,8 +37,7 @@ function checkInPatient() {
 }
 
 document.querySelectorAll(".nav-links a, .side-nav a").forEach((a) => {
-  a.addEventListener("click", (e) => {
-    e.preventDefault();
+  a.addEventListener("click", () => {
     const group = a.closest("ul");
     group.querySelectorAll("li").forEach((li) => li.classList.remove("active"));
     group.querySelectorAll("a").forEach((x) => x.classList.remove("active"));

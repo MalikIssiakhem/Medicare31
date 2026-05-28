@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Appels</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/appels.css" />
+  </head>
+  <body>
+    <nav>
+      <a class="logo" href="index3.html">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
+        </div>
+        MediCare31
+      </a>
+
+      <div class="nav-actions">
+        <a class="nav-link" href="index3.html">Dashboard</a>
+        <a class="nav-link" href="calendrier.html">Agenda</a>
+        <a class="nav-link" href="patients.html">Patients</a>
+        <a class="nav-link" href="documents.html">Documents</a>
+      </div>
+    </nav>
+
+    <main class="page">
+      <div class="page-header">
+        <div>
+          <h1 class="title">Journal des appels</h1>
+          <p class="subtitle">
+            Suivi des appels entrants, sortants, urgents et à rappeler.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button class="btn secondary" type="button">Nouveau rappel</button>
+          <button class="btn" type="button">Ajouter un appel</button>
+        </div>
+      </div>
+
+      <section class="stats-grid">
+        <article class="card card-padding">
+          <div class="stat-label">Appels à traiter</div>
+          <div class="stat-value">9</div>
+        </article>
+        <article class="card card-padding">
+          <div class="stat-label">À rappeler</div>
+          <div class="stat-value">4</div>
+        </article>
+        <article class="card card-padding">
+          <div class="stat-label">Urgents</div>
+          <div class="stat-value">2</div>
+        </article>
+        <article class="card card-padding">
+          <div class="stat-label">Traités</div>
+          <div class="stat-value">18</div>
+        </article>
+      </section>
+
+      <section class="grid">
+        <article class="card card-padding">
+          <h2 class="section-title">Derniers appels</h2>
+
+          <div class="call-list">
+            <article class="call-item">
+              <div class="call-icon red">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div class="call-name">Thomas Lambert</div>
+                <div class="call-meta">
+                  Rappeler pour les résultats · 10 min
+                </div>
+              </div>
+              <div class="call-actions">
+                <span class="chip red">Urgent</span>
+                <span class="chip blue">À traiter</span>
+              </div>
+            </article>
+
+            <article class="call-item">
+              <div class="call-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.35 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div class="call-name">Laura Moreau</div>
+                <div class="call-meta">Demande de rendez-vous · Hier</div>
+              </div>
+              <div class="call-actions">
+                <span class="chip blue">Entrant</span>
+                <span class="chip gold">À rappeler</span>
+              </div>
+            </article>
+
+            <article class="call-item">
+              <div class="call-icon green">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div>
+                <div class="call-name">Pharmacie Centrale</div>
+                <div class="call-meta">Ordonnance transmise · Traité</div>
+              </div>
+              <div class="call-actions">
+                <span class="chip green">Traité</span>
+              </div>
+            </article>
+          </div>
+        </article>
+
+        <aside class="card card-padding">
+          <h2 class="section-title">Fonctionnalités attendues</h2>
+          <div class="list">
+            <div class="list-item">
+              <div class="list-top">
+                <span>Filtrer les appels</span>
+                <span class="pill green">Date / Statut</span>
+              </div>
+              <div class="list-sub">
+                Afficher uniquement les appels urgents, à rappeler ou traités.
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-top">
+                <span>Relier à un patient</span>
+                <span class="pill gold">Dossier</span>
+              </div>
+              <div class="list-sub">
+                Chaque appel peut être associé à une fiche patient.
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-top">
+                <span>Notes et suivi</span>
+                <span class="pill red">Rappel</span>
+              </div>
+              <div class="list-sub">
+                Ajouter un commentaire, un statut et une échéance de rappel.
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section style="margin-top: 18px" class="grid">
+        <article class="card card-padding">
+          <h2 class="section-title">Liens rapides</h2>
+          <div class="quick-links">
+            <a class="quick-link" href="index3.html">
+              Retour au dashboard secrétariat
+              <span>→</span>
+            </a>
+            <a class="quick-link" href="calendrier.html">
+              Ouvrir l’agenda
+              <span>→</span>
+            </a>
+            <a class="quick-link" href="patients.html">
+              Voir les patients
+              <span>→</span>
+            </a>
+            <a class="quick-link" href="documents.html">
+              Ouvrir les documents
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+
+        <aside class="card card-padding">
+          <h2 class="section-title">À brancher plus tard</h2>
+          <div class="list">
+            <div class="list-item">
+              <div class="list-top">
+                <span>Nouvel appel</span>
+                <span class="pill blue">Formulaire</span>
+              </div>
+              <div class="list-sub">
+                Ajouter un flux de création et d’édition des appels.
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-top">
+                <span>Historique complet</span>
+                <span class="pill gold">API</span>
+              </div>
+              <div class="list-sub">
+                Raccorder le journal à une source de données persistante.
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <footer>© 2024 MediCare31 · Hébergement certifié HDS</footer>
+  </body>
+</html>

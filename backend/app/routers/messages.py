@@ -17,7 +17,7 @@ from app.schemas.message import (
     ConversationCreate,
 )
 from app.services.auth import get_current_user
-
+from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/api/messages", tags=["messages"])
 
@@ -30,6 +30,13 @@ def _profile_name(user: User) -> tuple[str, str]:
     return "", ""
 
 
+def _is_online(user: User) -> bool:
+    if not user.last_login_at:
+        return False
+
+    return datetime.utcnow() - user.last_login_at < timedelta(minutes=2)
+
+
 def _user_to_mini(user: User) -> UserMiniOut:
     nom, prenom = _profile_name(user)
 
@@ -39,8 +46,9 @@ def _user_to_mini(user: User) -> UserMiniOut:
         nom=nom,
         prenom=prenom,
         role=user.role.code_role if user.role else "",
+        is_online=_is_online(user),
+        last_seen_at=user.last_login_at,
     )
-
 
 def _require_participant(thread_id: int, user_id: int, db: Session) -> ConversationParticipant:
     participant = (
@@ -328,3 +336,35 @@ def archive_conversation(
     db.commit()
 
     return {"status": "ok", "archived": archived}
+
+@router.delete("/conversations/{thread_id}")
+def delete_conversation(
+    thread_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    _require_participant(thread_id, current_user.id_user, db)
+
+    thread = db.query(ConversationThread).filter(
+        ConversationThread.id_thread == thread_id
+    ).first()
+
+    if not thread:
+        raise HTTPException(status_code=404, detail="Conversation introuvable")
+
+    db.query(MessageAttachment).join(Message).filter(
+        Message.id_thread == thread_id
+    ).delete(synchronize_session=False)
+
+    db.query(Message).filter(
+        Message.id_thread == thread_id
+    ).delete(synchronize_session=False)
+
+    db.query(ConversationParticipant).filter(
+        ConversationParticipant.id_thread == thread_id
+    ).delete(synchronize_session=False)
+
+    db.delete(thread)
+    db.commit()
+
+    return {"status": "ok", "deleted": True}
