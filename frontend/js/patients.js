@@ -1,237 +1,145 @@
 authGuard();
-// ═══ DATA ═══
+
 const COLORS = [
-  "#3b82f6",
-  "#10b981",
-  "#8b5cf6",
-  "#f59e0b",
-  "#ef4444",
-  "#14b8a6",
-  "#f97316",
-  "#6366f1",
-  "#ec4899",
-  "#0891b2",
+  "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444",
+  "#14b8a6", "#f97316", "#6366f1", "#ec4899", "#0891b2",
 ];
 
-let patients = [
-  {
-    id: 1,
-    nom: "Durand",
-    prenom: "Sophie",
-    ddn: "1985-03-12",
-    sexe: "Féminin",
-    dossier: "P-2024-0721",
-    medecin: "Dr. Jean Martin",
-    statut: "Actif",
-    lastVisit: "02/06/2025",
-    tel: "06 55 44 33 22",
-    email: "sophie.durand@email.fr",
-    ville: "Toulouse",
-    groupe: "A+",
-    allergie: "Aucune connue",
-  },
-  {
-    id: 2,
-    nom: "Robert",
-    prenom: "Alain",
-    ddn: "1962-07-28",
-    sexe: "Masculin",
-    dossier: "P-2024-0834",
-    medecin: "Dr. Jean Martin",
-    statut: "Suivi",
-    lastVisit: "02/06/2025",
-    tel: "06 12 45 78 90",
-    email: "alain.robert@email.fr",
-    ville: "Toulouse",
-    groupe: "O+",
-    allergie: "Pénicilline",
-  },
-  {
-    id: 3,
-    nom: "Lefèvre",
-    prenom: "Julie",
-    ddn: "1990-11-05",
-    sexe: "Féminin",
-    dossier: "P-2024-0902",
-    medecin: "Dr. Sophie Blanc",
-    statut: "Actif",
-    lastVisit: "28/05/2025",
-    tel: "07 88 21 36 54",
-    email: "julie.lefevre@email.fr",
-    ville: "Toulouse",
-    groupe: "B+",
-    allergie: "Aspirine",
-  },
-  {
-    id: 4,
-    nom: "Dupont",
-    prenom: "Marc",
-    ddn: "1978-09-15",
-    sexe: "Masculin",
-    dossier: "P-2024-1182",
-    medecin: "Dr. Ahmed Karim",
-    statut: "Nouveau",
-    lastVisit: "01/06/2025",
-    tel: "06 98 76 54 32",
-    email: "marc.dupont@email.fr",
-    ville: "Blagnac",
-    groupe: "AB-",
-    allergie: "Aucune connue",
-  },
-  {
-    id: 5,
-    nom: "Martin",
-    prenom: "Claire",
-    ddn: "1995-04-22",
-    sexe: "Féminin",
-    dossier: "P-2024-1203",
-    medecin: "Dr. Marie Leclerc",
-    statut: "Actif",
-    lastVisit: "03/06/2025",
-    tel: "06 33 22 11 44",
-    email: "claire.martin@email.fr",
-    ville: "Colomiers",
-    groupe: "O-",
-    allergie: "Latex",
-  },
-  {
-    id: 6,
-    nom: "Lefebvre",
-    prenom: "Paul",
-    ddn: "1955-12-01",
-    sexe: "Masculin",
-    dossier: "P-2024-1098",
-    medecin: "Dr. Jean Martin",
-    statut: "Suivi",
-    lastVisit: "04/06/2025",
-    tel: "05 61 22 33 44",
-    email: "paul.lefebvre@email.fr",
-    ville: "Toulouse",
-    groupe: "A-",
-    allergie: "Aucune connue",
-  },
-  {
-    id: 7,
-    nom: "Lambert",
-    prenom: "Thomas",
-    ddn: "1988-06-17",
-    sexe: "Masculin",
-    dossier: "P-2024-1312",
-    medecin: "Dr. Sophie Blanc",
-    statut: "Actif",
-    lastVisit: "10/05/2025",
-    tel: "06 77 88 99 00",
-    email: "thomas.lambert@email.fr",
-    ville: "Muret",
-    groupe: "B-",
-    allergie: "Aucune connue",
-  },
-  {
-    id: 8,
-    nom: "Moreau",
-    prenom: "Laura",
-    ddn: "2001-02-14",
-    sexe: "Féminin",
-    dossier: "P-2024-0934",
-    medecin: "Dr. Jean Martin",
-    statut: "Actif",
-    lastVisit: "28/04/2025",
-    tel: "06 44 55 66 77",
-    email: "laura.moreau@email.fr",
-    ville: "Toulouse",
-    groupe: "O+",
-    allergie: "Iode",
-  },
-  {
-    id: 9,
-    nom: "Bernard",
-    prenom: "Henri",
-    ddn: "1948-08-30",
-    sexe: "Masculin",
-    dossier: "P-2023-0415",
-    medecin: "Dr. Ahmed Karim",
-    statut: "Inactif",
-    lastVisit: "15/12/2024",
-    tel: "05 61 44 55 66",
-    email: "henri.bernard@email.fr",
-    ville: "Toulouse",
-    groupe: "A+",
-    allergie: "Aucune connue",
-  },
-  {
-    id: 10,
-    nom: "Garcia",
-    prenom: "Isabelle",
-    ddn: "1972-05-09",
-    sexe: "Féminin",
-    dossier: "P-2024-0656",
-    medecin: "Dr. Marie Leclerc",
-    statut: "Actif",
-    lastVisit: "20/05/2025",
-    tel: "06 22 33 44 55",
-    email: "isabelle.garcia@email.fr",
-    ville: "Balma",
-    groupe: "AB+",
-    allergie: "Sulfamides",
-  },
-  {
-    id: 11,
-    nom: "Petit",
-    prenom: "Antoine",
-    ddn: "1982-10-23",
-    sexe: "Masculin",
-    dossier: "P-2024-1024",
-    medecin: "Dr. Jean Martin",
-    statut: "Actif",
-    lastVisit: "18/05/2025",
-    tel: "06 11 22 33 44",
-    email: "antoine.petit@email.fr",
-    ville: "Toulouse",
-    groupe: "O+",
-    allergie: "Aucune connue",
-  },
-  {
-    id: 12,
-    nom: "Giraud",
-    prenom: "Nathalie",
-    ddn: "1968-01-19",
-    sexe: "Féminin",
-    dossier: "P-2023-0789",
-    medecin: "Dr. Sophie Blanc",
-    statut: "Suivi",
-    lastVisit: "12/05/2025",
-    tel: "06 99 00 11 22",
-    email: "nathalie.giraud@email.fr",
-    ville: "Toulouse",
-    groupe: "B+",
-    allergie: "Aucune connue",
-  },
-];
-let nextId = 13;
+const STATUS_TO_API = { Actif: "actif", Nouveau: "nouveau", Suivi: "suivi", Inactif: "inactif" };
+const STATUS_TO_DISPLAY = { actif: "Actif", nouveau: "Nouveau", suivi: "Suivi", inactif: "Inactif" };
+const SORT_FIELD_MAP = {
+  name: "nom",
+  dossier: "numero_dossier",
+  ddn: "date_naissance",
+  lastVisit: "created_at",
+  statut: "statut_patient",
+};
+
+let patientsCache = [];
+let totalPatients = 0;
 let editingId = null;
 let currentView = "table";
 let currentPage = 1;
 const PER_PAGE = 8;
-let sortField = "nom",
-  sortAsc = true;
+let sortField = "nom";
+let sortAsc = true;
 
-// ═══ INIT ═══
-renderAll();
-
-function renderAll() {
-  filterPatients();
+function adaptPatient(p) {
+  return {
+    id: p.id_patient,
+    dossier: p.numero_dossier,
+    civ: p.civilite,
+    nom: p.nom,
+    prenom: p.prenom,
+    ddn: p.date_naissance,
+    sexe: p.sexe,
+    secu: p.numero_securite_sociale,
+    email: p.email,
+    tel: p.telephone_principal,
+    tel2: p.telephone_secondaire,
+    adresse: p.adresse_ligne1,
+    cp: p.code_postal,
+    ville: p.ville,
+    groupe: p.groupe_sanguin,
+    allergie: p.allergie_resume,
+    statut: STATUS_TO_DISPLAY[p.statut_patient] || p.statut_patient || "Actif",
+    medecin_id: p.medecin_traitant_id,
+    medecin: null,
+    lastVisit: null,
+  };
 }
 
-function getColor(id) {
-  return COLORS[(id - 1) % COLORS.length];
+async function loadStats() {
+  const res = await fetch("/api/patients/stats", { headers: { Authorization: `Bearer ${getToken()}` } });
+  if (!res.ok) return;
+  const s = await res.json();
+  document.getElementById("statNouveaux").textContent = s.nouveaux_ce_mois;
+  document.getElementById("statRdv").textContent = s.rdv_cette_semaine;
+  document.getElementById("statSuivis").textContent = s.suivis_actifs;
 }
-function initials(p) {
-  return (p.prenom[0] + p.nom[0]).toUpperCase();
+
+async function loadMedecins() {
+  const res = await fetch("/api/staff/medecins", { headers: { Authorization: `Bearer ${getToken()}` } });
+  if (!res.ok) return;
+  const medecins = await res.json();
+
+  const filterSelect = document.getElementById("filterDoc");
+  const formSelect = document.getElementById("fMedecin");
+
+  medecins.forEach((m) => {
+    const label = [m.civilite, m.prenom, m.nom].filter(Boolean).join(" ");
+
+    const optFilter = document.createElement("option");
+    optFilter.value = m.id_staff;
+    optFilter.textContent = label;
+    filterSelect.appendChild(optFilter);
+
+    const optForm = document.createElement("option");
+    optForm.value = m.id_staff;
+    optForm.textContent = label;
+    formSelect.appendChild(optForm);
+  });
 }
+
+let searchTimer = null;
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { currentPage = 1; loadPatients(); }, 300);
+}
+
+async function loadPatients() {
+  const search = document.getElementById("searchInput").value.trim();
+  const statutRaw = document.getElementById("filterStatus").value;
+  const statut = STATUS_TO_API[statutRaw] || "";
+  const skip = (currentPage - 1) * PER_PAGE;
+  const apiSort = SORT_FIELD_MAP[sortField] || sortField;
+  const sortDir = sortAsc ? "asc" : "desc";
+
+  const medecinId = document.getElementById("filterDoc").value;
+
+  const params = new URLSearchParams({ skip, limit: PER_PAGE, sort_by: apiSort, sort_dir: sortDir });
+  if (search) params.set("search", search);
+  if (statut) params.set("statut", statut);
+  if (medecinId) params.set("medecin_traitant_id", medecinId);
+
+  const headers = { Authorization: `Bearer ${getToken()}` };
+
+  const [listRes, countRes] = await Promise.all([
+    fetch(`/api/patients/?${params}`, { headers }),
+    fetch(`/api/patients/count?${params}`, { headers }),
+  ]);
+
+  if (!listRes.ok || !countRes.ok) {
+    showToast("Erreur lors du chargement des patients");
+    return;
+  }
+
+  patientsCache = (await listRes.json()).map(adaptPatient);
+  totalPatients = (await countRes.json()).total;
+
+  document.getElementById("statTotal").textContent = totalPatients;
+
+  if (currentView === "table") renderTable(patientsCache, totalPatients);
+  else renderGrid(patientsCache);
+}
+
+function filterPatients() {
+  currentPage = 1;
+  loadPatients();
+}
+
+function sortBy(field) {
+  if (sortField === field) sortAsc = !sortAsc;
+  else { sortField = field; sortAsc = true; }
+  currentPage = 1;
+  loadPatients();
+}
+
+function getColor(id) { return COLORS[(id - 1) % COLORS.length]; }
+function initials(p) { return ((p.prenom[0] || "") + (p.nom[0] || "")).toUpperCase(); }
 function age(ddn) {
   if (!ddn) return "—";
-  const d = new Date(ddn);
-  const now = new Date();
+  const d = new Date(ddn), now = new Date();
   let a = now.getFullYear() - d.getFullYear();
   if (now < new Date(now.getFullYear(), d.getMonth(), d.getDate())) a--;
   return a;
@@ -241,74 +149,21 @@ function fmtDdn(ddn) {
   const [y, m, d] = ddn.split("-");
   return `${d}/${m}/${y}`;
 }
-
 function statusBadge(s) {
-  const map = {
-    Actif: "badge-green",
-    Nouveau: "badge-blue",
-    Suivi: "badge-gold",
-    Inactif: "badge-grey",
-  };
+  const map = { Actif: "badge-green", Nouveau: "badge-blue", Suivi: "badge-gold", Inactif: "badge-grey" };
   return `<span class="badge ${map[s] || "badge-grey"}">${s}</span>`;
 }
 
-// ═══ FILTER & RENDER ═══
-function filterPatients() {
-  const q = document.getElementById("searchInput").value.toLowerCase();
-  const sta = document.getElementById("filterStatus").value;
-  const doc = document.getElementById("filterDoc").value;
+function renderTable(list, total) {
+  const pages = Math.ceil(total / PER_PAGE) || 1;
 
-  let list = patients.filter((p) => {
-    const full = `${p.prenom} ${p.nom} ${p.dossier}`.toLowerCase();
-    return (
-      (!q || full.includes(q)) &&
-      (!sta || p.statut === sta) &&
-      (!doc || p.medecin === doc)
-    );
-  });
-
-  list.sort((a, b) => {
-    let va = a[sortField] || "",
-      vb = b[sortField] || "";
-    if (sortField === "name") {
-      va = a.nom;
-      vb = b.nom;
-    }
-    return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-  });
-
-  document.getElementById("statTotal").textContent = patients.length;
-
-  if (currentView === "table") renderTable(list);
-  else renderGrid(list);
-}
-
-function sortBy(field) {
-  if (sortField === field) sortAsc = !sortAsc;
-  else {
-    sortField = field;
-    sortAsc = true;
-  }
-  filterPatients();
-}
-
-// ═══ TABLE ═══
-function renderTable(list) {
-  const total = list.length;
-  const pages = Math.ceil(total / PER_PAGE);
-  if (currentPage > pages) currentPage = 1;
-  const slice = list.slice(
-    (currentPage - 1) * PER_PAGE,
-    currentPage * PER_PAGE,
-  );
-
-  document.getElementById("tableBody").innerHTML = slice
-    .map(
-      (p) => `
+  document.getElementById("tableBody").innerHTML = list.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-light)">Aucun patient trouvé</td></tr>`
+    : list.map((p) => `
     <tr onclick="openModal(${p.id})">
       <td><div class="patient-cell">
         <div class="pat-av" style="background:${getColor(p.id)}">${initials(p)}</div>
-        <div><div class="pat-name">${p.prenom} ${p.nom}</div><div class="pat-id">${p.email}</div></div>
+        <div><div class="pat-name">${p.prenom} ${p.nom}</div><div class="pat-id">${p.email || "—"}</div></div>
       </div></td>
       <td class="td-light">${p.dossier}</td>
       <td class="td-light">${fmtDdn(p.ddn)} <span class="td-lighter">(${age(p.ddn)} ans)</span></td>
@@ -321,13 +176,14 @@ function renderTable(list) {
         <button class="icon-btn" title="Rendez-vous" onclick="showToast('Agenda ouvert')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
         <button class="icon-btn danger" title="Supprimer" onclick="confirmDelete(${p.id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
       </div></td>
-    </tr>`,
-    )
-    .join("");
+    </tr>`).join("");
 
-  // Pagination
-  document.getElementById("pageInfo").textContent =
-    `${Math.min((currentPage - 1) * PER_PAGE + 1, total)}–${Math.min(currentPage * PER_PAGE, total)} sur ${total} patients`;
+  const start = total === 0 ? 0 : (currentPage - 1) * PER_PAGE + 1;
+  const end = Math.min(currentPage * PER_PAGE, total);
+  document.getElementById("pageInfo").textContent = total === 0
+    ? "Aucun résultat"
+    : `${start}–${end} sur ${total} patients`;
+
   const pb = document.getElementById("pageBtns");
   pb.innerHTML = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""} style="opacity:${currentPage === 1 ? 0.4 : 1}"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>`;
   for (let i = 1; i <= pages; i++)
@@ -336,18 +192,16 @@ function renderTable(list) {
 }
 
 function changePage(p) {
-  const total = patients.length;
-  const pages = Math.ceil(total / PER_PAGE);
+  const pages = Math.ceil(totalPatients / PER_PAGE) || 1;
   if (p < 1 || p > pages) return;
   currentPage = p;
-  filterPatients();
+  loadPatients();
 }
 
-// ═══ GRID ═══
 function renderGrid(list) {
-  document.getElementById("patientGrid").innerHTML = list
-    .map(
-      (p) => `
+  document.getElementById("patientGrid").innerHTML = list.length === 0
+    ? `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-light)">Aucun patient trouvé</div>`
+    : list.map((p) => `
     <div class="patient-card" onclick="openModal(${p.id})">
       <div class="pc-top">
         <div class="pc-avatar" style="background:${getColor(p.id)}">${initials(p)}</div>
@@ -370,42 +224,30 @@ function renderGrid(list) {
           <button class="pc-btn ghost" onclick="event.stopPropagation();showToast('Messagerie ouverte')">Message</button>
         </div>
       </div>
-    </div>`,
-    )
-    .join("");
+    </div>`).join("");
 }
 
-// ═══ VIEW SWITCH ═══
 function setView(v) {
   currentView = v;
   document.getElementById("vTable").classList.toggle("active", v === "table");
   document.getElementById("vGrid").classList.toggle("active", v === "grid");
-  document.getElementById("tableView").style.display =
-    v === "table" ? "block" : "none";
-  document.getElementById("gridView").style.display =
-    v === "grid" ? "block" : "none";
-  filterPatients();
+  document.getElementById("tableView").style.display = v === "table" ? "block" : "none";
+  document.getElementById("gridView").style.display = v === "grid" ? "block" : "none";
+  loadPatients();
 }
 
-// ═══ MODAL ═══
 let activeTab = 0;
 function openModal(id) {
   editingId = id || null;
   activeTab = 0;
 
-  // Reset tabs
-  document
-    .querySelectorAll(".modal-tab")
-    .forEach((t, i) => t.classList.toggle("active", i === 0));
-  document
-    .querySelectorAll(".tab-panel")
-    .forEach((p, i) => p.classList.toggle("active", i === 0));
+  document.querySelectorAll(".modal-tab").forEach((t, i) => t.classList.toggle("active", i === 0));
+  document.querySelectorAll(".tab-panel").forEach((p, i) => p.classList.toggle("active", i === 0));
 
   if (id) {
-    const p = patients.find((x) => x.id === id);
+    const p = patientsCache.find((x) => x.id === id);
     if (!p) return;
-    document.getElementById("modalTitleText").textContent =
-      `${p.prenom} ${p.nom}`;
+    document.getElementById("modalTitleText").textContent = `${p.prenom} ${p.nom}`;
     document.getElementById("btnDelete").style.display = "flex";
     document.getElementById("fCiv").value = p.civ || "M.";
     document.getElementById("fNom").value = p.nom || "";
@@ -413,50 +255,31 @@ function openModal(id) {
     document.getElementById("fDdn").value = p.ddn || "";
     document.getElementById("fEmail").value = p.email || "";
     document.getElementById("fTel").value = p.tel || "";
+    document.getElementById("fTel2").value = p.tel2 || "";
     document.getElementById("fAdresse").value = p.adresse || "";
     document.getElementById("fCp").value = p.cp || "";
     document.getElementById("fVille").value = p.ville || "";
-    document.getElementById("fMedecin").value = p.medecin || "";
+    document.getElementById("fMedecin").value = p.medecin_id || "";
     document.getElementById("fStatut").value = p.statut || "Actif";
-    document.getElementById("fMutuelle").value = p.mutuelle || "";
+    document.getElementById("fMutuelle").value = "";
     document.getElementById("fGroupe").value = p.groupe || "";
     document.getElementById("fAllergie").value = p.allergie || "";
-    document.getElementById("fNotes").value = p.notes || "";
+    document.getElementById("fNotes").value = "";
     document.getElementById("fSexe").value = p.sexe || "";
-    document.getElementById("fTaille").value = p.taille || "";
-    document.getElementById("fPoids").value = p.poids || "";
-    document.getElementById("fTA").value = p.ta || "";
-    document.getElementById("hs-taille").textContent = p.taille || "—";
-    document.getElementById("hs-poids").textContent = p.poids || "—";
-    document.getElementById("hs-ta").textContent = p.ta || "—";
+    document.getElementById("fSecu").value = p.secu || "";
+    document.getElementById("fTaille").value = "";
+    document.getElementById("fPoids").value = "";
+    document.getElementById("fTA").value = "";
+    document.getElementById("hs-taille").textContent = "—";
+    document.getElementById("hs-poids").textContent = "—";
+    document.getElementById("hs-ta").textContent = "—";
   } else {
     document.getElementById("modalTitleText").textContent = "Nouveau patient";
     document.getElementById("btnDelete").style.display = "none";
-    [
-      "fNom",
-      "fPrenom",
-      "fDdn",
-      "fEmail",
-      "fTel",
-      "fTel2",
-      "fAdresse",
-      "fCp",
-      "fVille",
-      "fMutuelle",
-      "fAllergie",
-      "fNotes",
-      "fSecu",
-      "fTaille",
-      "fPoids",
-      "fTA",
-    ].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
-    });
-    ["fCiv", "fSexe", "fGroupe", "fMedecin", "fStatut"].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.selectedIndex = 0;
-    });
+    ["fNom","fPrenom","fDdn","fEmail","fTel","fTel2","fAdresse","fCp","fVille","fMutuelle","fAllergie","fNotes","fSecu","fTaille","fPoids","fTA"]
+      .forEach((id) => { const el = document.getElementById(id); if (el) el.value = ""; });
+    ["fCiv","fSexe","fGroupe","fMedecin","fStatut"]
+      .forEach((id) => { const el = document.getElementById(id); if (el) el.selectedIndex = 0; });
     document.getElementById("hs-taille").textContent = "—";
     document.getElementById("hs-poids").textContent = "—";
     document.getElementById("hs-ta").textContent = "—";
@@ -466,12 +289,8 @@ function openModal(id) {
 
 function switchTab(i) {
   activeTab = i;
-  document
-    .querySelectorAll(".modal-tab")
-    .forEach((t, j) => t.classList.toggle("active", j === i));
-  document
-    .querySelectorAll(".tab-panel")
-    .forEach((p, j) => p.classList.toggle("active", j === i));
+  document.querySelectorAll(".modal-tab").forEach((t, j) => t.classList.toggle("active", j === i));
+  document.querySelectorAll(".tab-panel").forEach((p, j) => p.classList.toggle("active", j === i));
 }
 
 function closeModal() {
@@ -482,71 +301,80 @@ function closeModalOut(e) {
   if (e.target === document.getElementById("modalOverlay")) closeModal();
 }
 
-function savePatient() {
+async function savePatient() {
   const nom = document.getElementById("fNom").value.trim();
   const prenom = document.getElementById("fPrenom").value.trim();
-  if (!nom || !prenom) {
-    showToast("Nom et prénom obligatoires.");
+  const ddn = document.getElementById("fDdn").value;
+  if (!nom || !prenom) { showToast("Nom et prénom obligatoires."); return; }
+  if (!ddn) { showToast("Date de naissance obligatoire."); return; }
+
+  const body = {
+    civilite: document.getElementById("fCiv").value,
+    nom,
+    prenom,
+    date_naissance: ddn,
+    sexe: document.getElementById("fSexe").value || null,
+    numero_securite_sociale: document.getElementById("fSecu").value || null,
+    groupe_sanguin: document.getElementById("fGroupe").value || null,
+    allergie_resume: document.getElementById("fAllergie").value || null,
+    statut_patient: STATUS_TO_API[document.getElementById("fStatut").value] || "actif",
+    medecin_traitant_id: parseInt(document.getElementById("fMedecin").value) || null,
+    contact: {
+      email: document.getElementById("fEmail").value || null,
+      telephone_principal: document.getElementById("fTel").value || null,
+      telephone_secondaire: document.getElementById("fTel2").value || null,
+      adresse_ligne1: document.getElementById("fAdresse").value || null,
+      code_postal: document.getElementById("fCp").value || null,
+      ville: document.getElementById("fVille").value || null,
+    },
+  };
+
+  const url = editingId ? `/api/patients/${editingId}` : "/api/patients/";
+  const method = editingId ? "PUT" : "POST";
+
+  const res = await fetch(url, {
+    method,
+    headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    showToast(err.detail || "Erreur lors de l'enregistrement");
     return;
   }
 
-  const data = {
-    nom,
-    prenom,
-    civ: document.getElementById("fCiv").value,
-    ddn: document.getElementById("fDdn").value,
-    sexe: document.getElementById("fSexe").value,
-    email: document.getElementById("fEmail").value,
-    tel: document.getElementById("fTel").value,
-    adresse: document.getElementById("fAdresse").value,
-    cp: document.getElementById("fCp").value,
-    ville: document.getElementById("fVille").value,
-    medecin: document.getElementById("fMedecin").value,
-    statut: document.getElementById("fStatut").value,
-    mutuelle: document.getElementById("fMutuelle").value,
-    groupe: document.getElementById("fGroupe").value,
-    allergie: document.getElementById("fAllergie").value,
-    notes: document.getElementById("fNotes").value,
-    taille: document.getElementById("fTaille").value,
-    poids: document.getElementById("fPoids").value,
-    ta: document.getElementById("fTA").value,
-    lastVisit: new Date().toLocaleDateString("fr-FR"),
-  };
-
-  if (editingId) {
-    const idx = patients.findIndex((p) => p.id === editingId);
-    if (idx !== -1) patients[idx] = { ...patients[idx], ...data };
-    showToast("Patient mis à jour");
-  } else {
-    data.id = nextId++;
-    data.dossier = `P-${new Date().getFullYear()}-${String(data.id).padStart(4, "0")}`;
-    patients.push(data);
-    showToast("Patient créé avec succès");
-  }
+  showToast(editingId ? "Patient mis à jour" : "Patient créé avec succès");
   closeModal();
-  filterPatients();
+  loadPatients();
 }
 
-function confirmDelete(id) {
-  const p = patients.find((x) => x.id === id);
+async function confirmDelete(id) {
+  const p = patientsCache.find((x) => x.id === id);
   if (!p) return;
-  if (confirm(`Supprimer le patient ${p.prenom} ${p.nom} ?`)) {
-    patients = patients.filter((x) => x.id !== id);
-    showToast("Patient supprimé");
-    filterPatients();
-  }
+  if (!confirm(`Supprimer le patient ${p.prenom} ${p.nom} ?`)) return;
+  const res = await fetch(`/api/patients/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+  if (!res.ok) { showToast("Erreur lors de la suppression"); return; }
+  showToast("Patient supprimé");
+  loadPatients();
 }
 
-function deletePatient() {
+async function deletePatient() {
   if (!editingId) return;
-  const p = patients.find((x) => x.id === editingId);
+  const p = patientsCache.find((x) => x.id === editingId);
   if (!p) return;
-  if (confirm(`Supprimer ${p.prenom} ${p.nom} ?`)) {
-    patients = patients.filter((x) => x.id !== editingId);
-    closeModal();
-    showToast("Patient supprimé");
-    filterPatients();
-  }
+  if (!confirm(`Supprimer ${p.prenom} ${p.nom} ?`)) return;
+  const res = await fetch(`/api/patients/${editingId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+  if (!res.ok) { showToast("Erreur lors de la suppression"); return; }
+  closeModal();
+  showToast("Patient supprimé");
+  loadPatients();
 }
 
 function showToast(msg) {
@@ -556,6 +384,8 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeModal();
-});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+loadStats();
+loadMedecins();
+loadPatients();

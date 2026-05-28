@@ -168,7 +168,7 @@
               </div>
               <span class="stat-delta up">↑ 4%</span>
             </div>
-            <div class="stat-num">34</div>
+            <div class="stat-num" id="statNouveaux">—</div>
             <div class="stat-label">Nouveaux ce mois</div>
           </div>
           <div class="stat-card">
@@ -183,7 +183,7 @@
               </div>
               <span class="stat-delta up">↑ 8%</span>
             </div>
-            <div class="stat-num">18</div>
+            <div class="stat-num" id="statRdv">—</div>
             <div class="stat-label">RDV cette semaine</div>
           </div>
           <div class="stat-card">
@@ -195,7 +195,7 @@
               </div>
               <span class="stat-delta down">↓ 2%</span>
             </div>
-            <div class="stat-num">12</div>
+            <div class="stat-num" id="statSuivis">—</div>
             <div class="stat-label">Suivis actifs</div>
           </div>
         </div>
@@ -211,7 +211,7 @@
               type="text"
               id="searchInput"
               placeholder="Rechercher par nom, prénom, numéro de dossier…"
-              oninput="filterPatients()"
+              oninput="debounceSearch()"
             />
           </div>
           <select
@@ -231,10 +231,6 @@
             onchange="filterPatients()"
           >
             <option value="">Tous les médecins</option>
-            <option>Dr. Jean Martin</option>
-            <option>Dr. Sophie Blanc</option>
-            <option>Dr. Ahmed Karim</option>
-            <option>Dr. Marie Leclerc</option>
           </select>
           <div class="view-switch">
             <button
@@ -513,10 +509,6 @@
                   <div class="inp-wrap no-ico">
                     <select id="fMedecin">
                       <option value="">-- Choisir --</option>
-                      <option>Dr. Jean Martin</option>
-                      <option>Dr. Sophie Blanc</option>
-                      <option>Dr. Ahmed Karim</option>
-                      <option>Dr. Marie Leclerc</option>
                     </select>
                   </div>
                 </div>

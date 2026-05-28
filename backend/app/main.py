@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import Base, engine, SessionLocal
 import app.models  # noqa: F401
 
-from app.routers import auth, patients, messages, appointments
+from app.routers import auth, patients, messages, appointments, staff
 
 
 def _seed_roles() -> None:
@@ -82,6 +82,7 @@ app.include_router(auth.router)
 app.include_router(patients.router)
 app.include_router(messages.router)
 app.include_router(appointments.router, prefix="/api/appointments")
+app.include_router(staff.router)
 
 
 @app.get("/api/health")
