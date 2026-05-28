@@ -1,8 +1,7 @@
 authGuard();
 /* Nav / sidebar active state */
 document.querySelectorAll(".nav-links a, .side-nav a").forEach((a) => {
-  a.addEventListener("click", (e) => {
-    e.preventDefault();
+  a.addEventListener("click", () => {
     const ul = a.closest("ul");
     ul.querySelectorAll("li").forEach((li) => li.classList.remove("active"));
     ul.querySelectorAll("a").forEach((x) => x.classList.remove("active"));
