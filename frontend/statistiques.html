@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Statistiques</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/statistiques.css" />
+  </head>
+  <body>
+    <nav>
+      <a class="logo" href="index.html">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
+        </div>
+        MediCare31
+      </a>
+
+      <div class="nav-actions">
+        <a class="nav-link" href="index.html">Dashboard</a>
+        <a class="nav-link" href="calendrier.html">Agenda</a>
+        <a class="nav-link" href="patients.html">Patients</a>
+      </div>
+    </nav>
+
+    <main class="page">
+      <div class="page-header">
+        <div>
+          <h1 class="title">Statistiques</h1>
+          <p class="subtitle">
+            Suivi de l’activité, des rendez-vous, des patients et des messages.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button class="btn secondary" type="button">Exporter PDF</button>
+          <button class="btn" type="button">Exporter CSV</button>
+        </div>
+      </div>
+
+      <section class="stats-grid">
+        <article class="card card-padding">
+          <div class="stat-label">RDV du jour</div>
+          <div class="stat-value">8</div>
+        </article>
+        <article class="card card-padding">
+          <div class="stat-label">Patients actifs</div>
+          <div class="stat-value">248</div>
+        </article>
+        <article class="card card-padding">
+          <div class="stat-label">Messages non lus</div>
+          <div class="stat-value">5</div>
+        </article>
+        <article class="card card-padding">
+          <div class="stat-label">Docs en attente</div>
+          <div class="stat-value">18</div>
+        </article>
+      </section>
+
+      <section class="grid">
+        <article class="card card-padding">
+          <h2 class="section-title">Activité hebdomadaire</h2>
+          <div class="chart-box" aria-label="Graphique de statistiques">
+            <div class="bars">
+              <div class="bar" style="height: 42%"></div>
+              <div class="bar green" style="height: 64%"></div>
+              <div class="bar gold" style="height: 50%"></div>
+              <div class="bar" style="height: 78%"></div>
+              <div class="bar red" style="height: 36%"></div>
+              <div class="bar" style="height: 58%"></div>
+              <div class="bar green" style="height: 72%"></div>
+            </div>
+          </div>
+          <div class="legend">
+            <span class="legend-chip"
+              ><span class="dot"></span> Rendez-vous</span
+            >
+            <span class="legend-chip"
+              ><span class="dot green"></span> Patients</span
+            >
+            <span class="legend-chip"
+              ><span class="dot gold"></span> Messages</span
+            >
+            <span class="legend-chip"
+              ><span class="dot red"></span> Absences</span
+            >
+          </div>
+        </article>
+
+        <aside class="card card-padding">
+          <h2 class="section-title">Indicateurs clés</h2>
+          <div class="list">
+            <div class="list-item">
+              <div class="list-top">
+                <span>Taux de confirmation</span>
+                <span class="pill green">92%</span>
+              </div>
+              <div class="list-sub">
+                Les rendez-vous confirmés et honorés sont majoritaires cette
+                semaine.
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-top">
+                <span>Absentéisme</span>
+                <span class="pill red">4%</span>
+              </div>
+              <div class="list-sub">
+                Les créneaux non honorés restent faibles mais doivent être
+                suivis.
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-top">
+                <span>Documents traités</span>
+                <span class="pill gold">76%</span>
+              </div>
+              <div class="list-sub">
+                La plupart des documents entrants ont été lus ou classés.
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section style="margin-top: 18px" class="grid">
+        <article class="card card-padding">
+          <h2 class="section-title">Fonctionnalités attendues</h2>
+          <div class="list">
+            <div class="list-item">
+              <div class="list-top">
+                <span>Filtres temporels</span>
+                <span class="pill green">Jour / Semaine / Mois</span>
+              </div>
+              <div class="list-sub">
+                Permet de comparer les volumes d’activité selon la période.
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-top">
+                <span>Export</span>
+                <span class="pill gold">PDF / CSV</span>
+              </div>
+              <div class="list-sub">
+                Génération de rapports pour la gestion ou le partage interne.
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-top">
+                <span>Répartition par praticien</span>
+                <span class="pill red">À venir</span>
+              </div>
+              <div class="list-sub">
+                Visualisation de l’activité par médecin ou service.
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="card card-padding">
+          <h2 class="section-title">Liens rapides</h2>
+          <div class="quick-links">
+            <a class="quick-link" href="calendrier.html">
+              Ouvrir l’agenda
+              <span>→</span>
+            </a>
+            <a class="quick-link" href="patients.html">
+              Voir les patients
+              <span>→</span>
+            </a>
+            <a class="quick-link" href="messagerie.html">
+              Consulter les messages
+              <span>→</span>
+            </a>
+            <a class="quick-link" href="documents.html">
+              Ouvrir les documents
+              <span>→</span>
+            </a>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <footer>© 2024 MediCare31 · Hébergement certifié HDS</footer>
+  </body>
+</html>

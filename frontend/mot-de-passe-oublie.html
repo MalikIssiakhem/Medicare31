@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Mot de passe oublié</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/login.css" />
+  </head>
+  <body>
+    <div class="bg-deco"></div>
+    <div class="bg-circles">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <nav>
+      <a class="logo" href="login.html">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
+        </div>
+        MediCare31
+      </a>
+      <span class="nav-tagline">Réinitialisation de votre accès</span>
+    </nav>
+
+    <div class="page">
+      <div class="split">
+        <div class="panel-left">
+          <div class="panel-logo">
+            <div class="panel-logo-icon">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+                />
+                <rect x="10" y="7" width="4" height="10" rx="1" />
+                <rect x="7" y="10" width="10" height="4" rx="1" />
+              </svg>
+            </div>
+            MediCare31
+          </div>
+
+          <div class="panel-content">
+            <div class="panel-title">Réinitialisez votre mot de passe</div>
+            <p class="panel-desc">
+              Entrez votre adresse e-mail pour recevoir un lien de
+              réinitialisation sécurisé.
+            </p>
+            <ul class="feature-list">
+              <li>
+                <div class="feature-dot">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                    />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                </div>
+                Lien envoyé par e-mail
+              </li>
+              <li>
+                <div class="feature-dot">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4" />
+                    <path d="M12 16h.01" />
+                  </svg>
+                </div>
+                Réinitialisation sécurisée
+              </li>
+              <li>
+                <div class="feature-dot">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                Vos données restent protégées
+              </li>
+            </ul>
+          </div>
+
+          <div class="panel-footer">
+            © 2024 MediCare31 · Données protégées HDS
+          </div>
+        </div>
+
+        <div class="panel-right">
+          <div id="formView">
+            <div class="form-header">
+              <div class="form-title">Mot de passe oublié</div>
+              <div class="form-subtitle">
+                Saisissez votre adresse e-mail pour recevoir les instructions.
+              </div>
+            </div>
+
+            <div class="alert" id="alertBox">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span id="alertText"
+                >Veuillez saisir une adresse e-mail valide.</span
+              >
+            </div>
+
+            <form id="resetForm" novalidate>
+              <div class="form-group">
+                <label for="email">Adresse e-mail</label>
+                <div class="input-wrap">
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="nom@exemple.fr"
+                    autocomplete="email"
+                  />
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                    />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-submit">
+                <svg viewBox="0 0 24 24">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <polyline points="10 17 15 12 10 7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+                Envoyer le lien
+              </button>
+            </form>
+
+            <div class="divider"><span>ou</span></div>
+
+            <div class="register-row">
+              <a href="login.html">Retour à la connexion</a>
+            </div>
+          </div>
+
+          <div class="success-overlay" id="successView">
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div
+              style="
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: var(--text-dark);
+                font-family: &quot;Nunito&quot;, sans-serif;
+              "
+            >
+              Demande envoyée !
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-light)">
+              Si l’adresse existe, un lien de réinitialisation va être envoyé.
+            </div>
+            <a
+              href="login.html"
+              class="btn-submit"
+              style="text-decoration: none"
+            >
+              Retour à la connexion
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <a href="#">Mentions légales</a> ·
+      <a href="#">Politique de confidentialité</a> ·
+      <a href="#">Aide</a> &nbsp;·&nbsp; Hébergement certifié
+      <strong>HDS</strong> · © 2024 MediCare31
+    </footer>
+
+    <script>
+      const form = document.getElementById("resetForm");
+      const alertBox = document.getElementById("alertBox");
+      const alertText = document.getElementById("alertText");
+      const formView = document.getElementById("formView");
+      const successView = document.getElementById("successView");
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById("email").value.trim();
+
+        if (!email || !email.includes("@")) {
+          alertText.textContent = "Veuillez saisir une adresse e-mail valide.";
+          alertBox.classList.add("show");
+          return;
+        }
+
+        alertBox.classList.remove("show");
+        formView.style.display = "none";
+        successView.classList.add("show");
+      });
+    </script>
+  </body>
+</html>
