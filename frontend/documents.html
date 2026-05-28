@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare31 – Documents</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/documents.css" />
+  </head>
+  <body>
+    <nav>
+      <a class="logo" href="index.html">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z"
+            />
+            <rect x="10" y="7" width="4" height="10" rx="1" />
+            <rect x="7" y="10" width="10" height="4" rx="1" />
+          </svg>
+        </div>
+        MediCare31
+      </a>
+
+      <div class="nav-actions">
+        <a class="nav-link" href="index.html">Dashboard</a>
+        <a class="nav-link" href="messagerie.html">Messagerie</a>
+        <a class="nav-link" href="patients.html">Patients</a>
+      </div>
+    </nav>
+
+    <main class="page">
+      <div class="page-header">
+        <div>
+          <h1 class="title">Documents</h1>
+          <p class="subtitle">
+            Centralisez, consultez et partagez les documents médicaux et
+            administratifs.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <a class="btn secondary" href="messagerie.html">Partager</a>
+          <button class="btn" type="button">Déposer un document</button>
+        </div>
+      </div>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <div class="stat-label">Documents</div>
+          <div class="stat-value">126</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">À classer</div>
+          <div class="stat-value">18</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">Non lus</div>
+          <div class="stat-value">7</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">Partagés</div>
+          <div class="stat-value">24</div>
+        </article>
+      </section>
+
+      <section class="toolbar">
+        <input
+          class="field"
+          type="text"
+          placeholder="Rechercher un document, un patient ou un praticien…"
+        />
+        <select>
+          <option>Tous les types</option>
+          <option>Ordonnances</option>
+          <option>Analyses</option>
+          <option>Certificats</option>
+          <option>Comptes-rendus</option>
+        </select>
+        <select>
+          <option>Tous les statuts</option>
+          <option>Nouveau</option>
+          <option>Lu</option>
+          <option>Archivé</option>
+        </select>
+      </section>
+
+      <section class="grid">
+        <div class="panel">
+          <h2 class="panel-title">Derniers documents</h2>
+
+          <div class="doc-list">
+            <article class="doc-item">
+              <div class="doc-icon green">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+              </div>
+              <div>
+                <div class="doc-name">
+                  Ordonnance – Renouvellement traitement
+                </div>
+                <div class="doc-meta">
+                  Dr. Jean Martin · Paul Lefebvre · PDF · 120 Ko
+                </div>
+              </div>
+              <div class="doc-actions">
+                <span class="chip green">Lu</span>
+                <a class="chip blue" href="messagerie.html">Partager</a>
+              </div>
+            </article>
+
+            <article class="doc-item">
+              <div class="doc-icon gold">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <line x1="3" y1="9" x2="21" y2="9" />
+                  <line x1="3" y1="15" x2="21" y2="15" />
+                  <line x1="9" y1="9" x2="9" y2="21" />
+                </svg>
+              </div>
+              <div>
+                <div class="doc-name">Résultats d’analyses – Juin 2025</div>
+                <div class="doc-meta">
+                  Laboratoire Cerba · Marc Dupont · PDF · 420 Ko
+                </div>
+              </div>
+              <div class="doc-actions">
+                <span class="chip gold">À classer</span>
+                <a class="chip blue" href="patients.html">Voir patient</a>
+              </div>
+            </article>
+
+            <article class="doc-item">
+              <div class="doc-icon red">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <div>
+                <div class="doc-name">Certificat médical – Aptitude sport</div>
+                <div class="doc-meta">
+                  Dr. Jean Martin · Claire Martin · PDF · 98 Ko
+                </div>
+              </div>
+              <div class="doc-actions">
+                <span class="chip blue">Nouveau</span>
+                <a class="chip blue" href="messagerie.html">Envoyer</a>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <aside class="side-list">
+          <div class="side-card">
+            <h3>Fonctionnalités attendues</h3>
+            <p>
+              Cette page servira à consulter les pièces jointes, filtrer les
+              documents par type, les classer, les télécharger et les partager
+              avec un patient ou un praticien.
+            </p>
+          </div>
+
+          <div class="side-card">
+            <h3>Liens rapides</h3>
+            <div class="link-list">
+              <a class="link-item" href="messagerie.html">
+                Ouvrir la messagerie
+                <span>→</span>
+              </a>
+              <a class="link-item" href="patients.html">
+                Voir la fiche patient
+                <span>→</span>
+              </a>
+              <a class="link-item" href="calendrier.html">
+                Retour à l’agenda
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <footer>© 2024 MediCare31 · Hébergement certifié HDS</footer>
+  </body>
+</html>
