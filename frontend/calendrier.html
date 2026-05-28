@@ -190,6 +190,9 @@
                 >Mois
               </button>
             </div>
+            <select id="doctorSelector" class="doctor-selector hidden">
+              <option value="">Tous les médecins</option>
+            </select>
             <button class="btn-add-appt" onclick="openModal()">
               <svg viewBox="0 0 24 24">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -234,6 +237,32 @@
             ></div>
           </div>
         </div>
+
+        <!-- ═══ PENDING APPOINTMENTS ═══ -->
+        <section id="pendingAppts" class="pending-section">
+          <div class="pending-card">
+            <div class="pending-card-header">
+              <div class="pending-card-title-group">
+                <div class="pending-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div>
+                  <h3 class="pending-card-title">Rendez-vous en attente</h3>
+                  <p class="pending-card-subtitle">Ces demandes nécessitent votre validation</p>
+                </div>
+              </div>
+              <span id="pendingCount" class="pending-badge">0</span>
+            </div>
+            <div id="pendingTableBody" class="pending-list"></div>
+            <div id="pendingEmpty" class="pending-empty hidden">
+              <div class="pending-empty-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <p class="pending-empty-title">Tout est à jour</p>
+              <p class="pending-empty-sub">Aucun rendez-vous en attente de confirmation</p>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -266,22 +295,9 @@
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
-                <input
-                  type="text"
-                  id="mPatient"
-                  placeholder="Nom du patient"
-                  list="patientList"
-                />
-                <datalist id="patientList">
-                  <option>Sophie Durand</option>
-                  <option>Alain Robert</option>
-                  <option>Julie Lefèvre</option>
-                  <option>Marc Dupont</option>
-                  <option>Claire Martin</option>
-                  <option>Paul Lefebvre</option>
-                  <option>Thomas Lambert</option>
-                  <option>Laura Moreau</option>
-                </datalist>
+                <select id="mPatient">
+                  <option value="">-- Choisir un patient --</option>
+                </select>
               </div>
             </div>
             <div class="fg">
@@ -293,11 +309,7 @@
                   />
                 </svg>
                 <select id="mDoctor">
-                  <option value="">-- Choisir --</option>
-                  <option>Dr. Jean Martin</option>
-                  <option>Dr. Sophie Blanc</option>
-                  <option>Dr. Ahmed Karim</option>
-                  <option>Dr. Marie Leclerc</option>
+                  <option value="">-- Choisir un médecin --</option>
                 </select>
               </div>
             </div>
@@ -316,13 +328,6 @@
                 </svg>
                 <select id="mType">
                   <option value="">-- Type --</option>
-                  <option>Consultation générale</option>
-                  <option>Contrôle annuel</option>
-                  <option>Suivi diabète</option>
-                  <option>Suivi cholestérol</option>
-                  <option>Urgence</option>
-                  <option>Téléconsultation</option>
-                  <option>Renouvellement ordonnance</option>
                 </select>
               </div>
             </div>
@@ -390,11 +395,9 @@
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                   <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
-                <input
-                  type="text"
-                  id="mRoom"
-                  placeholder="Cabinet 1, Salle B..."
-                />
+                <select id="mRoom">
+                  <option value="">-- Aucune salle --</option>
+                </select>
               </div>
             </div>
           </div>
