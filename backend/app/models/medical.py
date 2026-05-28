@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text, Numeric
+from sqlalchemy import Boolean, Column, Integer, String, Date, DateTime, ForeignKey, Text, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db import Base
@@ -63,7 +63,11 @@ class Document(Base):
     taille_ko = Column(Integer)
     source_label = Column(String(255))
     document_date = Column(Date)
+    status = Column(String(50), default="nouveau", nullable=False)
+    is_read = Column(Boolean, default=False, nullable=False)
+    is_archived = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
+    deleted_at = Column(DateTime, nullable=True)
 
     patient = relationship("Patient", back_populates="documents")
     uploaded_by = relationship("User", foreign_keys=[id_uploaded_by_user])
