@@ -217,28 +217,7 @@
           <div class="card appts-card">
             <div class="card-title">Prochains Rendez-vous</div>
 
-            <div class="appt-row">
-              <span class="appt-time">09:00</span>
-              <div style="flex: 1">
-                <span class="appt-name">Sophie Durand</span>
-              </div>
-              <span class="badge badge-gold">En attente</span>
-            </div>
-
-            <div class="appt-row">
-              <span class="appt-time">09:30</span>
-              <div style="flex: 1">
-                <span class="appt-name">Alain Robert</span>
-              </div>
-            </div>
-
-            <div class="appt-row">
-              <span class="appt-time">10:15</span>
-              <div style="flex: 1">
-                <span class="appt-name">Julie Lefèvre</span>
-                <span class="appt-type">Contrôle annuel</span>
-              </div>
-            </div>
+            <div id="apptList"></div>
 
             <!-- Decorative doctor illustration placeholder -->
             <div class="appts-photo">
@@ -404,57 +383,9 @@
 
           <!-- DERNIERS MESSAGES -->
           <div class="card">
-            <div class="card-title" href="messagerie.html">
-              Derniers Messages
-            </div>
+            <div class="card-title">Derniers Messages</div>
 
-            <div class="msg-row">
-              <div class="msg-icon unread">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                  />
-                  <polyline points="22,6 12,13 2,6" />
-                </svg>
-              </div>
-              <div class="msg-body">
-                <span class="msg-name">Thomas Lambert</span
-                ><span class="msg-subject">Résultats d'analyses</span>
-              </div>
-              <div class="msg-time">Il y a 10 min</div>
-            </div>
-
-            <div class="msg-row">
-              <div class="msg-icon unread">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                  />
-                  <polyline points="22,6 12,13 2,6" />
-                </svg>
-              </div>
-              <div class="msg-body">
-                <span class="msg-name">Laura Moreau</span
-                ><span class="msg-subject">Demande de rendez-vous</span>
-              </div>
-              <div class="msg-time">Hier</div>
-            </div>
-
-            <div class="msg-row">
-              <div class="msg-icon read">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                  />
-                  <polyline points="14 2 14 8 20 8" />
-                </svg>
-              </div>
-              <div class="msg-body">
-                <span class="msg-name">Dr. Girard</span
-                ><span class="msg-subject">Compte-rendu de consultation</span>
-              </div>
-              <div class="msg-time bold">Il y a 2 jours</div>
-            </div>
+            <div id="msgList"></div>
 
             <a class="card-link" href="messagerie.html">
               Voir tous les messages
