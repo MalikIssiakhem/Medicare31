@@ -1,175 +1,315 @@
 authGuard();
+
+// ═══════════════════════════════════════════════
+// AUTH HELPERS
+// ═══════════════════════════════════════════════
+const TOKEN = () => getToken();
+const authHeaders = () => ({
+  'Authorization': `Bearer ${TOKEN()}`,
+  'Content-Type': 'application/json',
+});
+const currentUser = getUser();
+let currentDoctorFilter = null;
+
+async function apiFetch(url, options = {}) {
+  const res = await fetch(url, { ...options, headers: { ...authHeaders(), ...(options.headers || {}) } });
+  if (res.status === 401) {
+    logout();
+    return null;
+  }
+  return res;
+}
+
 // ═══════════════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════════════
-const DAYS_FR = [
-  "Dimanche",
-  "Lundi",
-  "Mardi",
-  "Mercredi",
-  "Jeudi",
-  "Vendredi",
-  "Samedi",
-];
-const DAYS_SHORT = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const DAYS_SHORT = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
 const MONTHS_FR = [
-  "janvier",
-  "février",
-  "mars",
-  "avril",
-  "mai",
-  "juin",
-  "juillet",
-  "août",
-  "septembre",
-  "octobre",
-  "novembre",
-  "décembre",
+  'janvier','février','mars','avril','mai','juin',
+  'juillet','août','septembre','octobre','novembre','décembre',
 ];
 
-const DOCTORS = [
-  { name: "Dr. Jean Martin", color: "#3b82f6", cls: "blue" },
-  { name: "Dr. Sophie Blanc", color: "#10b981", cls: "green" },
-  { name: "Dr. Ahmed Karim", color: "#8b5cf6", cls: "purple" },
-  { name: "Dr. Marie Leclerc", color: "#f59e0b", cls: "orange" },
-];
+let DOCTORS = [];
+let appointments = [];
+let nextId = 9000;
 
-let appointments = [
-  {
-    id: 1,
-    patient: "Sophie Durand",
-    doctor: "Dr. Jean Martin",
-    type: "Consultation générale",
-    date: "2025-06-02",
-    start: "09:00",
-    end: "09:30",
-    color: "blue",
-    status: "En attente",
-    notes: "",
-  },
-  {
-    id: 2,
-    patient: "Alain Robert",
-    doctor: "Dr. Jean Martin",
-    type: "Contrôle annuel",
-    date: "2025-06-02",
-    start: "09:30",
-    end: "10:00",
-    color: "blue",
-    status: "Confirmé",
-    notes: "",
-  },
-  {
-    id: 3,
-    patient: "Julie Lefèvre",
-    doctor: "Dr. Sophie Blanc",
-    type: "Suivi cholestérol",
-    date: "2025-06-02",
-    start: "10:15",
-    end: "11:00",
-    color: "green",
-    status: "Confirmé",
-    notes: "Patient à jeun",
-  },
-  {
-    id: 4,
-    patient: "Marc Dupont",
-    doctor: "Dr. Ahmed Karim",
-    type: "Urgence",
-    date: "2025-06-03",
-    start: "08:00",
-    end: "08:30",
-    color: "red",
-    status: "Confirmé",
-    notes: "Douleurs thoraciques",
-  },
-  {
-    id: 5,
-    patient: "Claire Martin",
-    doctor: "Dr. Marie Leclerc",
-    type: "Téléconsultation",
-    date: "2025-06-03",
-    start: "14:00",
-    end: "14:30",
-    color: "orange",
-    status: "Confirmé",
-    notes: "",
-  },
-  {
-    id: 6,
-    patient: "Paul Lefebvre",
-    doctor: "Dr. Jean Martin",
-    type: "Suivi diabète",
-    date: "2025-06-04",
-    start: "11:00",
-    end: "11:45",
-    color: "blue",
-    status: "Confirmé",
-    notes: "Apporter carnet glycémie",
-  },
-  {
-    id: 7,
-    patient: "Thomas Lambert",
-    doctor: "Dr. Sophie Blanc",
-    type: "Renouvellement ordonnance",
-    date: "2025-06-05",
-    start: "15:30",
-    end: "16:00",
-    color: "teal",
-    status: "Confirmé",
-    notes: "",
-  },
-  {
-    id: 8,
-    patient: "Laura Moreau",
-    doctor: "Dr. Ahmed Karim",
-    type: "Consultation générale",
-    date: "2025-06-06",
-    start: "09:00",
-    end: "09:30",
-    color: "purple",
-    status: "En attente",
-    notes: "",
-  },
-];
-let nextId = 9;
-
-let currentView = "week";
-let currentDate = new Date(2025, 5, 2); // June 2, 2025
-let miniDate = new Date(2025, 5, 1);
+let currentView = 'week';
+let currentDate = new Date();
+let miniDate = new Date();
 let editingId = null;
-let selectedStatus = "Confirmé";
-let selectedColor = "blue";
-let visibleDoctors = new Set(DOCTORS.map((d) => d.name));
+let selectedStatus = 'Confirmé';
+let selectedColor = 'blue';
+let visibleDoctors = new Set();
 
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
-function init() {
-  renderDoctorList();
+async function init() {
+  initUserNav();
+  await loadDoctors();
+  await loadAppointments();
   renderMiniCal();
   renderView();
   updateCurrentTimeLine();
   setInterval(updateCurrentTimeLine, 60000);
+
+  if (currentUser.role === 'secretariat' || currentUser.role === 'admin') {
+    setupDoctorSelector();
+  }
+
+  await loadPendingAppointments();
+  await populateModalSelects();
 }
 
 // ═══════════════════════════════════════════════
-// DOCTOR LIST
+// API — DOCTORS
+// ═══════════════════════════════════════════════
+async function loadDoctors() {
+  try {
+    const res = await apiFetch('/api/appointments/doctors');
+    if (!res || !res.ok) throw new Error('Erreur chargement médecins');
+    const data = await res.json();
+    DOCTORS = data.map(d => ({
+      id: d.id_staff,
+      name: `Dr. ${d.prenom} ${d.nom}`,
+      color: d.couleur_agenda || '#3b82f6',
+      cls: 'blue',
+      specialite: d.specialite,
+    }));
+    visibleDoctors = new Set(DOCTORS.map(d => d.name));
+    renderDoctorList();
+  } catch(e) {
+    console.error('Erreur chargement médecins', e);
+    DOCTORS = [];
+    visibleDoctors = new Set();
+    renderDoctorList();
+  }
+}
+
+// ═══════════════════════════════════════════════
+// MODAL SELECTS — peuplage depuis l'API
+// ═══════════════════════════════════════════════
+async function populateModalSelects() {
+  await populatePatientSelect();
+  populateDoctorSelect();
+  await populateTypeSelect();
+  await populateRoomSelect();
+}
+
+async function populatePatientSelect() {
+  try {
+    const res = await apiFetch('/api/patients/?limit=100');
+    if (!res || !res.ok) return;
+    const data = await res.json();
+    const sel = document.getElementById('mPatient');
+    sel.innerHTML = '<option value="">-- Choisir un patient --</option>';
+    data.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id_patient;
+      opt.textContent = `${p.prenom} ${p.nom}`;
+      sel.appendChild(opt);
+    });
+  } catch(e) {
+    console.error('Erreur chargement patients', e);
+  }
+}
+
+function populateDoctorSelect() {
+  const sel = document.getElementById('mDoctor');
+  sel.innerHTML = '<option value="">-- Choisir un médecin --</option>';
+  DOCTORS.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.name;
+    sel.appendChild(opt);
+  });
+}
+
+async function populateTypeSelect() {
+  try {
+    const res = await apiFetch('/api/appointments/types');
+    if (!res || !res.ok) return;
+    const data = await res.json();
+    const sel = document.getElementById('mType');
+    sel.innerHTML = '<option value="">-- Type --</option>';
+    data.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id_appointment_type;
+      opt.textContent = t.libelle;
+      sel.appendChild(opt);
+    });
+  } catch(e) {
+    console.error('Erreur chargement types', e);
+  }
+}
+
+async function populateRoomSelect() {
+  try {
+    const res = await apiFetch('/api/appointments/rooms');
+    if (!res || !res.ok) return;
+    const data = await res.json();
+    const sel = document.getElementById('mRoom');
+    sel.innerHTML = '<option value="">-- Aucune salle --</option>';
+    data.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.id_room;
+      opt.textContent = r.nom;
+      sel.appendChild(opt);
+    });
+  } catch(e) {
+    console.error('Erreur chargement salles', e);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// API — APPOINTMENTS
+// ═══════════════════════════════════════════════
+async function loadAppointments() {
+  try {
+    let url = '/api/appointments/';
+    const params = [];
+    if (currentDoctorFilter) params.push(`doctor_id=${currentDoctorFilter}`);
+    if (params.length) url += '?' + params.join('&');
+
+    const res = await apiFetch(url);
+    if (!res || !res.ok) throw new Error('Erreur chargement RDV');
+    const data = await res.json();
+
+    appointments = data.map(a => ({
+      id: a.id_appointment,
+      patient: `${a.patient_prenom} ${a.patient_nom}`,
+      doctor: `Dr. ${a.staff_prenom} ${a.staff_nom}`,
+      type: a.type_libelle || 'Consultation',
+      date: a.start_at.substring(0, 10),
+      start: a.start_at.substring(11, 16),
+      end: a.end_at.substring(11, 16),
+      color: a.couleur || 'blue',
+      status: a.statut === 'confirmé' ? 'Confirmé' : a.statut === 'annulé' ? 'Annulé' : 'En attente',
+      notes: a.notes || '',
+      room: a.room_nom || '',
+      _raw: a,
+    }));
+
+    renderView();
+  } catch(e) {
+    console.error('Erreur chargement RDV', e);
+    appointments = [];
+    renderView();
+  }
+}
+
+// ═══════════════════════════════════════════════
+// PENDING APPOINTMENTS
+// ═══════════════════════════════════════════════
+async function loadPendingAppointments() {
+  try {
+    const res = await apiFetch('/api/appointments/?statut=en_attente');
+    if (!res || !res.ok) throw new Error('Erreur');
+    const data = await res.json();
+    renderPendingTable(data);
+  } catch(e) {
+    console.error('Erreur RDV en attente', e);
+    renderPendingTable([]);
+  }
+}
+
+function renderPendingTable(list) {
+  const container = document.getElementById('pendingTableBody');
+  const empty = document.getElementById('pendingEmpty');
+  const badge = document.getElementById('pendingCount');
+  badge.textContent = list.length;
+
+  if (!list.length) {
+    container.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  container.innerHTML = list.map(a => {
+    const dt = new Date(a.start_at);
+    const dateStr = dt.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+    const timeStr = a.start_at.substring(11, 16);
+    const initials = ((a.patient_prenom || '')[0] || '') + ((a.patient_nom || '')[0] || '');
+    const notes = a.notes ? `<span class="pending-item-notes" title="${a.notes}">${a.notes}</span>` : '<span class="pending-item-notes"></span>';
+    return `
+    <div class="pending-item">
+      <div class="pending-item-avatar">${initials.toUpperCase()}</div>
+      <div class="pending-item-info">
+        <div class="pending-item-patient">${a.patient_prenom} ${a.patient_nom}</div>
+        <div class="pending-item-doctor">Dr. ${a.staff_prenom} ${a.staff_nom}</div>
+      </div>
+      <div class="pending-item-datetime">
+        <span class="pending-item-date">${dateStr}</span>
+        <span class="pending-item-time">${timeStr}</span>
+      </div>
+      <span class="pending-item-type">${a.type_libelle || 'Consultation'}</span>
+      ${notes}
+      <div class="pending-item-actions">
+        <button class="btn-confirm" onclick="updateStatus(${a.id_appointment}, 'confirmé')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmer
+        </button>
+        <button class="btn-refuse" onclick="updateStatus(${a.id_appointment}, 'annulé')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Refuser
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function updateStatus(id, statut) {
+  try {
+    const res = await apiFetch(`/api/appointments/${id}/status`, { method: 'PUT', body: JSON.stringify({ statut }) });
+    if (!res || !res.ok) throw new Error('Erreur');
+    await loadAppointments();
+    await loadPendingAppointments();
+    showToast(`Rendez-vous ${statut === 'confirmé' ? 'confirmé' : 'refusé'}`);
+  } catch(e) {
+    console.error('Erreur mise à jour statut', e);
+    showToast('Erreur lors de la mise à jour', false);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// DOCTOR SELECTOR (secrétaire / admin)
+// ═══════════════════════════════════════════════
+function setupDoctorSelector() {
+  const sel = document.getElementById('doctorSelector');
+  sel.classList.remove('hidden');
+  DOCTORS.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.name;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', async e => {
+    currentDoctorFilter = e.target.value || null;
+    await loadAppointments();
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DOCTOR LIST (sidebar)
 // ═══════════════════════════════════════════════
 function renderDoctorList() {
-  const el = document.getElementById("doctorList");
+  const el = document.getElementById('doctorList');
+  if (!DOCTORS.length) {
+    el.innerHTML = '<div style="font-size:.8rem;color:var(--text-light);padding:4px 0;">Aucun médecin</div>';
+    return;
+  }
   el.innerHTML = DOCTORS.map(
-    (d) => `
-          <div class="doctor-item checked" style="--color:${d.color}" onclick="toggleDoctor(this,'${d.name}')">
-            <div class="doctor-dot" style="background:${d.color}"></div>
-            <span class="doctor-name">${d.name}</span>
-            <div class="doctor-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-          </div>`,
-  ).join("");
+    d => `<div class="doctor-item checked" style="--color:${d.color}" onclick="toggleDoctor(this,'${d.name}')">
+        <div class="doctor-dot" style="background:${d.color}"></div>
+        <span class="doctor-name">${d.name}</span>
+        <div class="doctor-cb"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>`
+  ).join('');
 }
 
 function toggleDoctor(el, name) {
-  el.classList.toggle("checked");
+  el.classList.toggle('checked');
   if (visibleDoctors.has(name)) visibleDoctors.delete(name);
   else visibleDoctors.add(name);
   renderView();
@@ -179,37 +319,32 @@ function toggleDoctor(el, name) {
 // NAVIGATION
 // ═══════════════════════════════════════════════
 function navigate(dir) {
-  if (currentView === "week") currentDate = addDays(currentDate, dir * 7);
-  else if (currentView === "month")
-    currentDate = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + dir,
-      1,
-    );
+  if (currentView === 'week') currentDate = addDays(currentDate, dir * 7);
+  else if (currentView === 'month')
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + dir, 1);
   else currentDate = addDays(currentDate, dir);
   renderView();
+  loadAppointments();
+  loadPendingAppointments();
 }
 
 function goToday() {
   currentDate = new Date();
   renderView();
+  loadAppointments();
+  loadPendingAppointments();
 }
 
 function setView(v) {
   currentView = v;
-  ["vDay", "vWeek", "vMonth"].forEach((id) =>
-    document.getElementById(id).classList.remove("active"),
-  );
-  document
-    .getElementById("v" + v.charAt(0).toUpperCase() + v.slice(1))
-    .classList.add("active");
-  document.getElementById("weekView").classList.remove("active");
-  document.getElementById("monthView").classList.remove("active");
-  document.getElementById("dayView").classList.remove("active");
-  if (v === "week") document.getElementById("weekView").classList.add("active");
-  else if (v === "month")
-    document.getElementById("monthView").classList.add("active");
-  else document.getElementById("dayView").classList.add("active");
+  ['vDay','vWeek','vMonth'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('v' + v.charAt(0).toUpperCase() + v.slice(1)).classList.add('active');
+  document.getElementById('weekView').classList.remove('active');
+  document.getElementById('monthView').classList.remove('active');
+  document.getElementById('dayView').classList.remove('active');
+  if (v === 'week') document.getElementById('weekView').classList.add('active');
+  else if (v === 'month') document.getElementById('monthView').classList.add('active');
+  else document.getElementById('dayView').classList.add('active');
   renderView();
 }
 
@@ -217,8 +352,8 @@ function setView(v) {
 // RENDER DISPATCHER
 // ═══════════════════════════════════════════════
 function renderView() {
-  if (currentView === "week") renderWeek();
-  else if (currentView === "month") renderMonth();
+  if (currentView === 'week') renderWeek();
+  else if (currentView === 'month') renderMonth();
   else renderDay();
   renderMiniCal();
 }
@@ -232,85 +367,70 @@ function renderWeek() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Label
   const endDay = days[6];
-  document.getElementById("currentPeriod").textContent =
+  document.getElementById('currentPeriod').textContent =
     `${days[0].getDate()} – ${endDay.getDate()} ${MONTHS_FR[endDay.getMonth()]} ${endDay.getFullYear()}`;
 
-  // Header
-  const header = document.getElementById("weekHeader");
+  const header = document.getElementById('weekHeader');
   header.innerHTML =
     '<div class="week-header-gutter"></div>' +
-    days
-      .map((d) => {
-        const isToday = d.getTime() === today.getTime();
-        return `<div class="week-header-day">
-              <div class="week-day-name">${DAYS_SHORT[((d.getDay() + 6) % 7) + 1 > 6 ? 0 : (d.getDay() + 6) % 7]}</div>
-              <div class="week-day-num${isToday ? " today" : ""}">${d.getDate()}</div>
-            </div>`;
-      })
-      .join("");
+    days.map(d => {
+      const isToday = d.getTime() === today.getTime();
+      return `<div class="week-header-day">
+            <div class="week-day-name">${DAYS_SHORT[((d.getDay() + 6) % 7) + 1 > 6 ? 0 : (d.getDay() + 6) % 7]}</div>
+            <div class="week-day-num${isToday ? ' today' : ''}">${d.getDate()}</div>
+          </div>`;
+    }).join('');
 
-  // Body
-  const body = document.getElementById("weekBody");
-  body.innerHTML = "";
+  const body = document.getElementById('weekBody');
+  body.innerHTML = '';
 
-  // Time gutter
-  const gutter = document.createElement("div");
-  gutter.className = "time-gutter";
+  const gutter = document.createElement('div');
+  gutter.className = 'time-gutter';
   for (let h = 7; h <= 20; h++) {
-    const slot = document.createElement("div");
-    slot.className = "time-slot-label";
-    slot.textContent = `${String(h).padStart(2, "0")}:00`;
+    const slot = document.createElement('div');
+    slot.className = 'time-slot-label';
+    slot.textContent = `${String(h).padStart(2, '0')}:00`;
     gutter.appendChild(slot);
   }
   body.appendChild(gutter);
 
-  // Day columns
-  days.forEach((d) => {
+  days.forEach(d => {
     const isToday = d.getTime() === today.getTime();
-    const col = document.createElement("div");
-    col.className = "day-col" + (isToday ? " today-col" : "");
+    const col = document.createElement('div');
+    col.className = 'day-col' + (isToday ? ' today-col' : '');
     col.dataset.date = fmtDate(d);
 
     for (let h = 7; h <= 20; h++) {
-      const cell = document.createElement("div");
-      cell.className = "hour-cell";
+      const cell = document.createElement('div');
+      cell.className = 'hour-cell';
       col.appendChild(cell);
     }
 
-    // Add time line
     if (isToday) {
       const now = new Date();
       const mins = (now.getHours() - 7) * 60 + now.getMinutes();
       if (mins >= 0 && mins <= 14 * 60) {
-        const tl = document.createElement("div");
-        tl.className = "time-line";
-        tl.id = "timeLine";
-        tl.style.top = mins + "px";
+        const tl = document.createElement('div');
+        tl.className = 'time-line';
+        tl.id = 'timeLine';
+        tl.style.top = mins + 'px';
         col.appendChild(tl);
       }
     }
 
-    // Appointments
     const dayAppts = appointments.filter(
-      (a) => a.date === fmtDate(d) && visibleDoctors.has(a.doctor),
+      a => a.date === fmtDate(d) && visibleDoctors.has(a.doctor),
     );
-    dayAppts.forEach((a) => {
-      col.appendChild(buildApptEl(a));
-    });
+    dayAppts.forEach(a => col.appendChild(buildApptEl(a)));
 
-    // Click to add
-    col.addEventListener("click", (e) => {
-      if (e.target.closest(".appt")) return;
+    col.addEventListener('click', e => {
+      if (e.target.closest('.appt')) return;
       const rect = col.getBoundingClientRect();
       const y = e.clientY - rect.top + col.scrollTop;
       const hour = Math.floor(y / 60) + 7;
       const mins = Math.floor((y % 60) / 15) * 15;
-      openModal(
-        fmtDate(d),
-        `${String(hour).padStart(2, "0")}:${String(mins).padStart(2, "0")}`,
-      );
+      openModal(fmtDate(d), `${String(hour).padStart(2,'0')}:${String(mins).padStart(2,'0')}`);
     });
 
     body.appendChild(col);
@@ -324,63 +444,58 @@ function renderDay() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const isToday = currentDate.getTime() === today.getTime();
-  document.getElementById("currentPeriod").textContent =
+  document.getElementById('currentPeriod').textContent =
     `${DAYS_FR[currentDate.getDay()]} ${currentDate.getDate()} ${MONTHS_FR[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
 
-  const header = document.getElementById("dayHeader");
-  header.style.gridTemplateColumns = "60px 1fr";
+  const header = document.getElementById('dayHeader');
+  header.style.gridTemplateColumns = '60px 1fr';
   header.innerHTML = `<div class="week-header-gutter"></div>
-          <div class="week-header-day">
-            <div class="week-day-name">${DAYS_SHORT[currentDate.getDay()]}</div>
-            <div class="week-day-num${isToday ? " today" : ""}">${currentDate.getDate()}</div>
-          </div>`;
+        <div class="week-header-day">
+          <div class="week-day-name">${DAYS_SHORT[currentDate.getDay()]}</div>
+          <div class="week-day-num${isToday ? ' today' : ''}">${currentDate.getDate()}</div>
+        </div>`;
 
-  const body = document.getElementById("dayBody");
-  body.style.gridTemplateColumns = "60px 1fr";
-  body.innerHTML = "";
-  const gutter = document.createElement("div");
-  gutter.className = "time-gutter";
+  const body = document.getElementById('dayBody');
+  body.style.gridTemplateColumns = '60px 1fr';
+  body.innerHTML = '';
+  const gutter = document.createElement('div');
+  gutter.className = 'time-gutter';
   for (let h = 7; h <= 20; h++) {
-    const s = document.createElement("div");
-    s.className = "time-slot-label";
-    s.textContent = `${String(h).padStart(2, "0")}:00`;
+    const s = document.createElement('div');
+    s.className = 'time-slot-label';
+    s.textContent = `${String(h).padStart(2,'0')}:00`;
     gutter.appendChild(s);
   }
   body.appendChild(gutter);
 
-  const col = document.createElement("div");
-  col.className = "day-col" + (isToday ? " today-col" : "");
+  const col = document.createElement('div');
+  col.className = 'day-col' + (isToday ? ' today-col' : '');
   col.dataset.date = fmtDate(currentDate);
   for (let h = 7; h <= 20; h++) {
-    const c = document.createElement("div");
-    c.className = "hour-cell";
+    const c = document.createElement('div');
+    c.className = 'hour-cell';
     col.appendChild(c);
   }
   if (isToday) {
     const now = new Date();
     const mins = (now.getHours() - 7) * 60 + now.getMinutes();
     if (mins >= 0 && mins <= 14 * 60) {
-      const tl = document.createElement("div");
-      tl.className = "time-line";
-      tl.style.top = mins + "px";
+      const tl = document.createElement('div');
+      tl.className = 'time-line';
+      tl.style.top = mins + 'px';
       col.appendChild(tl);
     }
   }
   appointments
-    .filter(
-      (a) => a.date === fmtDate(currentDate) && visibleDoctors.has(a.doctor),
-    )
-    .forEach((a) => col.appendChild(buildApptEl(a)));
-  col.addEventListener("click", (e) => {
-    if (e.target.closest(".appt")) return;
+    .filter(a => a.date === fmtDate(currentDate) && visibleDoctors.has(a.doctor))
+    .forEach(a => col.appendChild(buildApptEl(a)));
+  col.addEventListener('click', e => {
+    if (e.target.closest('.appt')) return;
     const rect = col.getBoundingClientRect();
     const y = e.clientY - rect.top;
     const hour = Math.floor(y / 60) + 7;
     const mins = Math.floor((y % 60) / 15) * 15;
-    openModal(
-      fmtDate(currentDate),
-      `${String(hour).padStart(2, "0")}:${String(mins).padStart(2, "0")}`,
-    );
+    openModal(fmtDate(currentDate), `${String(hour).padStart(2,'0')}:${String(mins).padStart(2,'0')}`);
   });
   body.appendChild(col);
 }
@@ -389,62 +504,49 @@ function renderDay() {
 // MONTH VIEW
 // ═══════════════════════════════════════════════
 function renderMonth() {
-  document.getElementById("currentPeriod").textContent =
+  document.getElementById('currentPeriod').textContent =
     `${MONTHS_FR[currentDate.getMonth()].charAt(0).toUpperCase() + MONTHS_FR[currentDate.getMonth()].slice(1)} ${currentDate.getFullYear()}`;
 
-  const grid = document.getElementById("monthGrid");
-  grid.innerHTML = "";
+  const grid = document.getElementById('monthGrid');
+  grid.innerHTML = '';
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const first = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const last = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0,
-  );
-
-  // start from Monday
   let start = new Date(first);
-  const dow = (first.getDay() + 6) % 7; // Mon=0
+  const dow = (first.getDay() + 6) % 7;
   start.setDate(start.getDate() - dow);
 
   for (let i = 0; i < 42; i++) {
     const d = addDays(start, i);
-    const cell = document.createElement("div");
+    const cell = document.createElement('div');
     const isOther = d.getMonth() !== currentDate.getMonth();
     const isToday = d.getTime() === today.getTime();
-    cell.className =
-      "month-cell" +
-      (isOther ? " other-month" : "") +
-      (isToday ? " today" : "");
+    cell.className = 'month-cell' + (isOther ? ' other-month' : '') + (isToday ? ' today' : '');
 
-    const dateEl = document.createElement("div");
-    dateEl.className = "month-date";
+    const dateEl = document.createElement('div');
+    dateEl.className = 'month-date';
     dateEl.textContent = d.getDate();
     cell.appendChild(dateEl);
 
     const dayAppts = appointments.filter(
-      (a) => a.date === fmtDate(d) && visibleDoctors.has(a.doctor),
+      a => a.date === fmtDate(d) && visibleDoctors.has(a.doctor),
     );
-    dayAppts.slice(0, 3).forEach((a) => {
-      const el = document.createElement("div");
+    dayAppts.slice(0, 3).forEach(a => {
+      const el = document.createElement('div');
       el.className = `month-appt appt ${a.color}`;
       el.textContent = `${a.start} ${a.patient}`;
-      el.onclick = (e) => {
-        e.stopPropagation();
-        showDetail(a, e);
-      };
+      el.onclick = e => { e.stopPropagation(); showDetail(a, e); };
       cell.appendChild(el);
     });
     if (dayAppts.length > 3) {
-      const more = document.createElement("div");
-      more.className = "month-more";
+      const more = document.createElement('div');
+      more.className = 'month-more';
       more.textContent = `+${dayAppts.length - 3} autres`;
       cell.appendChild(more);
     }
 
-    cell.addEventListener("click", () => openModal(fmtDate(d)));
+    cell.addEventListener('click', () => openModal(fmtDate(d)));
     grid.appendChild(cell);
   }
 }
@@ -453,14 +555,14 @@ function renderMonth() {
 // BUILD APPOINTMENT ELEMENT
 // ═══════════════════════════════════════════════
 function buildApptEl(a) {
-  const el = document.createElement("div");
+  const el = document.createElement('div');
   el.className = `appt ${a.color}`;
   const startMins = timeToMins(a.start) - 7 * 60;
   const endMins = timeToMins(a.end) - 7 * 60;
-  el.style.top = startMins + "px";
-  el.style.height = Math.max(endMins - startMins, 20) + "px";
+  el.style.top = startMins + 'px';
+  el.style.height = Math.max(endMins - startMins, 20) + 'px';
   el.innerHTML = `<div class="appt-title">${a.patient}</div><div class="appt-sub">${a.start} · ${a.type}</div>`;
-  el.addEventListener("click", (e) => {
+  el.addEventListener('click', e => {
     e.stopPropagation();
     showDetail(a, e);
   });
@@ -471,13 +573,12 @@ function buildApptEl(a) {
 // MINI CALENDAR
 // ═══════════════════════════════════════════════
 function renderMiniCal() {
-  const y = miniDate.getFullYear(),
-    m = miniDate.getMonth();
-  document.getElementById("miniMonth").textContent = `${MONTHS_FR[m]} ${y}`;
-  const grid = document.getElementById("miniGrid");
-  grid.innerHTML = ["L", "M", "M", "J", "V", "S", "D"]
-    .map((d) => `<div class="mini-day-label">${d}</div>`)
-    .join("");
+  const y = miniDate.getFullYear(), m = miniDate.getMonth();
+  document.getElementById('miniMonth').textContent = `${MONTHS_FR[m]} ${y}`;
+  const grid = document.getElementById('miniGrid');
+  grid.innerHTML = ['L','M','M','J','V','S','D']
+    .map(d => `<div class="mini-day-label">${d}</div>`)
+    .join('');
 
   const first = new Date(y, m, 1);
   const start = new Date(first);
@@ -489,22 +590,18 @@ function renderMiniCal() {
 
   for (let i = 0; i < 42; i++) {
     const d = addDays(start, i);
-    const hasAppt = appointments.some((a) => a.date === fmtDate(d));
+    const hasAppt = appointments.some(a => a.date === fmtDate(d));
     const isToday = d.getTime() === today.getTime();
     const isSel = d.getTime() === sel.getTime();
     const isOther = d.getMonth() !== m;
-    const el = document.createElement("div");
-    el.className =
-      "mini-day" +
-      (isOther ? " other-month" : "") +
-      (isToday ? " today" : "") +
-      (isSel && !isToday ? " selected" : "") +
-      (hasAppt ? " has-appt" : "");
+    const el = document.createElement('div');
+    el.className = 'mini-day' +
+      (isOther ? ' other-month' : '') +
+      (isToday ? ' today' : '') +
+      (isSel && !isToday ? ' selected' : '') +
+      (hasAppt ? ' has-appt' : '');
     el.textContent = d.getDate();
-    el.onclick = () => {
-      currentDate = new Date(d);
-      renderView();
-    };
+    el.onclick = () => { currentDate = new Date(d); renderView(); };
     grid.appendChild(el);
   }
 }
@@ -518,11 +615,11 @@ function miniNav(dir) {
 // TIME LINE
 // ═══════════════════════════════════════════════
 function updateCurrentTimeLine() {
-  const el = document.getElementById("timeLine");
+  const el = document.getElementById('timeLine');
   if (!el) return;
   const now = new Date();
   const mins = (now.getHours() - 7) * 60 + now.getMinutes();
-  el.style.top = mins + "px";
+  el.style.top = mins + 'px';
 }
 
 // ═══════════════════════════════════════════════
@@ -530,223 +627,244 @@ function updateCurrentTimeLine() {
 // ═══════════════════════════════════════════════
 function openModal(date, startTime) {
   editingId = null;
-  selectedStatus = "Confirmé";
-  selectedColor = "blue";
-  document.getElementById("modalTitleText").textContent = "Nouveau rendez-vous";
-  document.getElementById("btnDelete").style.display = "none";
+  selectedStatus = 'Confirmé';
+  selectedColor = 'blue';
+  document.getElementById('modalTitleText').textContent = 'Nouveau rendez-vous';
+  document.getElementById('btnDelete').style.display = 'none';
 
-  // Reset form
-  document.getElementById("mPatient").value = "";
-  document.getElementById("mDoctor").value = "";
-  document.getElementById("mType").value = "";
-  document.getElementById("mRoom").value = "";
-  document.getElementById("mNotes").value = "";
-  document.getElementById("mDate").value = date || fmtDate(currentDate);
-  document.getElementById("mStart").value = startTime || "09:00";
-  document.getElementById("mEnd").value = startTime
-    ? addMins(startTime, 30)
-    : "09:30";
+  document.getElementById('mPatient').value = '';
+  document.getElementById('mDoctor').value = '';
+  document.getElementById('mType').value = '';
+  document.getElementById('mRoom').value = '';
+  document.getElementById('mNotes').value = '';
+  document.getElementById('mDate').value = date || fmtDate(currentDate);
+  document.getElementById('mStart').value = startTime || '09:00';
+  document.getElementById('mEnd').value = startTime ? addMins(startTime, 30) : '09:30';
 
-  document.querySelectorAll(".status-opt").forEach((o) => {
-    o.classList.toggle("sel", o.textContent === "Confirmé");
+  document.querySelectorAll('.status-opt').forEach(o => {
+    o.classList.toggle('sel', o.textContent === 'Confirmé');
   });
-  document.querySelectorAll(".color-dot").forEach((d) => {
-    d.classList.toggle("selected", d.dataset.color === "blue");
+  document.querySelectorAll('.color-dot').forEach(d => {
+    d.classList.toggle('selected', d.dataset.color === 'blue');
   });
 
   closeDetail();
-  document.getElementById("modalOverlay").classList.add("open");
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
 function openEditModal(a) {
   editingId = a.id;
   selectedStatus = a.status;
   selectedColor = a.color;
-  document.getElementById("modalTitleText").textContent =
-    "Modifier le rendez-vous";
-  document.getElementById("btnDelete").style.display = "flex";
+  document.getElementById('modalTitleText').textContent = 'Modifier le rendez-vous';
+  document.getElementById('btnDelete').style.display = 'flex';
 
-  document.getElementById("mPatient").value = a.patient;
-  document.getElementById("mDoctor").value = a.doctor;
-  document.getElementById("mType").value = a.type;
-  document.getElementById("mRoom").value = a.room || "";
-  document.getElementById("mNotes").value = a.notes;
-  document.getElementById("mDate").value = a.date;
-  document.getElementById("mStart").value = a.start;
-  document.getElementById("mEnd").value = a.end;
+  const raw = a._raw;
+  document.getElementById('mPatient').value = raw ? raw.id_patient : '';
+  document.getElementById('mDoctor').value = raw ? raw.id_staff : '';
+  document.getElementById('mType').value = raw && raw.id_appointment_type ? raw.id_appointment_type : '';
+  document.getElementById('mRoom').value = raw && raw.id_room ? raw.id_room : '';
+  document.getElementById('mNotes').value = a.notes;
+  document.getElementById('mDate').value = a.date;
+  document.getElementById('mStart').value = a.start;
+  document.getElementById('mEnd').value = a.end;
 
-  document.querySelectorAll(".status-opt").forEach((o) => {
-    o.classList.toggle("sel", o.textContent === a.status);
+  document.querySelectorAll('.status-opt').forEach(o => {
+    o.classList.toggle('sel', o.textContent === a.status);
   });
-  document.querySelectorAll(".color-dot").forEach((d) => {
-    d.classList.toggle("selected", d.dataset.color === a.color);
+  document.querySelectorAll('.color-dot').forEach(d => {
+    d.classList.toggle('selected', d.dataset.color === a.color);
   });
 
   closeDetail();
-  document.getElementById("modalOverlay").classList.add("open");
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
 function closeModal(e) {
-  if (e.target === document.getElementById("modalOverlay")) closeModalBtn();
+  if (e.target === document.getElementById('modalOverlay')) closeModalBtn();
 }
 function closeModalBtn() {
-  document.getElementById("modalOverlay").classList.remove("open");
+  document.getElementById('modalOverlay').classList.remove('open');
   editingId = null;
 }
 
 function selectStatus(el, val) {
-  document
-    .querySelectorAll(".status-opt")
-    .forEach((o) => o.classList.remove("sel"));
-  el.classList.add("sel");
+  document.querySelectorAll('.status-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
   selectedStatus = val;
 }
 
 function pickColor(el) {
-  document
-    .querySelectorAll(".color-dot")
-    .forEach((d) => d.classList.remove("selected"));
-  el.classList.add("selected");
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
   selectedColor = el.dataset.color;
 }
 
-function saveAppt() {
-  const patient = document.getElementById("mPatient").value.trim();
-  const doctor = document.getElementById("mDoctor").value;
-  const type = document.getElementById("mType").value;
-  const date = document.getElementById("mDate").value;
-  const start = document.getElementById("mStart").value;
-  const end = document.getElementById("mEnd").value;
-  if (!patient || !doctor || !type || !date || !start || !end) {
-    showToast("Veuillez remplir les champs obligatoires.", false);
+async function saveAppt() {
+  const idPatient = parseInt(document.getElementById('mPatient').value, 10);
+  const idStaff = parseInt(document.getElementById('mDoctor').value, 10);
+  const idType = parseInt(document.getElementById('mType').value, 10) || null;
+  const idRoom = parseInt(document.getElementById('mRoom').value, 10) || null;
+  const date = document.getElementById('mDate').value;
+  const start = document.getElementById('mStart').value;
+  const end = document.getElementById('mEnd').value;
+  const notes = document.getElementById('mNotes').value.trim() || null;
+
+  if (!idPatient || !idStaff || !idType || !date || !start || !end) {
+    showToast('Veuillez remplir les champs obligatoires.', false);
     return;
   }
 
-  if (editingId) {
-    const idx = appointments.findIndex((a) => a.id === editingId);
-    if (idx !== -1)
-      appointments[idx] = {
-        ...appointments[idx],
-        patient,
-        doctor,
-        type,
-        date,
-        start,
-        end,
-        status: selectedStatus,
-        color: selectedColor,
-        notes: document.getElementById("mNotes").value,
-        room: document.getElementById("mRoom").value,
-      };
-    showToast("Rendez-vous modifié avec succès");
-  } else {
-    appointments.push({
-      id: nextId++,
-      patient,
-      doctor,
-      type,
-      date,
-      start,
-      end,
-      status: selectedStatus,
-      color: selectedColor,
-      notes: document.getElementById("mNotes").value,
-      room: document.getElementById("mRoom").value,
-    });
-    showToast("Rendez-vous ajouté avec succès");
+  const body = {
+    id_patient: idPatient,
+    id_staff: idStaff,
+    id_appointment_type: idType,
+    id_room: idRoom,
+    start_at: `${date}T${start}:00`,
+    end_at: `${date}T${end}:00`,
+    notes,
+    couleur: selectedColor,
+  };
+
+  try {
+    let res;
+    if (editingId) {
+      res = await apiFetch(`/api/appointments/${editingId}`, { method: 'PUT', body: JSON.stringify(body) });
+    } else {
+      res = await apiFetch('/api/appointments/', { method: 'POST', body: JSON.stringify(body) });
+    }
+
+    if (!res || !res.ok) {
+      const err = await res.text();
+      console.error('Erreur API RDV', err);
+      showToast('Erreur lors de l\'enregistrement.', false);
+      return;
+    }
+
+    showToast(editingId ? 'Rendez-vous modifié avec succès' : 'Rendez-vous ajouté avec succès');
+    closeModalBtn();
+    await loadAppointments();
+    await loadPendingAppointments();
+  } catch(e) {
+    console.error('Erreur réseau', e);
+    showToast('Erreur réseau.', false);
   }
-  closeModalBtn();
-  renderView();
 }
 
-function deleteAppt() {
+async function deleteAppt() {
   if (!editingId) return;
-  appointments = appointments.filter((a) => a.id !== editingId);
-  closeModalBtn();
-  showToast("Rendez-vous supprimé");
-  renderView();
+
+  try {
+    const res = await apiFetch(`/api/appointments/${editingId}`, { method: 'DELETE' });
+
+    if (!res || !res.ok) {
+      const err = await res.text();
+      console.error('Erreur suppression RDV', err);
+      showToast('Erreur lors de la suppression.', false);
+      return;
+    }
+
+    closeModalBtn();
+    showToast('Rendez-vous supprimé');
+    await loadAppointments();
+    await loadPendingAppointments();
+  } catch(e) {
+    console.error('Erreur réseau', e);
+    showToast('Erreur réseau.', false);
+  }
 }
 
 // ═══════════════════════════════════════════════
 // DETAIL POPUP
 // ═══════════════════════════════════════════════
 function showDetail(a, e) {
-  const popup = document.getElementById("detailPopup");
-  document.getElementById("dp-title").textContent = a.patient;
-  document.getElementById("dp-time").textContent =
-    `${a.date ? fmtDateFr(a.date) : ""} · ${a.start} – ${a.end}`;
-  document.getElementById("dp-doctor").textContent = a.doctor;
-  document.getElementById("dp-type").textContent = a.type;
-  const badge = document.getElementById("dp-badge");
+  const popup = document.getElementById('detailPopup');
+  document.getElementById('dp-title').textContent = a.patient;
+  document.getElementById('dp-time').textContent =
+    `${a.date ? fmtDateFr(a.date) : ''} · ${a.start} – ${a.end}`;
+  document.getElementById('dp-doctor').textContent = a.doctor;
+  document.getElementById('dp-type').textContent = a.type;
+  const badge = document.getElementById('dp-badge');
   badge.textContent = a.status;
-  badge.className = "detail-badge";
-  if (a.status === "Confirmé") {
-    badge.style.background = "var(--green-pale)";
-    badge.style.color = "#065f46";
-  } else if (a.status === "En attente") {
-    badge.style.background = "var(--gold-pale)";
-    badge.style.color = "#92400e";
+  badge.className = 'detail-badge';
+  if (a.status === 'Confirmé') {
+    badge.style.background = 'var(--green-pale)';
+    badge.style.color = '#065f46';
+  } else if (a.status === 'En attente') {
+    badge.style.background = 'var(--gold-pale)';
+    badge.style.color = '#92400e';
   } else {
-    badge.style.background = "var(--red-pale)";
-    badge.style.color = "var(--red)";
+    badge.style.background = 'var(--red-pale)';
+    badge.style.color = 'var(--red)';
   }
 
   if (a.notes) {
-    document.getElementById("dp-notes").textContent = a.notes;
-    document.getElementById("dp-notes-row").style.display = "flex";
-  } else document.getElementById("dp-notes-row").style.display = "none";
+    document.getElementById('dp-notes').textContent = a.notes;
+    document.getElementById('dp-notes-row').style.display = 'flex';
+  } else {
+    document.getElementById('dp-notes-row').style.display = 'none';
+  }
 
-  document.getElementById("dp-edit").onclick = () => openEditModal(a);
-  document.getElementById("dp-del").onclick = () => {
-    appointments = appointments.filter((x) => x.id !== a.id);
+  document.getElementById('dp-edit').onclick = () => openEditModal(a);
+  document.getElementById('dp-del').onclick = async () => {
+    if (a._raw) {
+      try {
+        await fetch(`/api/appointments/${a.id}`, {
+          method: 'DELETE',
+          headers: authHeaders(),
+        });
+      } catch(ex) {
+        console.error('Erreur suppression', ex);
+      }
+    }
+    appointments = appointments.filter(x => x.id !== a.id);
     closeDetail();
-    showToast("Rendez-vous supprimé");
+    showToast('Rendez-vous supprimé');
     renderView();
+    await loadPendingAppointments();
   };
 
   const x = Math.min(e.clientX + 10, window.innerWidth - 320);
   const y = Math.min(e.clientY + 10, window.innerHeight - 250);
-  popup.style.left = x + "px";
-  popup.style.top = y + "px";
-  popup.classList.add("open");
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+  popup.classList.add('open');
 }
 
 function closeDetail() {
-  document.getElementById("detailPopup").classList.remove("open");
+  document.getElementById('detailPopup').classList.remove('open');
 }
-document.addEventListener("click", (e) => {
+
+document.addEventListener('click', e => {
   if (
-    !e.target.closest(".detail-popup") &&
-    !e.target.closest(".appt") &&
-    !e.target.closest(".month-appt")
-  )
-    closeDetail();
+    !e.target.closest('.detail-popup') &&
+    !e.target.closest('.appt') &&
+    !e.target.closest('.month-appt')
+  ) closeDetail();
 });
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeModalBtn();
-    closeDetail();
-  }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModalBtn(); closeDetail(); }
 });
 
 // ═══════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════
 function showToast(msg) {
-  const t = document.getElementById("toast");
-  document.getElementById("toastMsg").textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 3000);
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 // ═══════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════
 function fmtDate(d) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 function fmtDateFr(s) {
-  const [y, m, d] = s.split("-");
+  const [y, m, d] = s.split('-');
   return `${d}/${m}/${y}`;
 }
 function getMonday(d) {
@@ -762,17 +880,16 @@ function addDays(d, n) {
   return r;
 }
 function timeToMins(t) {
-  const [h, m] = t.split(":").map(Number);
+  const [h, m] = t.split(':').map(Number);
   return h * 60 + m;
 }
 function addMins(t, n) {
   const m = timeToMins(t) + n;
-  return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  return `${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`;
 }
 
-// auto-adjust end time when start changes
-document.getElementById("mStart").addEventListener("change", function () {
-  document.getElementById("mEnd").value = addMins(this.value, 30);
+document.getElementById('mStart').addEventListener('change', function() {
+  document.getElementById('mEnd').value = addMins(this.value, 30);
 });
 
 init();

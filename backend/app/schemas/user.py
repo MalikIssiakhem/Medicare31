@@ -42,6 +42,7 @@ class UserOut(BaseModel):
     prenom: str
     role: str
     is_active: bool
+    id_patient: Optional[int] = None
 
     model_config = {"from_attributes": True}
 

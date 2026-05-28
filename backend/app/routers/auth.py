@@ -286,6 +286,11 @@ def _get_or_create_mock_user(email: str, nom: str, prenom: str, db: Session) -> 
 @router.get("/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)):
     profile = current_user.staff_profile or current_user.patient_profile
+    id_patient = (
+        current_user.patient_profile.id_patient
+        if current_user.patient_profile
+        else None
+    )
 
     return {
         "id_user": current_user.id_user,
