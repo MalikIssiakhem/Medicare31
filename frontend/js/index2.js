@@ -1,4 +1,5 @@
 authGuard();
+initUserNav();
 /* Nav / sidebar active state */
 document.querySelectorAll(".nav-links a, .side-nav a").forEach((a) => {
   a.addEventListener("click", () => {

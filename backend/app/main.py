@@ -6,6 +6,7 @@ from app.db import Base, engine, SessionLocal
 import app.models  # noqa: F401
 
 from app.routers import auth, patients, messages, appointments, staff, chatbot
+from app.routers import auth, patients, messages, appointments, staff, documents
 
 
 def _seed_roles() -> None:
@@ -60,9 +61,32 @@ def _seed_reference_data() -> None:
         db.close()
 
 
+def _sync_document_columns() -> None:
+    from sqlalchemy import inspect, text
+
+    existing = {col["name"] for col in inspect(engine).get_columns("documents")}
+    statements = []
+    if "status" not in existing:
+        statements.append("ALTER TABLE documents ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'nouveau'")
+    if "is_read" not in existing:
+        statements.append("ALTER TABLE documents ADD COLUMN is_read BOOLEAN NOT NULL DEFAULT FALSE")
+    if "is_archived" not in existing:
+        statements.append("ALTER TABLE documents ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT FALSE")
+    if "deleted_at" not in existing:
+        statements.append("ALTER TABLE documents ADD COLUMN deleted_at TIMESTAMP NULL")
+
+    if not statements:
+        return
+
+    with engine.begin() as conn:
+        for statement in statements:
+            conn.execute(text(statement))
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    _sync_document_columns()
     _seed_roles()
     _seed_reference_data()
     yield
@@ -84,6 +108,7 @@ app.include_router(messages.router)
 app.include_router(appointments.router, prefix="/api/appointments")
 app.include_router(staff.router)
 app.include_router(chatbot.router)
+app.include_router(documents.router)
 
 
 @app.get("/api/health")

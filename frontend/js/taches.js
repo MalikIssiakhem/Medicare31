@@ -1,4 +1,4 @@
-authGuard();
+staffGuard();
 initUserNav();
 accessGuard();
 

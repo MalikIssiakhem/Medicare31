@@ -1,7 +1,7 @@
 from datetime import datetime, date, timedelta
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -110,9 +110,37 @@ def my_appointments(
     appts = (
         db.query(Appointment)
         .filter(Appointment.id_patient == patient.id_patient)
-        .order_by(Appointment.start_at.desc())
+        .order_by(Appointment.start_at.asc())
         .all()
     )
+    return [_build_appt_out(a) for a in appts]
+
+
+@router.get("/upcoming", response_model=list[AppointmentOut])
+def upcoming_appointments(
+    limit: int = Query(5, ge=1, le=20),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    now = datetime.utcnow()
+    role = current_user.role.code_role
+
+    query = db.query(Appointment).filter(
+        Appointment.start_at >= now,
+        Appointment.statut != "annulé",
+    )
+
+    if role == "patient":
+        patient = db.query(Patient).filter(Patient.id_user == current_user.id_user).first()
+        if not patient:
+            return []
+        query = query.filter(Appointment.id_patient == patient.id_patient)
+    elif role == "medecin":
+        staff = db.query(Staff).filter(Staff.id_user == current_user.id_user).first()
+        if staff:
+            query = query.filter(Appointment.id_staff == staff.id_staff)
+
+    appts = query.order_by(Appointment.start_at.asc()).limit(limit).all()
     return [_build_appt_out(a) for a in appts]
 
 

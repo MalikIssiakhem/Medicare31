@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prendre rendez-vous — MediCare31</title>
+    <title>Mes rendez-vous — MediCare31</title>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" />
     <link rel="stylesheet" href="/css/rendez-vous.css" />
     <link rel="stylesheet" href="css/chatbot.css" />
@@ -21,75 +21,115 @@
         MediCare31
       </a>
       <div class="nav-right">
-        <div class="user-chip">
+        <div class="user-chip" id="userMenuBtn" onclick="toggleUserMenu(event)">
           <div class="avatar" id="user-nav-avatar">--</div>
           <span id="user-nav-name">Chargement...</span>
           <svg class="chev" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9" />
           </svg>
+          <div class="user-dropdown" id="userDropdown" onclick="event.stopPropagation()">
+            <a class="dropdown-item" href="/index2.html">Tableau de bord</a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item danger" onclick="confirmLogout()">Déconnexion</button>
+          </div>
         </div>
-        <button class="btn-logout" onclick="logout()">Déconnexion</button>
       </div>
     </nav>
 
     <main class="rdv-container">
-      <div class="stepper">
-        <div class="step active" id="step-indicator-1">1. Choisir un médecin</div>
-        <div class="step" id="step-indicator-2">2. Choisir un créneau</div>
-        <div class="step" id="step-indicator-3">3. Confirmer</div>
+      <!-- Tabs navigation -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="myrdv" onclick="switchTab('myrdv')">
+          Mes rendez-vous
+        </button>
+        <button class="tab-btn" data-tab="book" onclick="switchTab('book')">
+          Prendre un rendez-vous
+        </button>
       </div>
 
-      <!-- Étape 1 -->
-      <section id="step1" class="step-section">
-        <h2>Choisissez votre médecin</h2>
-        <div class="search-bar">
-          <input type="text" id="doctorSearch" placeholder="Rechercher par nom ou spécialité..." />
+      <!-- Tab 1 : Mes rendez-vous -->
+      <div id="tab-myrdv" class="tab-pane">
+        <div class="my-appt-header">
+          <h2>Mes prochains rendez-vous</h2>
+          <button class="btn-primary" onclick="switchTab('book')">+ Nouveau rendez-vous</button>
         </div>
-        <div id="doctorGrid" class="doctor-grid"></div>
-      </section>
+        <div id="myApptList">
+          <div class="appt-loading">Chargement...</div>
+        </div>
+      </div>
 
-      <!-- Étape 2 -->
-      <section id="step2" class="step-section hidden">
-        <div class="step2-header">
-          <button id="backToStep1" class="btn-back">&#8592; Retour</button>
-          <h2 id="selectedDoctorTitle"></h2>
+      <!-- Tab 2 : Prendre un rendez-vous -->
+      <div id="tab-book" class="tab-pane hidden">
+        <div class="stepper">
+          <div class="step active" id="step-indicator-1">1. Choisir un médecin</div>
+          <div class="step" id="step-indicator-2">2. Choisir un créneau</div>
+          <div class="step" id="step-indicator-3">3. Confirmer</div>
         </div>
-        <div class="week-nav">
-          <button id="prevWeek">&#8592;</button>
-          <span id="weekLabel"></span>
-          <button id="nextWeek">&#8594;</button>
-        </div>
-        <div id="slotsGrid" class="slots-grid">
-          <div class="slots-loading">Chargement des créneaux...</div>
-        </div>
-      </section>
 
-      <!-- Étape 3 -->
-      <section id="step3" class="step-section hidden">
-        <div class="confirm-card">
-          <h2>Confirmer le rendez-vous</h2>
-          <div class="confirm-summary" id="confirmSummary"></div>
-          <div class="confirm-notes">
-            <label for="confirmNotes">Notes (optionnel)</label>
-            <textarea id="confirmNotes" placeholder="Informations utiles pour le médecin..."></textarea>
+        <!-- Étape 1 -->
+        <section id="step1" class="step-section">
+          <h2>Choisissez votre médecin</h2>
+          <div class="search-bar">
+            <input type="text" id="doctorSearch" placeholder="Rechercher par nom ou spécialité..." />
           </div>
-          <div class="confirm-actions">
-            <button id="backToStep2" class="btn-secondary">Retour</button>
-            <button id="submitBooking" class="btn-primary">Confirmer le rendez-vous</button>
-          </div>
-        </div>
-      </section>
+          <div id="doctorList"></div>
+        </section>
 
-      <!-- Succès -->
-      <section id="stepSuccess" class="step-section hidden">
-        <div class="success-card">
-          <div class="success-icon">&#10003;</div>
-          <h2>Rendez-vous demandé !</h2>
-          <p>Votre demande a bien été envoyée. Le médecin confirmera votre rendez-vous prochainement.</p>
-          <a href="/index2.html" class="btn-primary">Retour au tableau de bord</a>
-        </div>
-      </section>
+        <!-- Étape 2 -->
+        <section id="step2" class="step-section hidden">
+          <div class="step2-header">
+            <button id="backToStep1" class="btn-back">&#8592; Retour</button>
+            <h2 id="selectedDoctorTitle"></h2>
+          </div>
+          <div class="week-nav">
+            <button id="prevWeek">&#8592;</button>
+            <span id="weekLabel"></span>
+            <button id="nextWeek">&#8594;</button>
+          </div>
+          <div id="slotsGrid" class="slots-grid">
+            <div class="slots-loading">Chargement des créneaux...</div>
+          </div>
+        </section>
+
+        <!-- Étape 3 -->
+        <section id="step3" class="step-section hidden">
+          <div class="confirm-card">
+            <h2>Confirmer le rendez-vous</h2>
+            <div class="confirm-summary" id="confirmSummary"></div>
+            <div class="confirm-notes">
+              <label for="confirmNotes">Notes (optionnel)</label>
+              <textarea id="confirmNotes" placeholder="Informations utiles pour le médecin..."></textarea>
+            </div>
+            <div class="confirm-actions">
+              <button id="backToStep2" class="btn-secondary">Retour</button>
+              <button id="submitBooking" class="btn-primary">Confirmer le rendez-vous</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Succès -->
+        <section id="stepSuccess" class="step-section hidden">
+          <div class="success-card">
+            <div class="success-icon">&#10003;</div>
+            <h2>Rendez-vous demandé !</h2>
+            <p>Votre demande a bien été envoyée. Le médecin confirmera votre rendez-vous prochainement.</p>
+            <button class="btn-primary" onclick="switchTab('myrdv')">Voir mes rendez-vous</button>
+          </div>
+        </section>
+      </div>
     </main>
+
+    <!-- Logout confirmation modal -->
+    <div class="logout-overlay" id="logoutOverlay" onclick="closeLogoutModal()">
+      <div class="logout-modal" onclick="event.stopPropagation()">
+        <h3>Déconnexion</h3>
+        <p>Voulez-vous vraiment vous déconnecter ?</p>
+        <div class="logout-modal-actions">
+          <button class="btn-cancel-logout" onclick="closeLogoutModal()">Annuler</button>
+          <button class="btn-confirm-logout" onclick="logout()">Se déconnecter</button>
+        </div>
+      </div>
+    </div>
 
     <script src="/js/auth.js"></script>
     <script src="/js/chatbot.js"></script>

@@ -1,4 +1,5 @@
 authGuard();
+staffGuard();
 initUserNav();
 
 const COLORS = [
