@@ -7,7 +7,7 @@ from app.models.user import User
 from app.models.role import Role
 from app.models.staff import Staff
 from app.models.patient import Patient
-from app.models.message import ConversationThread, ConversationParticipant, Message
+from app.models.message import ConversationThread, ConversationParticipant, Message, MessageAttachment
 from app.schemas.message import (
     UserMiniOut,
     MessageOut,
@@ -352,9 +352,14 @@ def delete_conversation(
     if not thread:
         raise HTTPException(status_code=404, detail="Conversation introuvable")
 
-    db.query(MessageAttachment).join(Message).filter(
-        Message.id_thread == thread_id
-    ).delete(synchronize_session=False)
+    message_ids = [
+        m.id_message for m in
+        db.query(Message.id_message).filter(Message.id_thread == thread_id).all()
+    ]
+    if message_ids:
+        db.query(MessageAttachment).filter(
+            MessageAttachment.id_message.in_(message_ids)
+        ).delete(synchronize_session=False)
 
     db.query(Message).filter(
         Message.id_thread == thread_id
