@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import Base, engine, SessionLocal
 import app.models  # noqa: F401
 
+from app.routers import auth, patients, messages, appointments, staff, chatbot
 from app.routers import auth, patients, messages, appointments, staff, documents
 
 
@@ -106,6 +107,7 @@ app.include_router(patients.router)
 app.include_router(messages.router)
 app.include_router(appointments.router, prefix="/api/appointments")
 app.include_router(staff.router)
+app.include_router(chatbot.router)
 app.include_router(documents.router)
 
 

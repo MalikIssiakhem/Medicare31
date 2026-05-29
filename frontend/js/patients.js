@@ -1,3 +1,4 @@
+authGuard();
 staffGuard();
 initUserNav();
 
