@@ -193,7 +193,7 @@
       const formView = document.getElementById("formView");
       const successView = document.getElementById("successView");
 
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         const email = document.getElementById("email").value.trim();
@@ -205,8 +205,27 @@
         }
 
         alertBox.classList.remove("show");
-        formView.style.display = "none";
-        successView.classList.add("show");
+
+        try {
+          const response = await fetch("/api/auth/forgot-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            alertText.textContent = error.detail || "Une erreur est survenue.";
+            alertBox.classList.add("show");
+            return;
+          }
+
+          formView.style.display = "none";
+          successView.classList.add("show");
+        } catch (err) {
+          alertText.textContent = "Impossible de contacter le serveur.";
+          alertBox.classList.add("show");
+        }
       });
     </script>
   </body>

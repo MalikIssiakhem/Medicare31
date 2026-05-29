@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
     app_base_url: str = "http://localhost"
+    frontend_base_url: str | None = None
 
     model_config = {"env_file": ".env"}
 
