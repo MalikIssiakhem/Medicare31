@@ -110,7 +110,7 @@ def my_appointments(
     appts = (
         db.query(Appointment)
         .filter(Appointment.id_patient == patient.id_patient)
-        .order_by(Appointment.start_at.desc())
+        .order_by(Appointment.start_at.asc())
         .all()
     )
     return [_build_appt_out(a) for a in appts]

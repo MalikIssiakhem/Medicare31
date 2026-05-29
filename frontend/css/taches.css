@@ -550,3 +550,27 @@ main {
     flex-direction: column;
   }
 }
+
+/* ── USER DROPDOWN ── */
+.user-chip { position: relative; cursor: pointer; }
+.user-chip .chevron { width: 13px; height: 13px; fill: rgba(255,255,255,.65); flex-shrink: 0; transition: transform .2s; }
+.user-chip.open .chevron { transform: rotate(180deg); }
+.user-dropdown { display: none; position: absolute; top: calc(100% + 10px); right: 0; min-width: 190px; background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,.18); overflow: hidden; z-index: 999; }
+.user-dropdown.open { display: block; }
+.dropdown-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: .88rem; font-weight: 600; color: #ef4444; cursor: pointer; transition: background .15s; }
+.dropdown-item:hover { background: #fef2f2; }
+.dropdown-item svg { width: 16px; height: 16px; stroke: #ef4444; flex-shrink: 0; }
+/* ── LOGOUT MODAL ── */
+.logout-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.55); backdrop-filter: blur(3px); z-index: 2000; align-items: center; justify-content: center; }
+.logout-overlay.open { display: flex; }
+.logout-modal { background: #fff; border-radius: 16px; padding: 36px 32px 28px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.2); animation: logoutIn .2s ease; }
+@keyframes logoutIn { from { opacity: 0; transform: translateY(-12px) scale(.97); } to { opacity: 1; transform: none; } }
+.logout-icon { width: 56px; height: 56px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+.logout-icon svg { width: 24px; height: 24px; stroke: #ef4444; }
+.logout-title { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+.logout-text { font-size: .87rem; color: #64748b; line-height: 1.55; margin-bottom: 26px; }
+.logout-actions { display: flex; gap: 10px; }
+.btn-cancel-logout { flex: 1; padding: 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; color: #475569; font-weight: 600; font-size: .88rem; cursor: pointer; font-family: inherit; transition: background .15s; }
+.btn-cancel-logout:hover { background: #f8fafc; }
+.btn-confirm-logout { flex: 1; padding: 10px; border: none; border-radius: 8px; background: #ef4444; color: #fff; font-weight: 600; font-size: .88rem; cursor: pointer; font-family: inherit; transition: background .15s; }
+.btn-confirm-logout:hover { background: #dc2626; }

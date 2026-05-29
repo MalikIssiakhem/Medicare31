@@ -1,4 +1,5 @@
 staffGuard();
+initUserNav();
 
 // ═══════════════════════════════════════════════
 // AUTH HELPERS

@@ -299,6 +299,7 @@ def me(current_user: User = Depends(get_current_user)):
         "prenom": profile.prenom if profile else "",
         "role": current_user.role.code_role,
         "is_active": current_user.is_active,
+        "id_patient": current_user.patient_profile.id_patient if current_user.patient_profile else None,
     }
 
 @router.post("/ping")
