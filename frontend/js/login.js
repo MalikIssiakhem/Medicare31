@@ -1,5 +1,10 @@
 let pwdVisible = false;
 
+function getQueryParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
 function togglePwd() {
   pwdVisible = !pwdVisible;
 
@@ -15,6 +20,33 @@ function togglePwd() {
     : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
          <circle cx="12" cy="12" r="3"/>`;
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  const resetStatus = getQueryParam("reset");
+  const verifyStatus = getQueryParam("verified");
+  const errorStatus = getQueryParam("error");
+
+  if (resetStatus === "success") {
+    showAlert(
+      "Votre mot de passe a bien été réinitialisé. Vous pouvez désormais vous connecter.",
+      "success",
+    );
+  } else if (verifyStatus === "1") {
+    showAlert(
+      "Votre adresse e-mail a été vérifiée avec succès. Vous pouvez maintenant vous connecter.",
+      "success",
+    );
+  } else if (verifyStatus === "already") {
+    showAlert(
+      "Votre adresse e-mail est déjà vérifiée. Connectez-vous simplement.",
+      "success",
+    );
+  } else if (errorStatus === "token_invalide") {
+    showAlert(
+      "Lien invalide ou expiré. Réessayez de réinitialiser votre mot de passe.",
+    );
+  }
+});
 
 async function handleSubmit(event) {
   event.preventDefault();
@@ -117,11 +149,15 @@ function redirectUser(role, email) {
   window.location.href = "index2.html";
 }
 
-function showAlert(message) {
+function showAlert(message, type = "error") {
   const box = document.getElementById("alertBox");
   const text = document.getElementById("alertText");
 
   text.textContent = message;
+  box.classList.remove("success");
+  if (type === "success") {
+    box.classList.add("success");
+  }
   box.classList.add("show");
   box.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }

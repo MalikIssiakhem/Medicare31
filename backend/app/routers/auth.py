@@ -1,21 +1,31 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
+from app.config import settings
 from app.db import get_db
 from app.models.user import User
 from app.models.role import Role
-from app.schemas.user import UserCreate, UserOut, Token, PatientRegister
+from app.schemas.user import (
+    UserCreate,
+    UserOut,
+    Token,
+    PatientRegister,
+    PasswordResetConfirm,
+    PasswordResetRequest,
+)
 from app.services.auth import (
     hash_password,
     verify_password,
     create_access_token,
     create_verification_token,
+    create_password_reset_token,
     decode_verification_token,
+    decode_password_reset_token,
     get_current_user,
 )
 
@@ -126,8 +136,13 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/register/patient", status_code=201)
-def register_patient(data: PatientRegister, db: Session = Depends(get_db)):
-    if db.query(User).filter(User.email == data.email).first():
+def register_patient(
+    data: PatientRegister,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    email = data.email.lower().strip()
+    if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=400, detail="Cette adresse e-mail est déjà utilisée.")
 
     role = db.query(Role).filter(Role.code_role == "patient").first()
@@ -135,7 +150,7 @@ def register_patient(data: PatientRegister, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Rôle patient introuvable.")
 
     user = User(
-        email=data.email,
+        email=email,
         password_hash=hash_password(data.password),
         id_role=role.id_role,
         is_active=False,
@@ -183,30 +198,66 @@ def register_patient(data: PatientRegister, db: Session = Depends(get_db)):
     token = create_verification_token(user.id_user)
     try:
         from app.services.email import send_verification_email
-        send_verification_email(data.email, data.prenom, token)
+        background_tasks.add_task(send_verification_email, email, data.prenom, token)
     except Exception:
         pass
 
     return {"message": "Compte créé. Vérifiez votre boîte mail pour activer votre compte."}
 
 
-@router.get("/verify-email")
-def verify_email(token: str, db: Session = Depends(get_db)):
-    from app.config import settings
-    user_id = decode_verification_token(token)
+@router.post("/forgot-password")
+def forgot_password(
+    data: PasswordResetRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    email = data.email.lower().strip()
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        token = create_password_reset_token(user.id_user)
+        try:
+            from app.services.email import send_password_reset_email
+            background_tasks.add_task(send_password_reset_email, email, user.staff_profile.prenom if user.staff_profile else user.patient_profile.prenom if user.patient_profile else "Utilisateur", token)
+        except Exception:
+            pass
+
+    return {"message": "Si l'adresse existe, un lien de réinitialisation a été envoyé."}
+
+
+@router.post("/reset-password")
+def reset_password(data: PasswordResetConfirm, db: Session = Depends(get_db)):
+    user_id = decode_password_reset_token(data.token)
     if user_id is None:
-        return RedirectResponse(url="/login.html?error=token_invalide")
+        raise HTTPException(status_code=400, detail="Token invalide ou expiré")
 
     user = db.query(User).filter(User.id_user == user_id).first()
     if not user:
-        return RedirectResponse(url="/login.html?error=token_invalide")
+        raise HTTPException(status_code=400, detail="Utilisateur introuvable")
+
+    user.password_hash = hash_password(data.password)
+    db.commit()
+
+    return {"message": "Mot de passe réinitialisé avec succès."}
+
+
+@router.get("/verify-email")
+def verify_email(token: str, db: Session = Depends(get_db)):
+    user_id = decode_verification_token(token)
+    frontend_url = (settings.frontend_base_url or settings.app_base_url).rstrip("/")
+
+    if user_id is None:
+        return RedirectResponse(url=f"{frontend_url}/login.html?error=token_invalide")
+
+    user = db.query(User).filter(User.id_user == user_id).first()
+    if not user:
+        return RedirectResponse(url=f"{frontend_url}/login.html?error=token_invalide")
     if user.email_verified:
-        return RedirectResponse(url="/login.html?verified=already")
+        return RedirectResponse(url=f"{frontend_url}/login.html?verified=already")
 
     user.email_verified = True
     user.is_active = True
     db.commit()
-    return RedirectResponse(url="/login.html?verified=1")
+    return RedirectResponse(url=f"{frontend_url}/login.html?verified=1")
 
 
 @router.post("/login", response_model=Token)
