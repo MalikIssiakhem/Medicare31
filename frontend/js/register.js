@@ -1,33 +1,16 @@
 let current = 1;
 
-function normalizeName(value) {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z]/g, '');
+function getEmail() {
+  return document.getElementById('email').value.trim().toLowerCase();
 }
 
-function generateEmail() {
-  const prenom = normalizeName(document.getElementById('prenom').value);
-  const nom = normalizeName(document.getElementById('nom').value);
-  const emailInput = document.getElementById('email');
-
-  if (!prenom || !nom) {
-    emailInput.value = '';
-    return '';
-  }
-
-  const generatedEmail = `${prenom.charAt(0)}${nom}@clinique.fr`;
-  emailInput.value = generatedEmail;
-  return generatedEmail;
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
 function goTo(step) {
   if (step > current && !validate(current)) return;
 
-  if (step === 2) generateEmail();
   if (step === 4) fillSummary();
 
   for (let i = 1; i <= 4; i++) {
@@ -73,16 +56,7 @@ function validate(step) {
     check('prenom', 'err-prenom', value => value.trim().length > 0);
     check('ddn', 'err-ddn', value => value.length > 0);
     check('sexe', 'err-sexe', value => value !== '');
-
-    const email = generateEmail();
-    const errEmail = document.getElementById('err-email');
-
-    if (!email) {
-      errEmail.classList.add('show');
-      ok = false;
-    } else {
-      errEmail.classList.remove('show');
-    }
+    check('email', 'err-email', value => isValidEmail(value.trim().toLowerCase()));
   }
 
   if (step === 2) {
@@ -137,8 +111,6 @@ function validate(step) {
 }
 
 function fillSummary() {
-  generateEmail();
-
   const civ = document.querySelector('input[name="civilite"]:checked');
   const ddn = document.getElementById('ddn').value;
   const adresse = [
@@ -173,13 +145,13 @@ async function submitForm() {
   }
 
   const submitBtn = document.getElementById('submitBtn');
-  const email = generateEmail();
+  const email = getEmail();
   const password = document.getElementById('pwd').value;
   const nom = document.getElementById('nom').value.trim();
   const prenom = document.getElementById('prenom').value.trim();
 
-  if (!email) {
-    alert("Impossible de générer l'adresse e-mail.");
+  if (!isValidEmail(email)) {
+    alert('Veuillez saisir une adresse e-mail valide.');
     goTo(1);
     return;
   }
@@ -268,12 +240,7 @@ function toggleEye(inputId, iconId) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  const nomInput = document.getElementById('nom');
-  const prenomInput = document.getElementById('prenom');
   const numSecuInput = document.getElementById('numsecu');
-
-  if (nomInput) nomInput.addEventListener('input', generateEmail);
-  if (prenomInput) prenomInput.addEventListener('input', generateEmail);
 
   if (numSecuInput) {
     numSecuInput.addEventListener('input', function () {

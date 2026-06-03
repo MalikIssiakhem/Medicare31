@@ -17,6 +17,7 @@ from app.schemas.user import (
     PatientRegister,
     PasswordResetConfirm,
     PasswordResetRequest,
+    PasswordChange,
 )
 from app.services.auth import (
     hash_password,
@@ -81,7 +82,11 @@ def _build_token(user: User) -> dict:
 
 
 @router.post("/register", response_model=UserOut, status_code=201)
-def register(data: UserCreate, db: Session = Depends(get_db)):
+def register(
+    data: UserCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     email = data.email.lower().strip()
     role_code = _normalize_role(data.role)
 
@@ -94,6 +99,8 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
         email=email,
         password_hash=hash_password(data.password),
         id_role=role.id_role,
+        is_active=False,
+        email_verified=False,
     )
 
     db.add(user)
@@ -124,6 +131,13 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
 
     db.commit()
     db.refresh(user)
+
+    token = create_verification_token(user.id_user)
+    try:
+        from app.services.email import send_verification_email
+        background_tasks.add_task(send_verification_email, email, data.prenom, token)
+    except Exception:
+        pass
 
     return {
         "id_user": user.id_user,
@@ -240,6 +254,36 @@ def reset_password(data: PasswordResetConfirm, db: Session = Depends(get_db)):
     return {"message": "Mot de passe réinitialisé avec succès."}
 
 
+@router.post("/change-password")
+def change_password(
+    data: PasswordChange,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not verify_password(data.current_password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Mot de passe actuel incorrect.")
+
+    if len(data.new_password) < 8:
+        raise HTTPException(
+            status_code=400,
+            detail="Le nouveau mot de passe doit faire au moins 8 caractères.",
+        )
+
+    current_user.password_hash = hash_password(data.new_password)
+    db.commit()
+
+    profile = current_user.staff_profile or current_user.patient_profile
+    prenom = profile.prenom if profile else "Utilisateur"
+    try:
+        from app.services.email import send_password_changed_email
+        background_tasks.add_task(send_password_changed_email, current_user.email, prenom)
+    except Exception:
+        pass
+
+    return {"message": "Mot de passe modifié avec succès."}
+
+
 @router.get("/verify-email")
 def verify_email(token: str, db: Session = Depends(get_db)):
     user_id = decode_verification_token(token)
@@ -270,6 +314,11 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
         raise HTTPException(status_code=401, detail="Identifiants invalides")
 
     if not user.is_active:
+        if not user.email_verified:
+            raise HTTPException(
+                status_code=403,
+                detail="Veuillez confirmer votre adresse e-mail avant de vous connecter.",
+            )
         raise HTTPException(status_code=403, detail="Compte désactivé")
 
     user.last_login_at = func.now()

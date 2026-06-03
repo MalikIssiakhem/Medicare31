@@ -19,6 +19,20 @@ from datetime import date
 
 USERS_TO_CREATE = [
     {
+        "role_code": "admin",
+        "email": "admin@medicare31.fr",
+        "password": "Admin123!",
+        "staff": {
+            "type_staff": "admin",
+            "civilite": "M",
+            "nom": "Admin",
+            "prenom": "Super",
+            "specialite": None,
+            "telephone": "0561000000",
+            "couleur_agenda": "#7C3AED",
+        },
+    },
+    {
         "role_code": "medecin",
 
         "email": "dr.martin@medicare31.fr",

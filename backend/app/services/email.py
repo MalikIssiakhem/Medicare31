@@ -16,16 +16,19 @@ def send_email(to_email: str, subject: str, html: str, text: str | None = None, 
         message.attach(MIMEText(text, "plain", "utf-8"))
     message.attach(MIMEText(html, "html", "utf-8"))
 
-    context = ssl.create_default_context()
+    use_tls = settings.smtp_use_tls or bool(settings.smtp_user)
     try:
-        with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+        with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10) as server:
             server.ehlo()
-            server.starttls(context=context)
+            if use_tls:
+                server.starttls(context=ssl.create_default_context())
+                server.ehlo()
             if settings.smtp_user:
                 server.login(settings.smtp_user, settings.smtp_password)
             server.sendmail(from_email or settings.smtp_from, to_email, message.as_string())
+        print(f"[EMAIL] Envoyé vers {to_email} : {subject}")
     except Exception as exc:
-        print(f"[EMAIL] Échec envoi vers {to_email} : {exc}")
+        print(f"[EMAIL] ÉCHEC envoi vers {to_email} ({settings.smtp_host}:{settings.smtp_port}, tls={use_tls}) : {exc}")
 
 
 def send_verification_email(to_email: str, prenom: str, token: str) -> None:
@@ -164,3 +167,85 @@ def send_password_reset_email(to_email: str, prenom: str, token: str) -> None:
         html,
         text=text,
     )
+
+
+def _email_shell(title_bar: str, body_inner: str) -> str:
+    return f"""
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head><meta charset="UTF-8"></head>
+    <body style="margin:0;padding:0;background:#eef2f7;font-family:'Segoe UI',Arial,sans-serif">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:40px 0">
+        <tr><td align="center">
+          <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(44,95,158,.12)">
+            <tr><td style="padding:0">{title_bar}</td></tr>
+            <tr><td style="padding:40px">{body_inner}</td></tr>
+            <tr>
+              <td style="background:#f5f8fc;padding:20px 40px;border-top:1px solid #e0eaf5;text-align:center">
+                <p style="margin:0;font-size:12px;color:#8fa3bc">
+                  © 2024 MediCare31 · Hébergement certifié HDS<br>
+                  Cet e-mail a été envoyé automatiquement, merci de ne pas y répondre.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td></tr>
+      </table>
+    </body>
+    </html>
+    """
+
+
+def send_password_changed_email(to_email: str, prenom: str) -> None:
+    text = (
+        f"Bonjour {prenom},\n\n"
+        "Votre mot de passe MediCare31 vient d'être modifié. "
+        "Si vous êtes à l'origine de ce changement, aucune action n'est requise.\n\n"
+        "Si vous n'êtes pas à l'origine de cette modification, contactez immédiatement le cabinet."
+    )
+
+    title_bar = (
+        '<div style="background:linear-gradient(135deg,#2c5f9e,#1a3a6e);padding:30px 40px;text-align:center">'
+        '<span style="color:#fff;font-size:20px;font-weight:800">Mot de passe modifié</span></div>'
+    )
+    body_inner = f"""
+      <h1 style="margin:0 0 8px;font-size:20px;font-weight:700;color:#1e2d45">Bonjour {prenom},</h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#4a5f7a;line-height:1.6">
+        Votre mot de passe a bien été <strong>modifié</strong> à l'instant.
+        Si vous êtes à l'origine de ce changement, aucune action n'est nécessaire.
+      </p>
+      <p style="margin:0;font-size:13px;color:#b04a4a;background:#fef2f2;border-radius:10px;padding:14px 16px">
+        ⚠️ Vous n'êtes pas à l'origine de ce changement ? Contactez immédiatement le cabinet
+        pour sécuriser votre compte.
+      </p>
+    """
+
+    send_email(
+        to_email,
+        "Votre mot de passe a été modifié – MediCare31",
+        _email_shell(title_bar, body_inner),
+        text=text,
+    )
+
+
+def send_campaign_email(to_email: str, prenom: str, sujet: str, message: str, kind: str = "info") -> None:
+    is_promo = kind == "promo"
+    accent = "#e0853a" if is_promo else "#2c5f9e"
+    badge = "Offre MediCare31" if is_promo else "Information MediCare31"
+
+    safe_message = message.replace("\n", "<br>")
+
+    text = f"Bonjour {prenom},\n\n{message}\n\n— L'équipe MediCare31"
+
+    title_bar = (
+        f'<div style="background:linear-gradient(135deg,{accent},#1a3a6e);padding:30px 40px;text-align:center">'
+        f'<span style="color:#fff;font-size:20px;font-weight:800">{badge}</span></div>'
+    )
+    body_inner = f"""
+      <h1 style="margin:0 0 14px;font-size:21px;font-weight:700;color:#1e2d45">{sujet}</h1>
+      <p style="margin:0 0 18px;font-size:15px;color:#4a5f7a;line-height:1.7">Bonjour {prenom},</p>
+      <div style="font-size:15px;color:#4a5f7a;line-height:1.7">{safe_message}</div>
+      <p style="margin:24px 0 0;font-size:14px;color:#8fa3bc">— L'équipe MediCare31</p>
+    """
+
+    send_email(to_email, f"{sujet} – MediCare31", _email_shell(title_bar, body_inner), text=text)

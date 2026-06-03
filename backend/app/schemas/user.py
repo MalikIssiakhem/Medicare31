@@ -62,3 +62,14 @@ class PasswordResetRequest(BaseModel):
 class PasswordResetConfirm(BaseModel):
     token: str
     password: str
+
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class NewsletterBroadcast(BaseModel):
+    sujet: str
+    message: str
+    kind: str = "info"  # "info" | "promo"

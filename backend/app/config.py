@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     smtp_from: str = "noreply@medicare31.fr"
     smtp_user: str = ""
     smtp_password: str = ""
+    smtp_use_tls: bool = False
     app_base_url: str = "http://localhost"
     frontend_base_url: str | None = None
 
