@@ -54,9 +54,9 @@ nav {
   background: var(--blue-dark);
   display: flex;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 28px;
   height: 58px;
-  gap: 24px;
+  gap: 32px;
   position: sticky;
   top: 0;
   z-index: 200;
@@ -69,31 +69,31 @@ nav {
   color: #fff;
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
-  font-size: 1.18rem;
+  font-size: 1.22rem;
   text-decoration: none;
   white-space: nowrap;
 }
 
 .logo-icon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   background: rgba(255,255,255,.18);
-  border-radius: 7px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .logo-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   fill: #fff;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   margin-left: auto;
 }
 
@@ -107,8 +107,8 @@ nav {
 }
 
 .notif-btn svg {
-  width: 19px;
-  height: 19px;
+  width: 20px;
+  height: 20px;
   stroke: currentColor;
   fill: none;
   stroke-width: 2;
@@ -130,7 +130,7 @@ nav {
 .user-chip {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   color: #fff;
   cursor: pointer;
   padding: 4px 8px;
@@ -143,30 +143,30 @@ nav {
 }
 
 .u-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: linear-gradient(135deg,#9ecfff,#4f8fda);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: .78rem;
+  font-size: .85rem;
   color: #fff;
-  border: 2px solid rgba(255,255,255,.35);
+  border: 2px solid rgba(255,255,255,.4);
   flex-shrink: 0;
 }
 
 .user-chip > span {
-  font-size: .86rem;
+  font-size: .88rem;
   font-weight: 600;
 }
 
 .user-chip svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   fill: none;
-  stroke: rgba(255,255,255,.65);
+  stroke: rgba(255,255,255,.7);
   stroke-width: 2;
 }
 
@@ -1088,7 +1088,7 @@ button:disabled {
 
 /* ── USER DROPDOWN ── */
 .user-chip { position: relative; cursor: pointer; }
-.user-chip .chevron { width: 13px; height: 13px; fill: rgba(255,255,255,.65); flex-shrink: 0; transition: transform .2s; }
+.user-chip .chevron { width: 14px; height: 14px; fill: rgba(255,255,255,.7); flex-shrink: 0; transition: transform .2s; }
 .user-chip.open .chevron { transform: rotate(180deg); }
 .user-dropdown { display: none; position: absolute; top: calc(100% + 10px); right: 0; min-width: 190px; background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,.18); overflow: hidden; z-index: 999; }
 .user-dropdown.open { display: block; }

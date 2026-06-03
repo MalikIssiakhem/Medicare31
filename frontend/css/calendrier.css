@@ -41,29 +41,29 @@ body {
 nav {
   background: var(--blue-dark);
   display: flex; align-items: center;
-  padding: 0 24px; height: 58px; gap: 24px;
+  padding: 0 28px; height: 58px; gap: 32px;
   position: sticky; top: 0; z-index: 200;
 }
 .logo {
   display: flex; align-items: center; gap: 10px;
   color: #fff; font-family: 'Nunito', sans-serif;
-  font-weight: 800; font-size: 1.18rem; text-decoration: none; white-space: nowrap;
+  font-weight: 800; font-size: 1.22rem; text-decoration: none; white-space: nowrap;
 }
-.logo-icon { width: 30px; height: 30px; background: rgba(255,255,255,.18); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
-.logo-icon svg { width: 18px; height: 18px; fill: #fff; }
-.nav-links { display: flex; gap: 4px; list-style: none; flex: 1; }
-.nav-links a { color: rgba(255,255,255,.72); text-decoration: none; font-size: .9rem; font-weight: 500; padding: 6px 13px; border-radius: 6px; transition: color .15s, background .15s; }
+.logo-icon { width: 32px; height: 32px; background: rgba(255,255,255,.18); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-icon svg { width: 20px; height: 20px; fill: #fff; }
+.nav-links { display: flex; gap: 6px; list-style: none; flex: 1; }
+.nav-links a { color: rgba(255,255,255,.75); text-decoration: none; font-size: .92rem; font-weight: 500; padding: 6px 14px; border-radius: 6px; transition: color .15s, background .15s; }
 .nav-links a:hover { color: #fff; background: rgba(255,255,255,.12); }
 .nav-links a.active { color: #fff; border-bottom: 2px solid #fff; border-radius: 0; padding-bottom: 4px; }
-.nav-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.nav-right { display: flex; align-items: center; gap: 16px; margin-left: auto; }
 .notif-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,.8); position: relative; padding: 4px; }
-.notif-btn svg { width: 19px; height: 19px; }
+.notif-btn svg { width: 20px; height: 20px; }
 .notif-dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #ef5350; border-radius: 50%; border: 1.5px solid var(--blue-dark); }
-.user-chip { display: flex; align-items: center; gap: 9px; color: #fff; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background .15s; }
+.user-chip { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background .15s; }
 .user-chip:hover { background: rgba(255,255,255,.12); }
-.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#9ecfff,#4f8fda); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .78rem; color: #fff; border: 2px solid rgba(255,255,255,.35); }
-.user-chip span { font-size: .86rem; font-weight: 600; }
-.user-chip .chev { width: 13px; height: 13px; fill: rgba(255,255,255,.6); }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#9ecfff,#4f8fda); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; color: #fff; border: 2px solid rgba(255,255,255,.4); flex-shrink: 0; }
+.user-chip span { font-size: .88rem; font-weight: 600; }
+.user-chip .chev { width: 14px; height: 14px; fill: rgba(255,255,255,.7); }
 
 /* ── APP LAYOUT ── */
 .app { display: flex; flex: 1; }
@@ -735,7 +735,7 @@ textarea.inp:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba
 
 /* ── USER DROPDOWN ── */
 .user-chip { position: relative; cursor: pointer; }
-.user-chip .chevron { width: 13px; height: 13px; fill: rgba(255,255,255,.65); flex-shrink: 0; transition: transform .2s; }
+.user-chip .chevron { width: 14px; height: 14px; fill: rgba(255,255,255,.7); flex-shrink: 0; transition: transform .2s; }
 .user-chip.open .chevron { transform: rotate(180deg); }
 .user-dropdown {
   display: none; position: absolute;
