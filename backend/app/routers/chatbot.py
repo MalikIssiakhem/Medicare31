@@ -174,11 +174,17 @@ def chat_message(
         )
 
     if any(word in text for word in ["attente", "confirmer", "validation"]):
-        pending = _pending_count(db)
+        if role in {"medecin", "secretariat", "admin"}:
+            pending = _pending_count(db)
+            return ChatResponse(
+                reply=f"Il y a {pending} rendez-vous en attente de validation dans l'agenda.",
+                suggestions=["Ouvrir l'agenda", "Créer un rendez-vous", "Messages"],
+                actions=[ChatAction(label="Agenda", path="/calendrier.html")],
+            )
         return ChatResponse(
-            reply=f"Il y a {pending} rendez-vous en attente de validation dans l'agenda.",
-            suggestions=["Ouvrir l'agenda", "Créer un rendez-vous", "Messages"],
-            actions=[ChatAction(label="Agenda", path="/calendrier.html")],
+            reply="Vos demandes de rendez-vous sont validées par le secrétariat. Vous pouvez suivre leur statut dans Mes rendez-vous.",
+            suggestions=["Mon prochain rendez-vous", "Envoyer un message", "Documents"],
+            actions=[ChatAction(label="Mes rendez-vous", path="/rendez-vous.html")],
         )
 
     if any(word in text for word in ["stat", "statistique", "rapport", "activité", "activite"]):
