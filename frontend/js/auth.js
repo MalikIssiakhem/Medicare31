@@ -203,9 +203,12 @@ const _STAFF_VISIBILITY_ROLES = ["medecin", "secretariat", "admin"];
 
 function applyRoleVisibility() {
   const role = (getUser().role || "").toLowerCase();
-  if (_STAFF_VISIBILITY_ROLES.includes(role)) return;
+  const isStaff = _STAFF_VISIBILITY_ROLES.includes(role);
   document.querySelectorAll("[data-staff-only]").forEach((el) => {
-    el.style.display = "none";
+    el.style.display = isStaff ? "" : "none";
+  });
+  document.querySelectorAll("[data-patient-only]").forEach((el) => {
+    el.style.display = isStaff ? "none" : "";
   });
 }
 

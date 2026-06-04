@@ -88,13 +88,23 @@ function buildParams() {
 }
 
 async function loadStats() {
-  const res = await fetch("/api/documents/stats", { headers: authHeaders() });
-  if (!res.ok) throw new Error("stats");
-  const stats = await res.json();
-  document.getElementById("statTotal").textContent = stats.total ?? 0;
-  document.getElementById("statAClasser").textContent = stats.a_classer ?? 0;
-  document.getElementById("statNonLus").textContent = stats.non_lus ?? 0;
-  document.getElementById("statArchives").textContent = stats.archives ?? 0;
+  // Les stats globales sont réservées au staff ; pour un patient (403) on ignore
+  // silencieusement pour ne pas bloquer le rendu de ses propres documents.
+  try {
+    const res = await fetch("/api/documents/stats", { headers: authHeaders() });
+    if (!res.ok) return;
+    const stats = await res.json();
+    const set = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value ?? 0;
+    };
+    set("statTotal", stats.total);
+    set("statAClasser", stats.a_classer);
+    set("statNonLus", stats.non_lus);
+    set("statArchives", stats.archives);
+  } catch (e) {
+    /* stats indisponibles */
+  }
 }
 
 async function loadDocuments() {
