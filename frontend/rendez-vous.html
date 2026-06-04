@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mes rendez-vous — MediCare31</title>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/css/rendez-vous.css" />
     <link rel="stylesheet" href="css/chatbot.css" />
   </head>
@@ -21,22 +21,81 @@
         MediCare31
       </a>
       <div class="nav-right">
+        <button class="notif-btn" title="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+
         <div class="user-chip" id="userMenuBtn" onclick="toggleUserMenu(event)">
           <div class="avatar" id="user-nav-avatar">--</div>
-          <span id="user-nav-name">Chargement...</span>
-          <svg class="chev" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+          <span id="user-nav-name">Chargement…</span>
+          <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
           <div class="user-dropdown" id="userDropdown" onclick="event.stopPropagation()">
-            <a class="dropdown-item" href="/index2.html">Tableau de bord</a>
-            <div class="dropdown-divider"></div>
-            <button class="dropdown-item danger" onclick="confirmLogout()">Déconnexion</button>
+            <div class="dropdown-item" onclick="confirmLogout()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Se déconnecter
+            </div>
           </div>
         </div>
       </div>
     </nav>
 
-    <main class="rdv-container">
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside>
+        <ul class="side-nav">
+          <li>
+            <a href="index2.html">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              Tableau de bord
+            </a>
+          </li>
+          <li class="active">
+            <a href="rendez-vous.html">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              Mes rendez-vous
+            </a>
+          </li>
+          <li>
+            <a href="documents.html">
+              <svg viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Mes documents
+            </a>
+          </li>
+          <li>
+            <a href="messagerie.html">
+              <svg viewBox="0 0 24 24">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              Ma messagerie
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="rdv-main">
+        <div class="rdv-container">
       <!-- Tabs navigation -->
       <div class="tabs-nav">
         <button class="tab-btn active" data-tab="myrdv" onclick="switchTab('myrdv')">
@@ -117,7 +176,9 @@
           </div>
         </section>
       </div>
-    </main>
+        </div>
+      </main>
+    </div>
 
     <!-- Logout confirmation modal -->
     <div class="logout-overlay" id="logoutOverlay" onclick="closeLogoutModal()">

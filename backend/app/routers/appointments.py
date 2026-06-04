@@ -16,7 +16,7 @@ from app.schemas.appointment import (
     SlotOut,
     DoctorOut,
 )
-from app.services.auth import get_current_user
+from app.dependencies import get_current_user
 from app.models.user import User
 
 router = APIRouter(tags=["appointments"])
@@ -46,7 +46,7 @@ def _build_appt_out(a: Appointment) -> dict:
 
 
 @router.get("/doctors", response_model=list[DoctorOut])
-def list_doctors(db: Session = Depends(get_db)):
+def list_doctors(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     doctors = db.query(Staff).filter(Staff.type_staff == "medecin").all()
     return [
         {
@@ -64,6 +64,7 @@ def list_doctors(db: Session = Depends(get_db)):
 def available_slots(
     doctor_id: int,
     date: str,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     try:
@@ -195,10 +196,18 @@ def create_appointment(
     db: Session = Depends(get_db),
 ):
     role = current_user.role.code_role
-    statut = "en_attente" if role == "patient" else "confirmé"
+    if role == "patient":
+        patient = db.query(Patient).filter(Patient.id_user == current_user.id_user).first()
+        if not patient:
+            raise HTTPException(status_code=403, detail="Profil patient introuvable.")
+        id_patient = patient.id_patient
+        statut = "en_attente"
+    else:
+        id_patient = data.id_patient
+        statut = "confirmé"
 
     appt = Appointment(
-        id_patient=data.id_patient,
+        id_patient=id_patient,
         id_staff=data.id_staff,
         id_room=data.id_room,
         id_appointment_type=data.id_appointment_type,
@@ -216,13 +225,13 @@ def create_appointment(
 
 
 @router.get("/types")
-def list_appointment_types(db: Session = Depends(get_db)):
+def list_appointment_types(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     types = db.query(AppointmentType).all()
     return [{"id_appointment_type": t.id_appointment_type, "libelle": t.libelle} for t in types]
 
 
 @router.get("/rooms")
-def list_rooms(db: Session = Depends(get_db)):
+def list_rooms(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     rooms = db.query(Room).filter(Room.is_active == True).all()
     return [{"id_room": r.id_room, "nom": r.nom} for r in rooms]
 

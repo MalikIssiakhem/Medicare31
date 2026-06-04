@@ -7,6 +7,8 @@ from pydantic import BaseModel
 from app.db import get_db
 from app.models.patient import Patient, PatientContact
 from app.models.appointment import Appointment
+from app.models.user import User
+from app.dependencies import require_staff, get_current_user, STAFF_ROLES
 
 router = APIRouter(prefix="/api/patients", tags=["patients"])
 
@@ -101,6 +103,7 @@ def list_patients(
     sort_dir: Literal["asc", "desc"] = Query("asc"),
     skip: int = Query(0, ge=0),
     limit: int = Query(8, ge=1, le=100),
+    current_user: User = Depends(require_staff),
     db: Session = Depends(get_db),
 ):
     col = _SORT_COLUMNS[sort_by]
@@ -125,6 +128,7 @@ def count_patients(
     search: Optional[str] = Query(None),
     statut: Optional[str] = Query(None),
     medecin_traitant_id: Optional[int] = Query(None),
+    current_user: User = Depends(require_staff),
     db: Session = Depends(get_db),
 ):
     q = db.query(Patient)
@@ -140,7 +144,7 @@ def count_patients(
 
 
 @router.get("/stats")
-def patient_stats(db: Session = Depends(get_db)):
+def patient_stats(current_user: User = Depends(require_staff), db: Session = Depends(get_db)):
     today = date.today()
 
     nouveaux_ce_mois = db.query(Patient).filter(
@@ -170,7 +174,7 @@ def patient_stats(db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=PatientOut, status_code=201)
-def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
+def create_patient(data: PatientCreate, current_user: User = Depends(require_staff), db: Session = Depends(get_db)):
     patient = Patient(
         numero_dossier=_next_dossier(db),
         **{k: v for k, v in data.model_dump(exclude={"contact"}).items()},
@@ -186,7 +190,19 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/{patient_id}", response_model=PatientOut)
-def get_patient(patient_id: int, db: Session = Depends(get_db)):
+def get_patient(
+    patient_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    is_staff = bool(current_user.role) and current_user.role.code_role in STAFF_ROLES
+    is_owner = (
+        current_user.patient_profile is not None
+        and current_user.patient_profile.id_patient == patient_id
+    )
+    if not (is_staff or is_owner):
+        raise HTTPException(status_code=403, detail="Accès non autorisé à ce dossier patient.")
+
     patient = (
         db.query(Patient)
         .options(joinedload(Patient.contact))
@@ -199,7 +215,7 @@ def get_patient(patient_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{patient_id}", response_model=PatientOut)
-def update_patient(patient_id: int, data: PatientCreate, db: Session = Depends(get_db)):
+def update_patient(patient_id: int, data: PatientCreate, current_user: User = Depends(require_staff), db: Session = Depends(get_db)):
     patient = db.query(Patient).filter(Patient.id_patient == patient_id).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient introuvable")
@@ -220,7 +236,7 @@ def update_patient(patient_id: int, data: PatientCreate, db: Session = Depends(g
 
 
 @router.delete("/{patient_id}", status_code=204)
-def delete_patient(patient_id: int, db: Session = Depends(get_db)):
+def delete_patient(patient_id: int, current_user: User = Depends(require_staff), db: Session = Depends(get_db)):
     patient = db.query(Patient).filter(Patient.id_patient == patient_id).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient introuvable")

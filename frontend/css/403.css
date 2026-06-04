@@ -1,0 +1,135 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --tape-yellow: #f4c430;
+  --tape-dark: #161616;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  font-family: "Source Sans 3", sans-serif;
+  color: #fff;
+  background:
+    radial-gradient(120% 90% at 50% -10%, #2f6bb0 0%, #1d4a85 38%, #112f59 72%, #0c2244 100%);
+}
+
+/* Texture toile bleue subtile */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .35;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px);
+}
+
+/* ── Contenu ── */
+.err-content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  padding: 24px;
+}
+
+.err-code {
+  font-family: "Nunito", sans-serif;
+  font-weight: 900;
+  font-size: clamp(6rem, 22vw, 12.5rem);
+  line-height: .95;
+  letter-spacing: -.04em;
+  color: #eaf2fb;
+  text-shadow:
+    0 2px 0 rgba(0,0,0,.12),
+    0 18px 50px rgba(0,0,0,.35);
+}
+
+.err-title {
+  font-family: "Nunito", sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  letter-spacing: .01em;
+  margin-top: 2px;
+  color: #ffffff;
+}
+
+.err-msg {
+  margin-top: 12px;
+  font-size: clamp(.9rem, 2vw, 1rem);
+  color: rgba(226, 238, 252, .72);
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.55;
+}
+
+.err-actions { margin-top: 30px; }
+
+.err-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: .95rem;
+  text-decoration: none;
+  color: #11305a;
+  background: #eaf2fb;
+  border: 1.5px solid rgba(255,255,255,.6);
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  transition: transform .15s, background .15s, box-shadow .15s;
+}
+.err-btn:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.34);
+}
+
+/* ── Ruban de chantier ── */
+.tape {
+  position: absolute;
+  left: -12%;
+  width: 124%;
+  height: 54px;
+  z-index: 2;
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--tape-yellow) 0,
+    var(--tape-yellow) 24px,
+    var(--tape-dark) 24px,
+    var(--tape-dark) 48px
+  );
+  border-top: 2px solid rgba(0, 0, 0, .45);
+  border-bottom: 2px solid rgba(0, 0, 0, .45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+  opacity: .97;
+}
+.tape-1 { top: 62%; transform: rotate(-8deg); }
+.tape-2 { top: 71%; transform: rotate(6deg); }
+
+/* ── Étincelle déco ── */
+.err-spark {
+  position: absolute;
+  right: 7%;
+  bottom: 9%;
+  z-index: 3;
+  font-size: 1.4rem;
+  color: rgba(234, 242, 251, .55);
+  animation: spark 2.6s ease-in-out infinite;
+}
+@keyframes spark {
+  0%, 100% { opacity: .35; transform: scale(.9) rotate(0deg); }
+  50% { opacity: .9; transform: scale(1.15) rotate(20deg); }
+}
+
+@media (max-width: 600px) {
+  .tape { height: 40px; }
+  .tape-1 { top: 64%; }
+  .tape-2 { top: 72%; }
+}

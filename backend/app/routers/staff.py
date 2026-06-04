@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.db import get_db
 from app.models.staff import Staff
+from app.models.user import User
+from app.dependencies import require_staff
 
 router = APIRouter(prefix="/api/staff", tags=["staff"])
 
@@ -20,7 +22,7 @@ class MedecinOut(BaseModel):
 
 
 @router.get("/medecins", response_model=list[MedecinOut])
-def list_medecins(db: Session = Depends(get_db)):
+def list_medecins(current_user: User = Depends(require_staff), db: Session = Depends(get_db)):
     return (
         db.query(Staff)
         .filter(Staff.type_staff == "medecin")

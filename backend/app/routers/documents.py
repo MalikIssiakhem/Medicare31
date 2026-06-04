@@ -12,7 +12,7 @@ from app.db import get_db
 from app.models.medical import Document
 from app.models.patient import Patient
 from app.models.user import User
-from app.services.auth import get_current_user
+from app.dependencies import get_current_user, require_staff, STAFF_ROLES
 from app.schemas.documents import DocumentOut, DocumentUpdate
 
 router = APIRouter(prefix="/api/documents", tags=["documents"])
@@ -70,8 +70,14 @@ def list_documents(
     if status:
         q = q.filter(Document.status == status)
 
-    if patient_id:
-        q = q.filter(Document.id_patient == patient_id)
+    if current_user.role.code_role in STAFF_ROLES:
+        if patient_id:
+            q = q.filter(Document.id_patient == patient_id)
+    else:
+        my_pid = current_user.patient_profile.id_patient if current_user.patient_profile else None
+        if my_pid is None:
+            return []
+        q = q.filter(Document.id_patient == my_pid)
 
     return q.offset(skip).limit(limit).all()
 
@@ -79,7 +85,7 @@ def list_documents(
 @router.get("/stats")
 def document_stats(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_staff),
 ):
     base = db.query(Document).filter(Document.deleted_at.is_(None))
 
@@ -101,7 +107,7 @@ def upload_document(
     document_date: Optional[str] = Form(None),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_staff),
 ):
     patient = db.query(Patient).filter(Patient.id_patient == id_patient).first()
     if not patient:
@@ -164,6 +170,11 @@ def get_document(
     if not doc:
         raise HTTPException(status_code=404, detail="Document introuvable")
 
+    if current_user.role.code_role not in STAFF_ROLES:
+        my_pid = current_user.patient_profile.id_patient if current_user.patient_profile else None
+        if doc.id_patient != my_pid:
+            raise HTTPException(status_code=403, detail="Accès non autorisé à ce document.")
+
     return doc
 
 
@@ -180,6 +191,11 @@ def download_document(
 
     if not doc:
         raise HTTPException(status_code=404, detail="Document introuvable")
+
+    if current_user.role.code_role not in STAFF_ROLES:
+        my_pid = current_user.patient_profile.id_patient if current_user.patient_profile else None
+        if doc.id_patient != my_pid:
+            raise HTTPException(status_code=403, detail="Accès non autorisé à ce document.")
 
     file_path = _document_file_path(doc)
 
@@ -208,7 +224,7 @@ def update_document(
     document_id: int,
     data: DocumentUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_staff),
 ):
     doc = db.query(Document).filter(
         Document.id_document == document_id,
@@ -233,7 +249,7 @@ def update_document(
 def delete_document(
     document_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_staff),
 ):
     doc = db.query(Document).filter(
         Document.id_document == document_id,

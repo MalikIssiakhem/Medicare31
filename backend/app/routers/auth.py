@@ -27,8 +27,8 @@ from app.services.auth import (
     create_password_reset_token,
     decode_verification_token,
     decode_password_reset_token,
-    get_current_user,
 )
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 

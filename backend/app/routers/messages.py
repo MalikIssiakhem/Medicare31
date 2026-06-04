@@ -16,7 +16,7 @@ from app.schemas.message import (
     MessageCreate,
     ConversationCreate,
 )
-from app.services.auth import get_current_user
+from app.dependencies import get_current_user, STAFF_ROLES
 from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/api/messages", tags=["messages"])
@@ -113,7 +113,7 @@ def list_message_users(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    users = (
+    query = (
         db.query(User)
         .options(
             joinedload(User.role),
@@ -122,9 +122,15 @@ def list_message_users(
         )
         .filter(User.is_active == True)
         .filter(User.id_user != current_user.id_user)
-        .order_by(User.email.asc())
-        .all()
     )
+
+    # Un patient ne peut écrire qu'au personnel (pas aux autres patients).
+    if current_user.role and current_user.role.code_role == "patient":
+        query = query.join(Role, Role.id_role == User.id_role).filter(
+            Role.code_role.in_(STAFF_ROLES)
+        )
+
+    users = query.order_by(User.email.asc()).all()
 
     return [_user_to_mini(user) for user in users]
 

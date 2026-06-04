@@ -9,7 +9,7 @@ from app.db import get_db
 from app.models.appointment import Appointment
 from app.models.patient import Patient
 from app.models.user import User
-from app.services.auth import get_current_user
+from app.dependencies import get_current_user
 
 
 router = APIRouter(prefix="/api/chatbot", tags=["chatbot"])

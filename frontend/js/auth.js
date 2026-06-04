@@ -17,7 +17,7 @@ function staffGuard() {
   }
   const user = getUser();
   if (!_STAFF_ROLES.includes(user.role)) {
-    window.location.replace("index2.html");
+    window.location.replace("403.html");
   }
 }
 
@@ -199,6 +199,16 @@ function _buildChangePwdOverlay() {
   return overlay;
 }
 
+const _STAFF_VISIBILITY_ROLES = ["medecin", "secretariat", "admin"];
+
+function applyRoleVisibility() {
+  const role = (getUser().role || "").toLowerCase();
+  if (_STAFF_VISIBILITY_ROLES.includes(role)) return;
+  document.querySelectorAll("[data-staff-only]").forEach((el) => {
+    el.style.display = "none";
+  });
+}
+
 function _injectChangePwdMenuItem() {
   const dropdown = document.getElementById("userDropdown");
   if (!dropdown || document.getElementById("cp-menu-item")) return;
@@ -214,3 +224,4 @@ function _injectChangePwdMenuItem() {
 }
 
 document.addEventListener("DOMContentLoaded", _injectChangePwdMenuItem);
+document.addEventListener("DOMContentLoaded", applyRoleVisibility);

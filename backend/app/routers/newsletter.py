@@ -5,7 +5,7 @@ from app.db import get_db
 from app.models.user import User
 from app.models.patient import Patient, PatientSecurity
 from app.schemas.user import NewsletterBroadcast
-from app.services.auth import get_current_user
+from app.dependencies import get_current_user
 from app.services.email import send_campaign_email
 
 router = APIRouter(prefix="/api/newsletter", tags=["newsletter"])

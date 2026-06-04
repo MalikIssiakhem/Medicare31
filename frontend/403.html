@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>403 — Accès interdit · MediCare31</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/403.css" />
+  </head>
+  <body>
+    <div class="tape tape-1"></div>
+    <div class="tape tape-2"></div>
+
+    <main class="err-content">
+      <div class="err-code">403</div>
+      <h1 class="err-title">Accès interdit</h1>
+      <p class="err-msg">Vous n'avez pas la permission d'accéder à cette ressource.</p>
+      <div class="err-actions">
+        <a href="login.html" id="backBtn" class="err-btn">Retour à mon espace</a>
+      </div>
+    </main>
+
+    <div class="err-spark">✦</div>
+
+    <script src="js/auth.js"></script>
+    <script>
+      (function () {
+        const link = document.getElementById("backBtn");
+        const user = typeof getUser === "function" ? getUser() : {};
+        const role = (user.role || "").toLowerCase();
+        const dest = {
+          patient: "index2.html",
+          medecin: "index.html",
+          secretariat: "index3.html",
+          admin: "index.html",
+        }[role];
+        if (dest) {
+          link.setAttribute("href", dest);
+        } else {
+          link.textContent = "Retour à la connexion";
+        }
+      })();
+    </script>
+  </body>
+</html>
