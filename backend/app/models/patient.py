@@ -18,6 +18,7 @@ class Patient(Base):
     numero_securite_sociale = Column(String(30))
     groupe_sanguin = Column(String(10))
     allergie_resume = Column(Text)
+    photo_url = Column(String(500), nullable=True)
     statut_patient = Column(String(30), default="actif")  # actif, suivi, nouveau, inactif
     medecin_traitant_id = Column(Integer, ForeignKey("staff.id_staff"), nullable=True)
     created_at = Column(DateTime, server_default=func.now())

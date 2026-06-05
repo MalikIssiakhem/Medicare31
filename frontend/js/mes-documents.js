@@ -2,6 +2,7 @@ authGuard();
 initUserNav();
 
 const TYPE_LABELS = {
+  carnet_sante: "Carnet de santé",
   ordonnance: "Ordonnance",
   analyse: "Analyse",
   certificat: "Certificat",

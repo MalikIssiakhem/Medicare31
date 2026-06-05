@@ -8,4 +8,5 @@ from app.models.appointment import Appointment
 from app.models.message import ConversationThread, ConversationParticipant, Message, MessageAttachment
 from app.models.notification import Notification
 from app.models.task import Task
+from app.models.call import Call
 from app.models import *

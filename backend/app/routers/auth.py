@@ -132,6 +132,11 @@ def register(
     db.commit()
     db.refresh(user)
 
+    if role_code == "patient":
+        db.refresh(patient)
+        from app.services.health_booklet import create_health_booklet
+        create_health_booklet(db, patient, user.id_user)
+
     token = create_verification_token(user.id_user)
     try:
         from app.services.email import send_verification_email
@@ -208,6 +213,10 @@ def register_patient(
     ))
 
     db.commit()
+
+    db.refresh(patient)
+    from app.services.health_booklet import create_health_booklet
+    create_health_booklet(db, patient, user.id_user)
 
     token = create_verification_token(user.id_user)
     try:
@@ -369,16 +378,19 @@ def _get_or_create_mock_user(email: str, nom: str, prenom: str, db: Session) -> 
         from app.models.patient import Patient
         import time
 
-        db.add(Patient(
+        patient = Patient(
             id_user=user.id_user,
             numero_dossier=f"MOCK-{int(time.time())}",
             nom=nom,
             prenom=prenom,
             date_naissance=date(2000, 1, 1),
-        ))
+        )
+        db.add(patient)
 
         db.commit()
-        db.refresh(user)
+        db.refresh(patient)
+        from app.services.health_booklet import create_health_booklet
+        create_health_booklet(db, patient, user.id_user)
 
     return _build_token(user)
 

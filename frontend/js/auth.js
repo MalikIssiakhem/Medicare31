@@ -226,5 +226,33 @@ function _injectChangePwdMenuItem() {
   dropdown.insertBefore(item, dropdown.firstChild);
 }
 
+function _injectProfileMenuItem() {
+  if ((getUser().role || "").toLowerCase() !== "patient") return;
+  const dropdown = document.getElementById("userDropdown");
+  if (!dropdown || document.getElementById("profile-menu-item")) return;
+  const item = document.createElement("a");
+  item.className = "dropdown-item";
+  item.id = "profile-menu-item";
+  item.href = "mon-profil.html";
+  item.style.color = "#2c5f9e";
+  item.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Mon profil`;
+  dropdown.insertBefore(item, dropdown.firstChild);
+}
+
+// Le "Tableau de bord" du staff pointe en dur vers index.html (dashboard médecin).
+// On le réaligne sur le dashboard du rôle (secrétariat -> index3, patient -> index2).
+function fixDashboardLinks() {
+  const role = (getUser().role || "").toLowerCase();
+  const dash = role === "secretariat" ? "index3.html" : role === "patient" ? "index2.html" : null;
+  if (!dash) return;
+  document
+    .querySelectorAll('.side-nav a[href="index.html"], a.logo[href="index.html"]')
+    .forEach((a) => a.setAttribute("href", dash));
+}
+
 document.addEventListener("DOMContentLoaded", _injectChangePwdMenuItem);
 document.addEventListener("DOMContentLoaded", applyRoleVisibility);
+document.addEventListener("DOMContentLoaded", _injectProfileMenuItem);
+document.addEventListener("DOMContentLoaded", fixDashboardLinks);

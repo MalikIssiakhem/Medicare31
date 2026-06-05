@@ -14,6 +14,9 @@ from app.routers import (
     chatbot,
     documents,
     newsletter,
+    medical,
+    profile,
+    calls,
 )
 
 
@@ -91,10 +94,36 @@ def _sync_document_columns() -> None:
             conn.execute(text(statement))
 
 
+def _sync_patient_columns() -> None:
+    from sqlalchemy import inspect, text
+
+    existing = {col["name"] for col in inspect(engine).get_columns("patients")}
+    if "photo_url" in existing:
+        return
+
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE patients ADD COLUMN photo_url VARCHAR(500)"))
+
+
+def _sync_call_columns() -> None:
+    from sqlalchemy import inspect, text
+
+    if inspect(engine).get_table_names().count("calls") == 0:
+        return
+    existing = {col["name"] for col in inspect(engine).get_columns("calls")}
+    if "rappel_at" in existing:
+        return
+
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE calls ADD COLUMN rappel_at TIMESTAMP"))
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     _sync_document_columns()
+    _sync_patient_columns()
+    _sync_call_columns()
     _seed_roles()
     _seed_reference_data()
     yield
@@ -118,6 +147,9 @@ app.include_router(staff.router)
 app.include_router(chatbot.router)
 app.include_router(documents.router)
 app.include_router(newsletter.router)
+app.include_router(medical.router)
+app.include_router(profile.router)
+app.include_router(calls.router)
 
 
 @app.get("/api/health")

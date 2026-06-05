@@ -14,7 +14,7 @@ from app.models.user import User
 from app.models.staff import Staff
 from app.models.patient import Patient, PatientContact
 from app.services.auth import hash_password
-from datetime import date
+from datetime import date, datetime
 
 
 USERS_TO_CREATE = [
@@ -85,6 +85,49 @@ USERS_TO_CREATE = [
 ]
 
 
+def _seed_medical_events(db, patient):
+    from app.models.medical import MedicalEvent
+    from app.models.staff import Staff
+
+    if db.query(MedicalEvent).filter(MedicalEvent.id_patient == patient.id_patient).first():
+        return
+
+    medecin = db.query(Staff).filter(Staff.type_staff == "medecin").first()
+    sid = medecin.id_staff if medecin else None
+
+    events = [
+        ("consultation", "Consultation de suivi", datetime(2026, 5, 22, 10, 0), "Cabinet 1"),
+        ("bilan", "Bilan sanguin annuel", datetime(2026, 3, 18, 9, 30), "Laboratoire central"),
+        ("consultation", "Renouvellement d'ordonnance", datetime(2025, 12, 5, 16, 0), "Cabinet 2"),
+    ]
+    for type_event, titre, dt, loc in events:
+        db.add(MedicalEvent(
+            id_patient=patient.id_patient,
+            type_event=type_event,
+            titre=titre,
+            event_date=dt,
+            id_staff=sid,
+            location=loc,
+        ))
+    db.commit()
+
+
+def _seed_vitals(db, patient):
+    from app.models.medical import MedicalVital
+
+    if db.query(MedicalVital).filter(MedicalVital.id_patient == patient.id_patient).first():
+        return
+
+    db.add(MedicalVital(
+        id_patient=patient.id_patient,
+        taille_cm=178,
+        poids_kg=78,
+        tension_arterielle="125/80",
+        date_mesure=datetime(2026, 5, 22, 10, 0),
+    ))
+    db.commit()
+
+
 def seed():
     db = SessionLocal()
     try:
@@ -140,6 +183,14 @@ def seed():
                     db.add(contact)
 
             db.commit()
+
+            if "patient" in entry:
+                from app.services.health_booklet import create_health_booklet
+                db.refresh(patient)
+                create_health_booklet(db, patient, user.id_user)
+                _seed_medical_events(db, patient)
+                _seed_vitals(db, patient)
+
             print(f"  [OK] {entry['email']} ({entry['role_code']}) créé — mot de passe : {entry['password']}")
 
     except Exception as exc:
