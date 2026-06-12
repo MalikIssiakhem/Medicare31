@@ -210,6 +210,9 @@ function applyRoleVisibility() {
   document.querySelectorAll("[data-patient-only]").forEach((el) => {
     el.style.display = isStaff ? "none" : "";
   });
+  document.querySelectorAll("[data-secretariat-only]").forEach((el) => {
+    el.style.display = role === "secretariat" ? "" : "none";
+  });
 }
 
 function _injectChangePwdMenuItem() {

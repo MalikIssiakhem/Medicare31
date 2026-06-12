@@ -450,3 +450,107 @@
     .page-header { align-items: flex-start; flex-direction: column; }
     .stats-row { grid-template-columns: 1fr; }
   }
+
+/* ── Dropdown utilisateur + déconnexion (fonctionnel) ── */
+.user-chip { position: relative; }
+.user-chip .chevron { transition: transform .2s; }
+.user-chip.open .chevron { transform: rotate(180deg); }
+
+.user-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #d6e2f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(44, 95, 158, .16);
+  min-width: 200px;
+  z-index: 300;
+  padding: 6px 0;
+}
+.user-dropdown.open { display: block; }
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 600;
+  color: #ef4444;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: left;
+  text-decoration: none;
+  transition: background .15s;
+}
+.dropdown-item:hover { background: #fef2f2; }
+.dropdown-item svg {
+  width: 16px; height: 16px;
+  stroke: currentColor;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.logout-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 35, 60, .5);
+  backdrop-filter: blur(5px);
+  z-index: 1100;
+  align-items: center;
+  justify-content: center;
+}
+.logout-overlay.open { display: flex; }
+
+.logout-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 36px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 8px 40px rgba(44, 95, 158, .16);
+  text-align: center;
+}
+.logout-modal h3 {
+  margin: 0 0 8px;
+  font-family: "Nunito", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e2d45;
+}
+.logout-modal p {
+  color: #4a5f7a;
+  font-size: .93rem;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+.logout-modal-actions { display: flex; gap: 10px; justify-content: center; }
+.btn-cancel-logout {
+  background: #eef2f7;
+  color: #4a5f7a;
+  border: 1.5px solid #d6e2f0;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-cancel-logout:hover { background: #e8f1fb; border-color: #4f8fda; color: #2c5f9e; }
+.btn-confirm-logout {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-confirm-logout:hover { background: #b91c1c; }
