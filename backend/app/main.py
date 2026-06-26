@@ -1,4 +1,8 @@
 from contextlib import asynccontextmanager
+import logging
+import os
+import sys
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -18,6 +22,50 @@ from app.routers import (
     profile,
     calls,
 )
+
+
+def _configure_logging() -> None:
+    """
+    Configure le logging global de l'application.
+
+    Objectifs :
+      - Émettre les logs sur stdout pour qu'ils apparaissent dans
+        `docker compose logs backend`.
+      - Avoir un format lisible (timestamp + niveau + logger + message).
+      - Réduire la verbosité des libs bruyantes (SQLAlchemy, access log).
+      - Laisser le niveau INFO par défaut, modifiable via la variable
+        d'environnement LOG_LEVEL (DEBUG / INFO / WARNING / ERROR).
+    """
+    level_name = os.environ.get("LOG_LEVEL", "INFO").upper()
+    level = getattr(logging, level_name, logging.INFO)
+
+    root = logging.getLogger()
+    # Évite d'empiler les handlers si main est rechargé (uvicorn --reload)
+    for handler in list(root.handlers):
+        root.removeHandler(handler)
+
+    handler = logging.StreamHandler(stream=sys.stdout)
+    handler.setFormatter(
+        logging.Formatter(
+            fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+    )
+    root.addHandler(handler)
+    root.setLevel(level)
+
+    # Libs trop bavardes à INFO — on les calme
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+    logging.getLogger("uvicorn.access").setLevel(logging.INFO)
+    logging.getLogger("uvicorn.error").setLevel(logging.INFO)
+    logging.getLogger("passlib").setLevel(logging.WARNING)
+
+    # Logger applicatif bien visible
+    logging.getLogger("app").setLevel(level)
+
+    logging.getLogger("app.startup").info(
+        "Logging configuré (niveau=%s)", logging.getLevelName(level)
+    )
 
 
 def _seed_roles() -> None:
@@ -126,8 +174,23 @@ async def lifespan(app: FastAPI):
     _sync_call_columns()
     _seed_roles()
     _seed_reference_data()
+
+    # Affiche la config SMTP chargée pour faciliter le diagnostic
+    from app.config import settings
+    smtp_logger = logging.getLogger("app.smtp")
+    smtp_logger.info(
+        "SMTP configuré : host=%s port=%s user=%s tls=%s",
+        settings.smtp_host,
+        settings.smtp_port,
+        settings.smtp_user or "(vide)",
+        settings.smtp_use_tls or bool(settings.smtp_user),
+    )
+
     yield
 
+
+# Initialisation du logging AVANT la création de l'app FastAPI
+_configure_logging()
 
 app = FastAPI(title="Medicare31 API", version="1.0.0", lifespan=lifespan)
 
