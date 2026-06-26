@@ -21,6 +21,7 @@ from app.routers import (
     medical,
     profile,
     calls,
+    health,
 )
 
 
@@ -213,8 +214,10 @@ app.include_router(newsletter.router)
 app.include_router(medical.router)
 app.include_router(profile.router)
 app.include_router(calls.router)
+app.include_router(health.router)
 
 
 @app.get("/api/health")
-def health():
+def health_root():
+    """Alias pour GET /api/health (cohérence avec l'ancien chemin)."""
     return {"status": "ok", "service": "Medicare31 API"}
