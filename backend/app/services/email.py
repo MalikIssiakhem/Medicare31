@@ -2,11 +2,43 @@ import ssl
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import logging
 
 from app.config import settings
 
+logger = logging.getLogger(__name__)
 
-def send_email(to_email: str, subject: str, html: str, text: str | None = None, from_email: str | None = None) -> None:
+
+def send_email(
+    to_email: str,
+    subject: str,
+    html: str,
+    text: str | None = None,
+    from_email: str | None = None,
+) -> bool:
+    """
+    Envoie un email via SMTP.
+
+    Returns:
+        True si l'email a été envoyé avec succès, False sinon.
+        Les erreurs sont journalisées (logger) et jamais silencieuses.
+    """
+    # 1. Validation explicite de la configuration SMTP
+    if not settings.smtp_host:
+        logger.error("❌ SMTP_HOST non configuré — email NON envoyé (vers %s)", to_email)
+        return False
+
+    # 2. Si on a un username, on exige un password (sinon config incohérente)
+    if settings.smtp_user and not settings.smtp_password:
+        logger.error(
+            "❌ SMTP_USER défini mais SMTP_PASSWORD manquant — email NON envoyé (vers %s)",
+            to_email,
+        )
+        return False
+
+    logger.info("📧 Envoi d'un email à %s via %s:%s (sujet: %s)",
+                to_email, settings.smtp_host, settings.smtp_port, subject)
+
     message = MIMEMultipart("alternative")
     message["Subject"] = subject
     message["From"] = f"MediCare31 <{from_email or settings.smtp_from}>"
@@ -17,18 +49,57 @@ def send_email(to_email: str, subject: str, html: str, text: str | None = None, 
     message.attach(MIMEText(html, "html", "utf-8"))
 
     use_tls = settings.smtp_use_tls or bool(settings.smtp_user)
+
     try:
         with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10) as server:
             server.ehlo()
             if use_tls:
                 server.starttls(context=ssl.create_default_context())
                 server.ehlo()
+
             if settings.smtp_user:
                 server.login(settings.smtp_user, settings.smtp_password)
-            server.sendmail(from_email or settings.smtp_from, to_email, message.as_string())
-        print(f"[EMAIL] Envoyé vers {to_email} : {subject}")
-    except Exception as exc:
-        print(f"[EMAIL] ÉCHEC envoi vers {to_email} ({settings.smtp_host}:{settings.smtp_port}, tls={use_tls}) : {exc}")
+
+            server.sendmail(
+                from_email or settings.smtp_from,
+                to_email,
+                message.as_string(),
+            )
+
+        logger.info("✅ Email envoyé avec succès à %s", to_email)
+        return True
+
+    except smtplib.SMTPAuthenticationError as exc:
+        logger.error(
+            "❌ Échec d'authentification SMTP pour %s (vérifie SMTP_USER/SMTP_PASSWORD) : %s",
+            settings.smtp_user, exc,
+        )
+        return False
+
+    except smtplib.SMTPConnectError as exc:
+        logger.error(
+            "❌ Impossible de se connecter à %s:%s — %s",
+            settings.smtp_host, settings.smtp_port, exc,
+        )
+        return False
+
+    except smtplib.SMTPServerDisconnected as exc:
+        logger.error("❌ Serveur SMTP déconnecté : %s", exc)
+        return False
+
+    except smtplib.SMTPException as exc:
+        logger.error("❌ Erreur SMTP générique vers %s : %s", to_email, exc)
+        return False
+
+    except OSError as exc:
+        # DNS, timeout réseau, refus de connexion...
+        logger.error("❌ Erreur réseau vers %s:%s — %s",
+                     settings.smtp_host, settings.smtp_port, exc)
+        return False
+
+    except Exception as exc:  # noqa: BLE001 — dernier filet de sécurité
+        logger.exception("❌ Erreur inattendue lors de l'envoi à %s", to_email)
+        return False
 
 
 def send_verification_email(to_email: str, prenom: str, token: str) -> None:
